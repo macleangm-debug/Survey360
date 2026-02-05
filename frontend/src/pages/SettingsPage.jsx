@@ -12,7 +12,14 @@ import {
   Save,
   Moon,
   Sun,
-  Check
+  Check,
+  Download,
+  Database,
+  Copy,
+  RefreshCw,
+  Eye,
+  EyeOff,
+  FileText
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -21,6 +28,7 @@ import { Label } from '../components/ui/label';
 import { Switch } from '../components/ui/switch';
 import { Separator } from '../components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Badge } from '../components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -49,12 +57,30 @@ export function SettingsPage() {
     emailDigest: false,
     pushEnabled: false,
   });
+
+  const [orgSettings, setOrgSettings] = useState({
+    requireGPS: true,
+    autoApprove: false,
+    duplicateDetection: true,
+    require2FA: false,
+    apiAccess: true,
+    autoApproveThreshold: 90,
+  });
+
+  const [exportSettings, setExportSettings] = useState({
+    defaultFormat: 'csv',
+    includeMetadata: true,
+    dateFormat: 'ISO',
+    timezone: 'UTC',
+  });
+
+  const [apiKey, setApiKey] = useState('dp_sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+  const [showApiKey, setShowApiKey] = useState(false);
   
   const [saving, setSaving] = useState(false);
 
   const handleSaveProfile = async () => {
     setSaving(true);
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     toast.success('Profile updated');
     setSaving(false);
@@ -67,6 +93,31 @@ export function SettingsPage() {
     setSaving(false);
   };
 
+  const handleSaveOrganization = async () => {
+    setSaving(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    toast.success('Organization settings saved');
+    setSaving(false);
+  };
+
+  const handleSaveExport = async () => {
+    setSaving(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    toast.success('Export settings saved');
+    setSaving(false);
+  };
+
+  const handleRegenerateApiKey = () => {
+    const newKey = `dp_sk_live_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+    setApiKey(newKey);
+    toast.success('API key regenerated');
+  };
+
+  const handleCopyApiKey = () => {
+    navigator.clipboard.writeText(apiKey);
+    toast.success('API key copied to clipboard');
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6 max-w-4xl" data-testid="settings-page">
@@ -77,11 +128,12 @@ export function SettingsPage() {
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-[400px]">
+          <TabsList className="grid w-full grid-cols-5 lg:w-[500px]">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="notifications">Alerts</TabsTrigger>
             <TabsTrigger value="organization">Organization</TabsTrigger>
+            <TabsTrigger value="api">API & Export</TabsTrigger>
           </TabsList>
 
           {/* Profile Tab */}
@@ -144,6 +196,8 @@ export function SettingsPage() {
                       <SelectContent>
                         <SelectItem value="en">English</SelectItem>
                         <SelectItem value="sw">Kiswahili</SelectItem>
+                        <SelectItem value="fr">Français</SelectItem>
+                        <SelectItem value="es">Español</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">
@@ -341,7 +395,7 @@ export function SettingsPage() {
                 <Separator />
 
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium">Data Settings</h4>
+                  <h4 className="text-sm font-medium">Data Collection Settings</h4>
                   
                   <div className="flex items-center justify-between">
                     <div>
@@ -350,17 +404,44 @@ export function SettingsPage() {
                         All submissions must include GPS coordinates
                       </p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={orgSettings.requireGPS}
+                      onCheckedChange={(checked) => setOrgSettings({ ...orgSettings, requireGPS: checked })}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Auto-approve Submissions</Label>
                       <p className="text-sm text-muted-foreground">
-                        Submissions with 90%+ quality score are auto-approved
+                        Submissions with high quality scores are auto-approved
                       </p>
                     </div>
-                    <Switch />
+                    <div className="flex items-center gap-3">
+                      <Switch 
+                        checked={orgSettings.autoApprove}
+                        onCheckedChange={(checked) => setOrgSettings({ ...orgSettings, autoApprove: checked })}
+                      />
+                      {orgSettings.autoApprove && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Threshold:</span>
+                          <Select 
+                            value={String(orgSettings.autoApproveThreshold)} 
+                            onValueChange={(v) => setOrgSettings({ ...orgSettings, autoApproveThreshold: Number(v) })}
+                          >
+                            <SelectTrigger className="w-20 h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="80">80%</SelectItem>
+                              <SelectItem value="85">85%</SelectItem>
+                              <SelectItem value="90">90%</SelectItem>
+                              <SelectItem value="95">95%</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -370,7 +451,10 @@ export function SettingsPage() {
                         Flag potentially duplicate submissions
                       </p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={orgSettings.duplicateDetection}
+                      onCheckedChange={(checked) => setOrgSettings({ ...orgSettings, duplicateDetection: checked })}
+                    />
                   </div>
                 </div>
 
@@ -386,7 +470,10 @@ export function SettingsPage() {
                         Require 2FA for all organization members
                       </p>
                     </div>
-                    <Switch />
+                    <Switch 
+                      checked={orgSettings.require2FA}
+                      onCheckedChange={(checked) => setOrgSettings({ ...orgSettings, require2FA: checked })}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -396,14 +483,219 @@ export function SettingsPage() {
                         Allow API access for integrations
                       </p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={orgSettings.apiAccess}
+                      onCheckedChange={(checked) => setOrgSettings({ ...orgSettings, apiAccess: checked })}
+                    />
                   </div>
                 </div>
 
                 <div className="flex justify-end">
-                  <Button>
+                  <Button onClick={handleSaveOrganization} disabled={saving}>
                     <Save className="w-4 h-4 mr-2" />
                     Save Organization Settings
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* API & Export Tab */}
+          <TabsContent value="api" className="space-y-6">
+            {/* API Key Management */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <Key className="w-5 h-5" />
+                  API Keys
+                </CardTitle>
+                <CardDescription>Manage API keys for external integrations</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Live API Key</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Use this key for production integrations
+                      </p>
+                    </div>
+                    <Badge className="bg-green-500/10 text-green-500 border-green-500/20">Active</Badge>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 relative">
+                      <Input 
+                        type={showApiKey ? 'text' : 'password'}
+                        value={apiKey}
+                        readOnly
+                        className="font-mono pr-10"
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute right-0 top-0"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                      >
+                        {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    <Button variant="outline" size="icon" onClick={handleCopyApiKey}>
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                    <Button variant="outline" onClick={handleRegenerateApiKey}>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Regenerate
+                    </Button>
+                  </div>
+
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <p className="text-xs text-muted-foreground">
+                      Keep your API key secret. Do not share it in publicly accessible code. 
+                      If you believe your key has been compromised, regenerate it immediately.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Export Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <Download className="w-5 h-5" />
+                  Export Settings
+                </CardTitle>
+                <CardDescription>Configure default export preferences</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Default Export Format</Label>
+                    <Select 
+                      value={exportSettings.defaultFormat} 
+                      onValueChange={(v) => setExportSettings({ ...exportSettings, defaultFormat: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="csv">CSV (.csv)</SelectItem>
+                        <SelectItem value="xlsx">Excel (.xlsx)</SelectItem>
+                        <SelectItem value="json">JSON (.json)</SelectItem>
+                        <SelectItem value="stata">Stata (.dta)</SelectItem>
+                        <SelectItem value="spss">SPSS (.sav)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Date Format</Label>
+                    <Select 
+                      value={exportSettings.dateFormat} 
+                      onValueChange={(v) => setExportSettings({ ...exportSettings, dateFormat: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ISO">ISO 8601 (2024-01-15T10:30:00Z)</SelectItem>
+                        <SelectItem value="US">US Format (01/15/2024)</SelectItem>
+                        <SelectItem value="EU">EU Format (15/01/2024)</SelectItem>
+                        <SelectItem value="unix">Unix Timestamp</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Timezone</Label>
+                    <Select 
+                      value={exportSettings.timezone} 
+                      onValueChange={(v) => setExportSettings({ ...exportSettings, timezone: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="UTC">UTC</SelectItem>
+                        <SelectItem value="local">Local Time</SelectItem>
+                        <SelectItem value="EST">Eastern (EST/EDT)</SelectItem>
+                        <SelectItem value="PST">Pacific (PST/PDT)</SelectItem>
+                        <SelectItem value="EAT">East Africa (EAT)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label>Include Metadata</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Add submission timestamps, GPS, device info
+                      </p>
+                    </div>
+                    <Switch 
+                      checked={exportSettings.includeMetadata}
+                      onCheckedChange={(checked) => setExportSettings({ ...exportSettings, includeMetadata: checked })}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-end">
+                  <Button onClick={handleSaveExport} disabled={saving}>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Export Settings
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Data Management */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <Database className="w-5 h-5" />
+                  Data Management
+                </CardTitle>
+                <CardDescription>Manage your organization's data</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <p className="font-medium">Export All Data</p>
+                    <p className="text-sm text-muted-foreground">
+                      Download all submissions, forms, and project data
+                    </p>
+                  </div>
+                  <Button variant="outline">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <p className="font-medium">Download Audit Log</p>
+                    <p className="text-sm text-muted-foreground">
+                      Export activity log for compliance purposes
+                    </p>
+                  </div>
+                  <Button variant="outline">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
+                  <div>
+                    <p className="font-medium text-destructive">Delete All Data</p>
+                    <p className="text-sm text-muted-foreground">
+                      Permanently delete all organization data. This cannot be undone.
+                    </p>
+                  </div>
+                  <Button variant="destructive">
+                    Delete All
                   </Button>
                 </div>
               </CardContent>
