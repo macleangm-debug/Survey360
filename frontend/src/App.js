@@ -99,12 +99,12 @@ function App() {
           } />
           <Route path="/cases" element={
             <ProtectedRoute>
-              <DashboardPage />
+              <CasesPage />
             </ProtectedRoute>
           } />
           <Route path="/quality" element={
             <ProtectedRoute>
-              <DashboardPage />
+              <QualityPage />
             </ProtectedRoute>
           } />
           <Route path="/exports" element={
@@ -119,7 +119,7 @@ function App() {
           } />
           <Route path="/settings" element={
             <ProtectedRoute>
-              <DashboardPage />
+              <SettingsPage />
             </ProtectedRoute>
           } />
           <Route path="/organizations/new" element={
