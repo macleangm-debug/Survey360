@@ -153,7 +153,7 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `/app/frontend/public/sw.js` - Service worker
 - `/app/frontend/src/lib/offlineStorage.js` - IndexedDB service with conflict resolution
 - `/app/frontend/src/pages/FormPreviewPage.jsx` - Form preview with GPS/Audio/Video capture
-- `/app/frontend/src/pages/FormBuilderPage.jsx` - Form builder with integrated logic editors
+- `/app/frontend/src/pages/FormBuilderPage.jsx` - Form builder with integrated logic editors, versioning, duplicate detection
 - `/app/frontend/src/pages/FormTemplatesPage.jsx` - Templates library
 - `/app/frontend/src/pages/GPSMapPage.jsx` - GPS visualization
 - `/app/frontend/src/pages/SettingsPage.jsx` - Settings with webhooks configuration
@@ -166,6 +166,9 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `/app/frontend/src/components/VideoRecorder.jsx` - Video recording component
 - `/app/frontend/src/components/CustomDashboard.jsx` - Custom dashboard widgets
 - `/app/frontend/src/components/CollaborationIndicator.jsx` - Real-time collaboration
+- `/app/frontend/src/components/DuplicateDetection.jsx` - Duplicate detection UI
+- `/app/frontend/src/components/FormVersioning.jsx` - Version comparison UI
+- `/app/frontend/src/components/OfflineSync.jsx` - Enhanced offline sync UI
 - `/app/frontend/src/components/MediaUpload.jsx` - Media upload
 - `/app/backend/routes/media_routes.py` - Media API
 - `/app/backend/routes/template_routes.py` - Templates API
@@ -175,4 +178,6 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `/app/backend/routes/export_routes.py` - Export API with Stata/SPSS
 - `/app/backend/routes/case_import_routes.py` - CSV import API
 - `/app/backend/routes/collaboration_routes.py` - WebSocket collaboration
+- `/app/backend/routes/duplicate_routes.py` - Duplicate detection API
+- `/app/backend/routes/versioning_routes.py` - Form versioning API
 - `/app/backend/logic_engine.py` - Calculation & skip logic engine
