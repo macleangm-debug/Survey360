@@ -22,7 +22,10 @@ import {
   Calculator,
   AlignLeft,
   Circle,
-  Repeat
+  Repeat,
+  GitBranch,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -30,6 +33,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Switch } from '../components/ui/switch';
+import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Separator } from '../components/ui/separator';
@@ -47,7 +51,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from '../components/ui/sheet';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '../components/ui/collapsible';
 import { DashboardLayout } from '../layouts/DashboardLayout';
+import { SkipLogicEditor, SkipLogicDisplay } from '../components/SkipLogicEditor';
+import { CalculatedFieldEditor } from '../components/CalculatedFieldEditor';
 import { useFormBuilderStore } from '../store';
 import { formAPI } from '../lib/api';
 import { generateId, cn } from '../lib/utils';
@@ -81,12 +92,22 @@ const FieldTypeButton = ({ type, label, icon: Icon, onClick }) => (
   </button>
 );
 
-const FieldEditor = ({ field, onChange, onClose }) => {
+const FieldEditor = ({ field, allFields, onChange, onClose }) => {
   const [localField, setLocalField] = useState(field);
   const [options, setOptions] = useState(field.options || []);
+  const [activeTab, setActiveTab] = useState('basic');
+  const [skipLogicOpen, setSkipLogicOpen] = useState(!!field.skip_logic);
+  const [calculationOpen, setCalculationOpen] = useState(!!field.calculation);
+
+  // Get other fields for skip logic references
+  const otherFields = allFields.filter(f => f.id !== field.id);
 
   const handleSave = () => {
-    onChange({ ...localField, options });
+    const savedField = { 
+      ...localField, 
+      options,
+    };
+    onChange(savedField);
     onClose();
   };
 
@@ -105,248 +126,394 @@ const FieldEditor = ({ field, onChange, onClose }) => {
   };
 
   const hasOptions = ['select', 'radio', 'checkbox', 'multiselect'].includes(field.type);
+  const isCalculate = field.type === 'calculate';
 
   return (
     <Sheet open={true} onOpenChange={onClose}>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="w-[400px] sm:w-[600px]">
         <SheetHeader>
-          <SheetTitle className="font-barlow">Edit Field</SheetTitle>
-          <SheetDescription>Configure field properties</SheetDescription>
+          <SheetTitle className="font-barlow text-white">Edit Field</SheetTitle>
+          <SheetDescription>Configure field properties and logic</SheetDescription>
         </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-180px)] mt-6">
-          <div className="space-y-6 pr-4">
-            {/* Basic Info */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Field Name (ID)</Label>
-                <Input
-                  value={localField.name}
-                  onChange={(e) => setLocalField({ ...localField, name: e.target.value })}
-                  placeholder="field_name"
-                  data-testid="field-name-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Label (English)</Label>
-                <Input
-                  value={localField.label}
-                  onChange={(e) => setLocalField({ ...localField, label: e.target.value })}
-                  placeholder="Question text"
-                  data-testid="field-label-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Label (Swahili)</Label>
-                <Input
-                  value={localField.label_sw || ''}
-                  onChange={(e) => setLocalField({ ...localField, label_sw: e.target.value })}
-                  placeholder="Swali kwa Kiswahili"
-                  data-testid="field-label-sw-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Hint</Label>
-                <Textarea
-                  value={localField.hint || ''}
-                  onChange={(e) => setLocalField({ ...localField, hint: e.target.value })}
-                  placeholder="Additional instructions"
-                  rows={2}
-                />
-              </div>
-            </div>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="basic">Basic</TabsTrigger>
+            <TabsTrigger value="validation">Validation</TabsTrigger>
+            <TabsTrigger value="logic">Logic</TabsTrigger>
+          </TabsList>
 
-            <Separator />
-
-            {/* Options for select/radio/checkbox */}
-            {hasOptions && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label>Options</Label>
-                  <Button variant="outline" size="sm" onClick={addOption}>
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add
-                  </Button>
-                </div>
+          <ScrollArea className="h-[calc(100vh-280px)] mt-4">
+            <div className="pr-4 space-y-6">
+              {/* Basic Tab */}
+              <TabsContent value="basic" className="space-y-4 mt-0">
                 <div className="space-y-2">
-                  {options.map((option, idx) => (
-                    <div key={idx} className="flex gap-2">
-                      <Input
-                        value={option.label}
-                        onChange={(e) => updateOption(idx, 'label', e.target.value)}
-                        placeholder="English"
-                        className="flex-1"
-                      />
-                      <Input
-                        value={option.label_sw || ''}
-                        onChange={(e) => updateOption(idx, 'label_sw', e.target.value)}
-                        placeholder="Swahili"
-                        className="flex-1"
-                      />
-                      <Button variant="ghost" size="icon" onClick={() => removeOption(idx)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
+                  <Label>Field Name (ID)</Label>
+                  <Input
+                    value={localField.name}
+                    onChange={(e) => setLocalField({ ...localField, name: e.target.value })}
+                    placeholder="field_name"
+                    data-testid="field-name-input"
+                  />
+                  <p className="text-xs text-gray-500">Used in formulas and exports</p>
                 </div>
-              </div>
-            )}
+                
+                <div className="space-y-2">
+                  <Label>Label (English)</Label>
+                  <Input
+                    value={localField.label}
+                    onChange={(e) => setLocalField({ ...localField, label: e.target.value })}
+                    placeholder="Question text"
+                    data-testid="field-label-input"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Label (Swahili)</Label>
+                  <Input
+                    value={localField.label_sw || ''}
+                    onChange={(e) => setLocalField({ ...localField, label_sw: e.target.value })}
+                    placeholder="Swali kwa Kiswahili"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Hint</Label>
+                  <Textarea
+                    value={localField.hint || ''}
+                    onChange={(e) => setLocalField({ ...localField, hint: e.target.value })}
+                    placeholder="Additional instructions for enumerators"
+                    rows={2}
+                  />
+                </div>
 
-            {hasOptions && <Separator />}
+                {/* Options for select/radio/checkbox */}
+                {hasOptions && (
+                  <>
+                    <Separator />
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label>Options</Label>
+                        <Button variant="outline" size="sm" onClick={addOption}>
+                          <Plus className="w-3 h-3 mr-1" />
+                          Add Option
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        {options.map((option, idx) => (
+                          <div key={idx} className="flex gap-2">
+                            <Input
+                              value={option.value}
+                              onChange={(e) => updateOption(idx, 'value', e.target.value)}
+                              placeholder="Value"
+                              className="w-24"
+                            />
+                            <Input
+                              value={option.label}
+                              onChange={(e) => updateOption(idx, 'label', e.target.value)}
+                              placeholder="English"
+                              className="flex-1"
+                            />
+                            <Input
+                              value={option.label_sw || ''}
+                              onChange={(e) => updateOption(idx, 'label_sw', e.target.value)}
+                              placeholder="Swahili"
+                              className="flex-1"
+                            />
+                            <Button variant="ghost" size="icon" onClick={() => removeOption(idx)}>
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                        {options.length === 0 && (
+                          <p className="text-sm text-gray-500 text-center py-4">
+                            No options yet. Click "Add Option" to create choices.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
 
-            {/* Validation */}
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Validation</Label>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="required" className="font-normal">Required</Label>
-                <Switch
-                  id="required"
-                  checked={localField.validation?.required || false}
-                  onCheckedChange={(checked) => 
-                    setLocalField({
-                      ...localField,
-                      validation: { ...localField.validation, required: checked }
-                    })
-                  }
-                />
-              </div>
-              {(field.type === 'text' || field.type === 'textarea') && (
-                <>
+                {/* Calculation formula for calculate fields */}
+                {isCalculate && (
+                  <>
+                    <Separator />
+                    <CalculatedFieldEditor
+                      value={localField.calculation || ''}
+                      onChange={(formula) => setLocalField({ ...localField, calculation: formula })}
+                      fields={otherFields}
+                      fieldName={localField.name}
+                    />
+                  </>
+                )}
+              </TabsContent>
+
+              {/* Validation Tab */}
+              <TabsContent value="validation" className="space-y-4 mt-0">
+                <div className="flex items-center justify-between p-3 bg-card/50 rounded-lg">
+                  <div>
+                    <Label htmlFor="required" className="font-medium">Required</Label>
+                    <p className="text-xs text-gray-500">User must answer this question</p>
+                  </div>
+                  <Switch
+                    id="required"
+                    checked={localField.validation?.required || false}
+                    onCheckedChange={(checked) => 
+                      setLocalField({
+                        ...localField,
+                        validation: { ...localField.validation, required: checked }
+                      })
+                    }
+                  />
+                </div>
+
+                {(field.type === 'text' || field.type === 'textarea') && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Min Length</Label>
+                        <Input
+                          type="number"
+                          value={localField.validation?.min_length || ''}
+                          onChange={(e) => 
+                            setLocalField({
+                              ...localField,
+                              validation: { ...localField.validation, min_length: parseInt(e.target.value) || null }
+                            })
+                          }
+                          placeholder="0"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Max Length</Label>
+                        <Input
+                          type="number"
+                          value={localField.validation?.max_length || ''}
+                          onChange={(e) => 
+                            setLocalField({
+                              ...localField,
+                              validation: { ...localField.validation, max_length: parseInt(e.target.value) || null }
+                            })
+                          }
+                          placeholder="No limit"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Pattern (Regex)</Label>
+                      <Input
+                        value={localField.validation?.pattern || ''}
+                        onChange={(e) => 
+                          setLocalField({
+                            ...localField,
+                            validation: { ...localField.validation, pattern: e.target.value }
+                          })
+                        }
+                        placeholder="e.g., ^[A-Z]{2}[0-9]{4}$"
+                      />
+                      <p className="text-xs text-gray-500">Regular expression for validation</p>
+                    </div>
+                  </>
+                )}
+
+                {field.type === 'number' && (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Min Length</Label>
+                      <Label>Min Value</Label>
                       <Input
                         type="number"
-                        value={localField.validation?.min_length || ''}
+                        value={localField.validation?.min_value || ''}
                         onChange={(e) => 
                           setLocalField({
                             ...localField,
-                            validation: { ...localField.validation, min_length: parseInt(e.target.value) || null }
+                            validation: { ...localField.validation, min_value: parseFloat(e.target.value) || null }
                           })
                         }
+                        placeholder="No min"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Max Length</Label>
+                      <Label>Max Value</Label>
                       <Input
                         type="number"
-                        value={localField.validation?.max_length || ''}
+                        value={localField.validation?.max_value || ''}
                         onChange={(e) => 
                           setLocalField({
                             ...localField,
-                            validation: { ...localField.validation, max_length: parseInt(e.target.value) || null }
+                            validation: { ...localField.validation, max_value: parseFloat(e.target.value) || null }
                           })
                         }
+                        placeholder="No max"
                       />
                     </div>
                   </div>
-                </>
-              )}
-              {field.type === 'number' && (
-                <div className="grid grid-cols-2 gap-4">
+                )}
+
+                {field.type === 'gps' && (
                   <div className="space-y-2">
-                    <Label>Min Value</Label>
+                    <Label>Minimum Accuracy (meters)</Label>
                     <Input
                       type="number"
-                      value={localField.validation?.min_value || ''}
+                      value={localField.validation?.min_accuracy || 50}
                       onChange={(e) => 
                         setLocalField({
                           ...localField,
-                          validation: { ...localField.validation, min_value: parseFloat(e.target.value) || null }
+                          validation: { ...localField.validation, min_accuracy: parseFloat(e.target.value) || 50 }
                         })
                       }
+                      placeholder="50"
                     />
+                    <p className="text-xs text-gray-500">GPS reading must be within this accuracy</p>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Max Value</Label>
-                    <Input
-                      type="number"
-                      value={localField.validation?.max_value || ''}
-                      onChange={(e) => 
-                        setLocalField({
-                          ...localField,
-                          validation: { ...localField.validation, max_value: parseFloat(e.target.value) || null }
-                        })
-                      }
+                )}
+
+                {(field.type === 'checkbox' || field.type === 'multiselect') && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Min Selections</Label>
+                      <Input
+                        type="number"
+                        value={localField.validation?.min_selections || ''}
+                        onChange={(e) => 
+                          setLocalField({
+                            ...localField,
+                            validation: { ...localField.validation, min_selections: parseInt(e.target.value) || null }
+                          })
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Max Selections</Label>
+                      <Input
+                        type="number"
+                        value={localField.validation?.max_selections || ''}
+                        onChange={(e) => 
+                          setLocalField({
+                            ...localField,
+                            validation: { ...localField.validation, max_selections: parseInt(e.target.value) || null }
+                          })
+                        }
+                        placeholder="No limit"
+                      />
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* Logic Tab */}
+              <TabsContent value="logic" className="space-y-4 mt-0">
+                {/* Skip Logic Section */}
+                <Collapsible open={skipLogicOpen} onOpenChange={setSkipLogicOpen}>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-between p-3 h-auto">
+                      <div className="flex items-center gap-2">
+                        <GitBranch className="w-4 h-4 text-primary" />
+                        <div className="text-left">
+                          <p className="font-medium text-white">Skip Logic</p>
+                          <p className="text-xs text-gray-500">Control when this field is shown</p>
+                        </div>
+                      </div>
+                      {skipLogicOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-2">
+                    <SkipLogicEditor
+                      value={localField.skip_logic}
+                      onChange={(logic) => setLocalField({ ...localField, skip_logic: logic })}
+                      fields={otherFields}
+                      currentFieldId={field.id}
                     />
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Separator />
+
+                {/* Quick Reference */}
+                <div className="p-4 bg-card/30 rounded-lg space-y-3">
+                  <h4 className="text-sm font-medium text-white">Available Field References</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {otherFields.slice(0, 10).map((f) => (
+                      <Badge key={f.id} variant="outline" className="text-xs">
+                        {f.name}
+                      </Badge>
+                    ))}
+                    {otherFields.length > 10 && (
+                      <Badge variant="outline" className="text-xs text-gray-500">
+                        +{otherFields.length - 10} more
+                      </Badge>
+                    )}
                   </div>
+                  {otherFields.length === 0 && (
+                    <p className="text-xs text-gray-500">Add more fields to reference them in logic</p>
+                  )}
                 </div>
-              )}
+              </TabsContent>
             </div>
+          </ScrollArea>
+        </Tabs>
 
-            <Separator />
-
-            {/* Skip Logic */}
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Skip Logic (Optional)</Label>
-              <div className="space-y-2">
-                <Label>Show if field</Label>
-                <Input
-                  value={localField.logic?.show_if || ''}
-                  onChange={(e) => 
-                    setLocalField({
-                      ...localField,
-                      logic: { ...localField.logic, show_if: e.target.value }
-                    })
-                  }
-                  placeholder="field_name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Equals value</Label>
-                <Input
-                  value={localField.logic?.show_value || ''}
-                  onChange={(e) => 
-                    setLocalField({
-                      ...localField,
-                      logic: { ...localField.logic, show_value: e.target.value }
-                    })
-                  }
-                  placeholder="value"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <Button variant="outline" className="flex-1" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button className="flex-1" onClick={handleSave} data-testid="save-field-btn">
-                Save Field
-              </Button>
-            </div>
-          </div>
-        </ScrollArea>
+        <div className="flex gap-2 pt-4 border-t border-border mt-4">
+          <Button variant="outline" className="flex-1" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button className="flex-1" onClick={handleSave} data-testid="save-field-btn">
+            Save Field
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
   );
 };
 
-const FieldRow = ({ field, onEdit, onRemove, dragControls }) => {
+const FieldRow = ({ field, allFields, onEdit, onRemove }) => {
   const Icon = fieldTypes.find(f => f.type === field.type)?.icon || Type;
+  const hasSkipLogic = field.skip_logic?.conditions?.length > 0;
+  const hasCalculation = field.type === 'calculate' && field.calculation;
 
   return (
     <motion.div
       className="flex items-center gap-3 p-4 bg-card/50 border border-border/50 rounded-sm hover:border-primary/50 transition-all group"
       layout
     >
-      <div className="cursor-grab active:cursor-grabbing" {...dragControls}>
+      <div className="cursor-grab active:cursor-grabbing">
         <GripVertical className="w-4 h-4 text-muted-foreground" />
       </div>
       <div className="w-8 h-8 rounded-sm bg-primary/10 flex items-center justify-center">
         <Icon className="w-4 h-4 text-primary" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate">{field.label || field.name}</p>
+        <div className="flex items-center gap-2">
+          <p className="font-medium truncate text-white">{field.label || field.name}</p>
+          {hasSkipLogic && (
+            <Badge variant="outline" className="text-[10px] px-1 py-0 bg-blue-500/10 text-blue-500 border-blue-500/30">
+              <GitBranch className="w-2 h-2 mr-1" />
+              Logic
+            </Badge>
+          )}
+          {hasCalculation && (
+            <Badge variant="outline" className="text-[10px] px-1 py-0 bg-purple-500/10 text-purple-500 border-purple-500/30">
+              <Calculator className="w-2 h-2 mr-1" />
+              Calc
+            </Badge>
+          )}
+        </div>
         <p className="text-xs text-muted-foreground">{field.type} • {field.name}</p>
+        {hasSkipLogic && (
+          <div className="mt-1">
+            <SkipLogicDisplay logic={field.skip_logic} fields={allFields} />
+          </div>
+        )}
       </div>
       {field.validation?.required && (
         <span className="text-xs text-red-500">Required</span>
       )}
       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button variant="ghost" size="icon" onClick={() => onEdit(field)}>
+        <Button variant="ghost" size="icon" onClick={() => onEdit(field)} data-testid={`edit-field-${field.id}`}>
           <Settings2 className="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => onRemove(field.id)}>
+        <Button variant="ghost" size="icon" onClick={() => onRemove(field.id)} data-testid={`remove-field-${field.id}`}>
           <Trash2 className="w-4 h-4" />
         </Button>
       </div>
@@ -403,7 +570,8 @@ export function FormBuilderPage() {
       hint: '',
       options: [],
       validation: { required: false },
-      logic: null,
+      skip_logic: null,
+      calculation: type === 'calculate' ? '' : null,
       order: fields.length
     };
     addField(newField);
@@ -436,9 +604,7 @@ export function FormBuilderPage() {
       return;
     }
     try {
-      // Save first
       await handleSave();
-      // Then publish
       await formAPI.publish(formId);
       toast.success('Form published!');
       navigate('/forms');
@@ -536,7 +702,7 @@ export function FormBuilderPage() {
             <Card className="bg-card/50 backdrop-blur-sm border-border/50 min-h-[60vh]">
               <CardHeader className="border-b border-border/50">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="font-barlow text-lg">Form Fields</CardTitle>
+                  <CardTitle className="font-barlow text-lg text-white">Form Fields</CardTitle>
                   <span className="text-sm text-muted-foreground">{fields.length} fields</span>
                 </div>
               </CardHeader>
@@ -546,7 +712,7 @@ export function FormBuilderPage() {
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                       <FileText className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="font-barlow text-lg font-semibold mb-2">No fields yet</h3>
+                    <h3 className="font-barlow text-lg font-semibold mb-2 text-white">No fields yet</h3>
                     <p className="text-muted-foreground max-w-md">
                       Click on field types on the left to add questions to your form
                     </p>
@@ -557,6 +723,7 @@ export function FormBuilderPage() {
                       <Reorder.Item key={field.id} value={field}>
                         <FieldRow
                           field={field}
+                          allFields={fields}
                           onEdit={setEditingField}
                           onRemove={removeField}
                         />
@@ -573,6 +740,7 @@ export function FormBuilderPage() {
         {editingField && (
           <FieldEditor
             field={editingField}
+            allFields={fields}
             onChange={handleFieldUpdate}
             onClose={() => setEditingField(null)}
           />
