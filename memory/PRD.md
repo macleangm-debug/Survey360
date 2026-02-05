@@ -220,3 +220,14 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `/app/backend/routes/duplicate_routes.py` - Duplicate detection API
 - `/app/backend/routes/versioning_routes.py` - Form versioning API
 - `/app/backend/logic_engine.py` - Calculation & skip logic engine
+
+### NEW Feature Files (Feb 5, 2026)
+- `/app/frontend/src/pages/AnalyticsPage.jsx` - Analytics dashboard page
+- `/app/frontend/src/pages/RBACPage.jsx` - Roles & permissions management
+- `/app/frontend/src/pages/WorkflowsPage.jsx` - Workflow automation page
+- `/app/frontend/src/pages/TranslationsPage.jsx` - Multi-language support page
+- `/app/frontend/src/components/AnalyticsDashboard.jsx` - Analytics charts component
+- `/app/backend/routes/analytics_routes.py` - Analytics API endpoints
+- `/app/backend/routes/rbac_routes.py` - RBAC management API
+- `/app/backend/routes/workflow_routes.py` - Workflow automation API
+- `/app/backend/routes/translation_routes.py` - Translation API
