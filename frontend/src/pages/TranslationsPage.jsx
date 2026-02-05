@@ -261,10 +261,7 @@ export function TranslationsPage() {
       
       const response = await fetch(`${API_URL}/api/translations/forms/${selectedForm}/translate`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           form_id: selectedForm,
           source_language: defaultLanguage,
@@ -278,10 +275,7 @@ export function TranslationsPage() {
       // Apply translations
       await fetch(`${API_URL}/api/translations/forms/${selectedForm}/apply-translations`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(result.translations)
       });
 
