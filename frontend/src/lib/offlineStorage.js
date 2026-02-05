@@ -317,6 +317,7 @@ export class SyncManager {
   constructor() {
     this.isSyncing = false;
     this.listeners = new Set();
+    this.conflictQueue = [];
     
     // Listen for online/offline events
     window.addEventListener('online', () => this.handleOnline());
@@ -352,18 +353,116 @@ export class SyncManager {
     this.notifyListeners({ type: 'offline' });
   }
 
-  async syncPendingSubmissions() {
+  // Conflict resolution strategies
+  resolveConflict(localData, serverData, strategy = 'server_wins') {
+    switch (strategy) {
+      case 'server_wins':
+        return { resolved: serverData, strategy: 'server_wins' };
+      
+      case 'client_wins':
+        return { resolved: localData, strategy: 'client_wins' };
+      
+      case 'merge':
+        // Merge strategy: prefer newer values field by field
+        const merged = { ...serverData };
+        const localTimestamp = new Date(localData.updated_at || localData.created_at).getTime();
+        const serverTimestamp = new Date(serverData.updated_at || serverData.created_at).getTime();
+        
+        if (localTimestamp > serverTimestamp) {
+          // Local is newer - merge local changes into server data
+          for (const key of Object.keys(localData.data || {})) {
+            if (localData.data[key] !== undefined) {
+              merged.data = merged.data || {};
+              merged.data[key] = localData.data[key];
+            }
+          }
+        }
+        return { resolved: merged, strategy: 'merge' };
+      
+      case 'manual':
+        // Queue for manual resolution
+        return { resolved: null, strategy: 'manual', conflict: { local: localData, server: serverData } };
+      
+      default:
+        return { resolved: serverData, strategy: 'server_wins' };
+    }
+  }
+
+  // Check for conflicts before syncing
+  async checkForConflicts(submission) {
+    try {
+      // Check if submission already exists on server
+      const response = await fetch(`/api/submissions/check/${submission.form_id}/${submission.local_id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const serverVersion = await response.json();
+        if (serverVersion && serverVersion.id) {
+          // Conflict detected
+          return {
+            hasConflict: true,
+            serverVersion,
+            localVersion: submission
+          };
+        }
+      }
+      return { hasConflict: false };
+    } catch (error) {
+      // If check fails, assume no conflict and proceed
+      return { hasConflict: false };
+    }
+  }
+
+  async syncPendingSubmissions(conflictStrategy = 'server_wins') {
     if (this.isSyncing || !navigator.onLine) return;
     
     this.isSyncing = true;
     this.notifyListeners({ type: 'sync_start' });
+    
+    const results = {
+      synced: 0,
+      failed: 0,
+      conflicts: 0,
+      total: 0
+    };
 
     try {
       const pending = await offlineStorage.getPendingSubmissions();
+      results.total = pending.length;
       console.log(`Syncing ${pending.length} pending submissions`);
 
       for (const submission of pending) {
         try {
+          // Check for conflicts first
+          const conflictCheck = await this.checkForConflicts(submission);
+          
+          if (conflictCheck.hasConflict) {
+            const resolution = this.resolveConflict(
+              submission, 
+              conflictCheck.serverVersion, 
+              conflictStrategy
+            );
+            
+            if (resolution.strategy === 'manual') {
+              // Add to conflict queue for manual resolution
+              this.conflictQueue.push(resolution.conflict);
+              results.conflicts++;
+              this.notifyListeners({ 
+                type: 'conflict_detected', 
+                submission: submission.local_id,
+                conflict: resolution.conflict 
+              });
+              continue;
+            }
+            
+            // Use resolved data
+            submission.data = resolution.resolved.data;
+          }
+
           // Upload submission to server
           const response = await fetch('/api/submissions/', {
             method: 'POST',
@@ -371,30 +470,90 @@ export class SyncManager {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
-            body: JSON.stringify(submission.data)
+            body: JSON.stringify({
+              ...submission.data,
+              local_id: submission.local_id,
+              offline_created_at: submission.created_at
+            })
           });
 
           if (response.ok) {
             const result = await response.json();
             await offlineStorage.updateSubmissionStatus(submission.local_id, 'synced', result.id);
+            results.synced++;
             this.notifyListeners({ type: 'sync_success', submission: submission.local_id });
+          } else if (response.status === 409) {
+            // Conflict response from server
+            const serverData = await response.json();
+            const resolution = this.resolveConflict(submission, serverData, conflictStrategy);
+            
+            if (resolution.strategy === 'manual') {
+              this.conflictQueue.push(resolution.conflict);
+              results.conflicts++;
+            } else {
+              // Retry with resolved data
+              await this.retryWithResolution(submission, resolution.resolved);
+              results.synced++;
+            }
           } else {
             await offlineStorage.updateSubmissionStatus(submission.local_id, 'failed');
+            results.failed++;
             this.notifyListeners({ type: 'sync_error', submission: submission.local_id });
           }
         } catch (error) {
           console.error('Failed to sync submission:', error);
           await offlineStorage.updateSubmissionStatus(submission.local_id, 'pending');
+          results.failed++;
         }
       }
 
-      this.notifyListeners({ type: 'sync_complete', synced: pending.length });
+      this.notifyListeners({ type: 'sync_complete', results });
     } catch (error) {
       console.error('Sync failed:', error);
       this.notifyListeners({ type: 'sync_error', error });
     } finally {
       this.isSyncing = false;
     }
+    
+    return results;
+  }
+
+  async retryWithResolution(submission, resolvedData) {
+    const response = await fetch('/api/submissions/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({
+        ...resolvedData,
+        local_id: submission.local_id,
+        conflict_resolved: true
+      })
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      await offlineStorage.updateSubmissionStatus(submission.local_id, 'synced', result.id);
+    }
+  }
+
+  // Get pending conflicts for manual resolution
+  getConflictQueue() {
+    return [...this.conflictQueue];
+  }
+
+  // Resolve a conflict manually
+  async resolveConflictManually(localId, resolvedData) {
+    this.conflictQueue = this.conflictQueue.filter(c => c.local.local_id !== localId);
+    
+    const submission = await offlineStorage.getSubmission(localId);
+    if (submission) {
+      submission.data = resolvedData;
+      await this.retryWithResolution(submission, resolvedData);
+    }
+    
+    this.notifyListeners({ type: 'conflict_resolved', localId });
   }
 
   // Request background sync if supported
