@@ -681,11 +681,11 @@ export function QualityPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-barlow">Quality Score Over Time</CardTitle>
-                  <CardDescription>Average quality score trends</CardDescription>
+                  <CardTitle className="font-barlow text-white">Quality Score Over Time</CardTitle>
+                  <CardDescription className="text-gray-400">Average quality score trends</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+                  <div className="h-[200px] flex items-center justify-center text-gray-400">
                     <div className="text-center">
                       <Activity className="w-12 h-12 mx-auto mb-2 text-primary/50" />
                       <p>Quality trends will appear</p>
@@ -697,23 +697,23 @@ export function QualityPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-barlow">GPS Accuracy</CardTitle>
-                  <CardDescription>Location data quality</CardDescription>
+                  <CardTitle className="font-barlow text-white">GPS Accuracy</CardTitle>
+                  <CardDescription className="text-gray-400">Location data quality</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">High Accuracy ({"<"}10m)</span>
+                      <span className="text-sm text-gray-300">High Accuracy ({"<"}10m)</span>
                       <span className="font-mono text-green-500">85%</span>
                     </div>
                     <Progress value={85} className="h-2" />
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">Medium Accuracy (10-50m)</span>
+                      <span className="text-sm text-gray-300">Medium Accuracy (10-50m)</span>
                       <span className="font-mono text-yellow-500">12%</span>
                     </div>
                     <Progress value={12} className="h-2" />
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">Low Accuracy ({">"}50m)</span>
+                      <span className="text-sm text-gray-300">Low Accuracy ({">"}50m)</span>
                       <span className="font-mono text-red-500">3%</span>
                     </div>
                     <Progress value={3} className="h-2" />
