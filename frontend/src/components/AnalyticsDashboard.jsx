@@ -111,7 +111,7 @@ export function AnalyticsDashboard({ orgId }) {
   const loadAnalytics = async () => {
     setLoading(true);
     try {
-      const headers = { 'Authorization': `Bearer ${localStorage.getItem('token')}` };
+      const headers = getAuthHeaders();
       
       const [overviewRes, submissionsRes, qualityRes, performanceRes] = await Promise.all([
         fetch(`${API_URL}/api/analytics/overview/${orgId}?period=${period}`, { headers }),
