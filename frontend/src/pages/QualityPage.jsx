@@ -405,8 +405,8 @@ export function QualityPage() {
               {/* Quality Gauge */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-barlow">Quality Score</CardTitle>
-                  <CardDescription>Overall data quality index</CardDescription>
+                  <CardTitle className="font-barlow text-white">Quality Score</CardTitle>
+                  <CardDescription className="text-gray-400">Overall data quality index</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {loading ? (
