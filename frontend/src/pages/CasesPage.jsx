@@ -498,8 +498,8 @@ export function CasesPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="font-barlow text-3xl font-bold tracking-tight">Cases</h1>
-            <p className="text-muted-foreground">Track respondents and longitudinal data</p>
+            <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Cases</h1>
+            <p className="text-gray-400">Track respondents and longitudinal data</p>
           </div>
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
