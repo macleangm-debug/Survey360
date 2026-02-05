@@ -199,10 +199,7 @@ export function TranslationsPage() {
     try {
       const response = await fetch(`${API_URL}/api/translations/translate`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           text: translateForm.text,
           source_language: translateForm.sourceLanguage,
