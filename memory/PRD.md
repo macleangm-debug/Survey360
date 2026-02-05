@@ -128,16 +128,19 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - [x] Stata/SPSS export formats ✅ (Feb 5, 2026)
 - [x] Batch case import from CSV ✅ (Feb 5, 2026)
 - [x] Real-time collaboration features ✅ (Feb 5, 2026)
+- [x] Duplicate detection alerts ✅ (Feb 5, 2026)
+- [x] Form versioning comparison view ✅ (Feb 5, 2026)
+- [x] Enhanced offline conflict resolution UI ✅ (Feb 5, 2026)
 
 ## Backlog - P1 (High Priority)
-- [ ] Duplicate detection alerts
-- [ ] Form versioning comparison
-- [ ] Enhanced offline conflict resolution UI
+- [ ] Advanced analytics and reporting
+- [ ] Role-based access control refinement
+- [ ] Submission workflow automation
 
 ## Backlog - P2 (Medium Priority)
-- [ ] Advanced dashboard widget customization (drag-drop resize)
 - [ ] Native mobile app
 - [ ] Multi-language AI translations
+- [ ] Advanced form logic branching visualization
 
 ## Test Credentials
 - **Email**: test@datapulse.io
