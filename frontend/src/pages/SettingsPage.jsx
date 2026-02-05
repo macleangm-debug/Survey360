@@ -658,7 +658,7 @@ export function SettingsPage() {
                   <Database className="w-5 h-5" />
                   Data Management
                 </CardTitle>
-                <CardDescription>Manage your organization's data</CardDescription>
+                <CardDescription>Manage your organization&apos;s data</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-4 border rounded-lg">
