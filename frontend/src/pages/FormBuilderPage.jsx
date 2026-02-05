@@ -26,7 +26,10 @@ import {
   Repeat,
   GitBranch,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  History,
+  Shield,
+  Copy
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -57,9 +60,18 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '../components/ui/collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown-menu';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { SkipLogicEditor, SkipLogicDisplay } from '../components/SkipLogicEditor';
 import { CalculatedFieldEditor } from '../components/CalculatedFieldEditor';
+import { VersionHistory, VersionComparison, SaveVersionDialog, RestoreVersionDialog } from '../components/FormVersioning';
+import { DuplicateRulesConfig, DuplicateReviewPanel } from '../components/DuplicateDetection';
 import { useFormBuilderStore } from '../store';
 import { formAPI } from '../lib/api';
 import { generateId, cn } from '../lib/utils';
