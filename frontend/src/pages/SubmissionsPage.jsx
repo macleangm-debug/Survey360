@@ -316,7 +316,7 @@ export function SubmissionsPage() {
     return (
       <DashboardLayout>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Please select an organization first</p>
+          <p className="text-gray-400">Please select an organization first</p>
         </div>
       </DashboardLayout>
     );
@@ -328,8 +328,8 @@ export function SubmissionsPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="font-barlow text-3xl font-bold tracking-tight">Submissions</h1>
-            <p className="text-muted-foreground">View and review collected data</p>
+            <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Submissions</h1>
+            <p className="text-gray-400">View and review collected data</p>
           </div>
           <div className="flex gap-2">
             <Select value={selectedForm} onValueChange={setSelectedForm}>
