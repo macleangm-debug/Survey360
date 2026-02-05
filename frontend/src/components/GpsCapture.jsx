@@ -110,6 +110,14 @@ export function GpsCapture({
     );
   }, [onChange]);
 
+  const stopTracking = useCallback(() => {
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      setWatchId(null);
+    }
+    setIsTracking(false);
+  }, [watchId]);
+
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported');
@@ -145,7 +153,9 @@ export function GpsCapture({
         
         // Stop tracking if we get good enough accuracy
         if (position.coords.accuracy <= minAccuracy) {
-          stopTracking();
+          navigator.geolocation.clearWatch(id);
+          setWatchId(null);
+          setIsTracking(false);
         }
       },
       (err) => {
@@ -156,14 +166,6 @@ export function GpsCapture({
 
     setWatchId(id);
   }, [onChange, gpsData, minAccuracy]);
-
-  const stopTracking = useCallback(() => {
-    if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId);
-      setWatchId(null);
-    }
-    setIsTracking(false);
-  }, [watchId]);
 
   const clearLocation = () => {
     onChange(null);
