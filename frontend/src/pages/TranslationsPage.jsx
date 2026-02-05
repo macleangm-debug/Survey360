@@ -232,10 +232,7 @@ export function TranslationsPage() {
         `${API_URL}/api/translations/glossary/${currentOrg?.id}?term=${encodeURIComponent(glossaryForm.term)}`,
         {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          },
+          headers: getAuthHeaders(),
           body: JSON.stringify(glossaryForm.translations)
         }
       );
