@@ -76,6 +76,7 @@ const fieldTypes = [
   { type: 'gps', label: 'GPS Location', icon: MapPin },
   { type: 'photo', label: 'Photo', icon: Camera },
   { type: 'audio', label: 'Audio', icon: Mic },
+  { type: 'video', label: 'Video', icon: Video },
   { type: 'note', label: 'Note', icon: FileText },
   { type: 'calculate', label: 'Calculate', icon: Calculator },
   { type: 'group', label: 'Group', icon: Settings2 },
