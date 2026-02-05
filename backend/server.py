@@ -1,3 +1,4 @@
+"""DataPulse - Main FastAPI Application"""
 from fastapi import FastAPI, APIRouter
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -5,12 +6,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
 
-
+# Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -19,56 +16,61 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# Create the main app
+app = FastAPI(
+    title="DataPulse API",
+    description="Modern data collection platform for research, M&E, and field surveys",
+    version="1.0.0"
+)
+
+# Store db in app state for route access
+app.state.db = db
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Import routes
+from routes.auth_routes import router as auth_router
+from routes.org_routes import router as org_router
+from routes.project_routes import router as project_router
+from routes.form_routes import router as form_router
+from routes.submission_routes import router as submission_router
+from routes.case_routes import router as case_router
+from routes.export_routes import router as export_router
+from routes.dashboard_routes import router as dashboard_router
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+# Include all route modules
+api_router.include_router(auth_router)
+api_router.include_router(org_router)
+api_router.include_router(project_router)
+api_router.include_router(form_router)
+api_router.include_router(submission_router)
+api_router.include_router(case_router)
+api_router.include_router(export_router)
+api_router.include_router(dashboard_router)
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
 
-# Add your routes to the router instead of directly to app
+# Health check endpoint
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "DataPulse API is running", "version": "1.0.0"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+@api_router.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    try:
+        # Test database connection
+        await db.command("ping")
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        return {"status": "unhealthy", "database": str(e)}
+
 
 # Include the router in the main app
 app.include_router(api_router)
 
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -84,6 +86,53 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+@app.on_event("startup")
+async def startup_db_client():
+    """Initialize database indexes on startup"""
+    logger.info("DataPulse API starting up...")
+    
+    # Create indexes for better query performance
+    try:
+        # Users
+        await db.users.create_index("email", unique=True)
+        await db.users.create_index("id", unique=True)
+        
+        # Organizations
+        await db.organizations.create_index("slug", unique=True)
+        await db.organizations.create_index("id", unique=True)
+        
+        # Org Members
+        await db.org_members.create_index([("org_id", 1), ("user_id", 1)], unique=True)
+        
+        # Projects
+        await db.projects.create_index("id", unique=True)
+        await db.projects.create_index([("org_id", 1), ("status", 1)])
+        
+        # Forms
+        await db.forms.create_index("id", unique=True)
+        await db.forms.create_index([("project_id", 1), ("status", 1)])
+        
+        # Submissions
+        await db.submissions.create_index("id", unique=True)
+        await db.submissions.create_index([("form_id", 1), ("submitted_at", -1)])
+        await db.submissions.create_index([("org_id", 1), ("submitted_at", -1)])
+        await db.submissions.create_index([("project_id", 1), ("status", 1)])
+        
+        # Cases
+        await db.cases.create_index("id", unique=True)
+        await db.cases.create_index([("project_id", 1), ("respondent_id", 1)], unique=True)
+        
+        # Audit Logs
+        await db.audit_logs.create_index([("org_id", 1), ("timestamp", -1)])
+        
+        logger.info("Database indexes created successfully")
+    except Exception as e:
+        logger.error(f"Error creating indexes: {e}")
+
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    """Cleanup on shutdown"""
+    logger.info("DataPulse API shutting down...")
     client.close()
