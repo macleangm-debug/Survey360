@@ -39,17 +39,17 @@ const StatCard = ({ title, value, icon: Icon, trend, description, onClick }) => 
     transition={{ duration: 0.2 }}
   >
     <Card 
-      className="hover:shadow-md transition-all cursor-pointer"
+      className="hover:shadow-md transition-all cursor-pointer h-full"
       onClick={onClick}
       data-testid={`stat-card-${title.toLowerCase().replace(/\s/g, '-')}`}
     >
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm text-muted-foreground mb-1">{title}</p>
-            <p className="text-3xl font-barlow font-bold tracking-tight">{value}</p>
+            <p className="text-sm text-gray-400 mb-1">{title}</p>
+            <p className="text-3xl font-barlow font-bold tracking-tight text-white">{value}</p>
             {description && (
-              <p className="text-xs text-muted-foreground mt-2">{description}</p>
+              <p className="text-xs text-gray-500 mt-2">{description}</p>
             )}
           </div>
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -58,11 +58,11 @@ const StatCard = ({ title, value, icon: Icon, trend, description, onClick }) => 
         </div>
         {trend !== undefined && (
           <div className="flex items-center gap-1 mt-4">
-            <TrendingUp className={`w-4 h-4 ${trend >= 0 ? 'text-green-600' : 'text-red-500'}`} />
-            <span className={`text-sm ${trend >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+            <TrendingUp className={`w-4 h-4 ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+            <span className={`text-sm ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
               {trend >= 0 ? '+' : ''}{trend}%
             </span>
-            <span className="text-xs text-muted-foreground ml-1">vs last week</span>
+            <span className="text-xs text-gray-500 ml-1">vs last week</span>
           </div>
         )}
       </CardContent>
