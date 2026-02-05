@@ -285,7 +285,7 @@ class DataPulseAPITester:
             ]
         }
         
-        success, status_code, data, _ = self.make_request('POST', '/forms', form_data, 201)
+        success, status_code, data, _ = self.make_request('POST', '/forms', form_data, 200)
         
         if success and isinstance(data, dict):
             self.log_test("Create Form", True, 
