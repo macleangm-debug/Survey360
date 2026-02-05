@@ -47,6 +47,10 @@ from routes.case_import_routes import router as case_import_router
 from routes.collaboration_routes import router as collaboration_router
 from routes.duplicate_routes import router as duplicate_router
 from routes.versioning_routes import router as versioning_router
+from routes.analytics_routes import router as analytics_router
+from routes.rbac_routes import router as rbac_router
+from routes.workflow_routes import router as workflow_router
+from routes.translation_routes import router as translation_router
 
 # Include all route modules
 api_router.include_router(auth_router)
@@ -66,6 +70,10 @@ api_router.include_router(case_import_router)
 api_router.include_router(collaboration_router)
 api_router.include_router(duplicate_router)
 api_router.include_router(versioning_router)
+api_router.include_router(analytics_router)
+api_router.include_router(rbac_router)
+api_router.include_router(workflow_router)
+api_router.include_router(translation_router)
 
 
 # Health check endpoint
