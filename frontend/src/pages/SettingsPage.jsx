@@ -689,6 +689,102 @@ export function SettingsPage() {
               </CardContent>
             </Card>
 
+            {/* Webhooks */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <Webhook className="w-5 h-5" />
+                  Webhooks
+                </CardTitle>
+                <CardDescription>Configure webhook notifications for real-time integrations</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Existing Webhooks */}
+                {webhooks.length > 0 && (
+                  <div className="space-y-3">
+                    {webhooks.map((webhook) => (
+                      <div key={webhook.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex-1 min-w-0 mr-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            {webhook.active ? (
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                            )}
+                            <p className="font-mono text-sm truncate">{webhook.url}</p>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {webhook.events.map((event) => (
+                              <Badge key={event} variant="outline" className="text-xs">
+                                {webhookEvents.find(e => e.value === event)?.label || event}
+                              </Badge>
+                            ))}
+                          </div>
+                          {webhook.lastTriggered && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Last triggered: {new Date(webhook.lastTriggered).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Switch 
+                            checked={webhook.active}
+                            onCheckedChange={() => handleToggleWebhook(webhook.id)}
+                          />
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteWebhook(webhook.id)}>
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <Separator />
+
+                {/* Add New Webhook */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium">Add New Webhook</h4>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label>Endpoint URL</Label>
+                      <Input
+                        placeholder="https://your-server.com/webhook"
+                        value={newWebhook.url}
+                        onChange={(e) => setNewWebhook({ ...newWebhook, url: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Events to Send</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {webhookEvents.map((event) => (
+                          <label key={event.value} className="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-muted/50">
+                            <input
+                              type="checkbox"
+                              checked={newWebhook.events.includes(event.value)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setNewWebhook({ ...newWebhook, events: [...newWebhook.events, event.value] });
+                                } else {
+                                  setNewWebhook({ ...newWebhook, events: newWebhook.events.filter(ev => ev !== event.value) });
+                                }
+                              }}
+                              className="rounded"
+                            />
+                            <span className="text-sm">{event.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <Button onClick={handleAddWebhook} className="w-full">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Webhook
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Data Management */}
             <Card>
               <CardHeader>
