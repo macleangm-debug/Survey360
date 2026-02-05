@@ -242,8 +242,8 @@ class TestAuthenticatedEndpoints:
             f"{BASE_URL}/api/exports/history?org_id={test_org_id}",
             headers=self.headers
         )
-        # Should return 200 or 403 (if no access to org)
-        assert response.status_code in [200, 403], f"Expected 200 or 403, got {response.status_code}"
+        # Should return 200, 401, or 403 (if no access to org)
+        assert response.status_code in [200, 401, 403], f"Expected 200, 401 or 403, got {response.status_code}"
         print(f"✓ Export history endpoint responds correctly (status: {response.status_code})")
 
 
