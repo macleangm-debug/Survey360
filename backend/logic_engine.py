@@ -97,8 +97,15 @@ class CalculationEngine:
                 # Replace field name with value (word boundary)
                 eval_expr = re.sub(r'\b' + re.escape(field_name) + r'\b', safe_value, eval_expr)
             
-            # Evaluate with safe globals
-            result = eval(eval_expr, {"__builtins__": {}}, self.SAFE_FUNCTIONS)
+            # Evaluate with safe globals that include comparison operators
+            safe_globals = {
+                "__builtins__": {
+                    "True": True,
+                    "False": False,
+                    "None": None,
+                }
+            }
+            result = eval(eval_expr, safe_globals, self.SAFE_FUNCTIONS)
             
             return result
             
