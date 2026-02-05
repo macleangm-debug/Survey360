@@ -301,7 +301,7 @@ export function WorkflowsPage() {
         `${API_URL}/api/workflows/${currentOrg.id}/${workflow.id}`,
         {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          headers: getAuthHeaders()
         }
       );
       
@@ -319,7 +319,7 @@ export function WorkflowsPage() {
         `${API_URL}/api/workflows/${currentOrg.id}/${workflow.id}/toggle`,
         {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          headers: getAuthHeaders()
         }
       );
       
