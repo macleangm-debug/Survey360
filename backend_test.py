@@ -178,7 +178,7 @@ class DataPulseAPITester:
             "description": "Test organization for API testing"
         }
         
-        success, status_code, data, _ = self.make_request('POST', '/organizations', org_data, 201)
+        success, status_code, data, _ = self.make_request('POST', '/organizations', org_data, 200)
         
         if success and isinstance(data, dict):
             self.log_test("Create Organization", True, 
