@@ -680,6 +680,33 @@ export function FormBuilderPage() {
             </div>
           </div>
           <div className="flex gap-2">
+            {/* More Options Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Settings2 className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setShowVersionHistory(true)}>
+                  <History className="w-4 h-4 mr-2" />
+                  Version History
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowVersionComparison(true)}>
+                  <Copy className="w-4 h-4 mr-2" />
+                  Compare Versions
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowSaveVersion(true)}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Version
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setShowDuplicateRules(true)}>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Duplicate Detection
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" onClick={() => navigate(`/forms/${formId}/preview`)}>
               <Eye className="w-4 h-4 mr-2" />
               Preview
