@@ -1,0 +1,175 @@
+{
+  "identity": {
+    "name": "DataPulse",
+    "persona": "The Tactical Humanitarian",
+    "vibe": "Precision, Reliability, Global, Technical",
+    "emotional_archetype": "The Performance Pro (Archetype 2) mixed with Swiss High-Contrast",
+    "tone": "Professional, Trustworthy, Efficient"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Barlow Condensed, sans-serif",
+      "body": "Manrope, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-5xl md:text-6xl font-bold tracking-tight",
+      "h2": "text-4xl font-bold tracking-tight",
+      "h3": "text-3xl font-semibold tracking-normal",
+      "body_lg": "text-lg leading-relaxed",
+      "body_base": "text-base leading-relaxed",
+      "caption": "text-xs tracking-wider uppercase font-medium text-muted-foreground"
+    },
+    "imports": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    ]
+  },
+  "colors": {
+    "palette": {
+      "light": {
+        "background": "#F8FAFC",
+        "foreground": "#0F172A",
+        "card": "#FFFFFF",
+        "card_foreground": "#0F172A",
+        "popover": "#FFFFFF",
+        "popover_foreground": "#0F172A",
+        "primary": "#4F46E5",
+        "primary_foreground": "#FFFFFF",
+        "secondary": "#F1F5F9",
+        "secondary_foreground": "#0F172A",
+        "muted": "#F1F5F9",
+        "muted_foreground": "#64748B",
+        "accent": "#F1F5F9",
+        "accent_foreground": "#0F172A",
+        "destructive": "#EF4444",
+        "destructive_foreground": "#FFFFFF",
+        "border": "#E2E8F0",
+        "input": "#E2E8F0",
+        "ring": "#4F46E5"
+      },
+      "dark": {
+        "background": "#020408",
+        "foreground": "#F8FAFC",
+        "card": "#0B0D12",
+        "card_foreground": "#F8FAFC",
+        "popover": "#0B0D12",
+        "popover_foreground": "#F8FAFC",
+        "primary": "#4F46E5",
+        "primary_foreground": "#FFFFFF",
+        "secondary": "#1E293B",
+        "secondary_foreground": "#F8FAFC",
+        "muted": "#1E293B",
+        "muted_foreground": "#94A3B8",
+        "accent": "#1E293B",
+        "accent_foreground": "#F8FAFC",
+        "destructive": "#7F1D1D",
+        "destructive_foreground": "#F8FAFC",
+        "border": "#1E293B",
+        "input": "#1E293B",
+        "ring": "#4F46E5"
+      }
+    },
+    "custom_tokens": {
+      "brand_indigo": "#4F46E5",
+      "brand_emerald": "#10B981",
+      "brand_orange": "#F97316",
+      "glass_border_dark": "rgba(255, 255, 255, 0.08)",
+      "glass_bg_dark": "rgba(11, 13, 18, 0.6)"
+    }
+  },
+  "visual_enhancers": {
+    "borders": {
+      "default": "border border-border",
+      "glass": "border border-white/10"
+    },
+    "shadows": {
+      "subtle": "shadow-sm",
+      "glow": "shadow-[0_0_20px_-5px_rgba(79,70,229,0.3)]",
+      "card": "shadow-xl ring-1 ring-black/5"
+    },
+    "radius": {
+      "default": "rounded-sm",
+      "card": "rounded-md",
+      "button": "rounded-sm"
+    },
+    "gradients": {
+      "hero_overlay": "bg-gradient-to-b from-transparent via-background/80 to-background",
+      "active_beam": "bg-gradient-to-r from-transparent via-primary/50 to-transparent"
+    }
+  },
+  "layout_strategy": {
+    "dashboard_grid": "grid grid-cols-1 md:grid-cols-12 gap-4 auto-rows-min",
+    "bento_grid": {
+      "wrapper": "grid grid-cols-1 md:grid-cols-4 gap-4",
+      "hero_cell": "md:col-span-2 md:row-span-2",
+      "tall_cell": "md:col-span-1 md:row-span-2",
+      "wide_cell": "md:col-span-2 md:row-span-1"
+    },
+    "spacing": {
+      "section_padding": "py-12 md:py-24",
+      "container_padding": "px-4 md:px-8",
+      "card_padding": "p-6"
+    }
+  },
+  "component_rules": {
+    "cards": {
+      "style": "bg-card/50 backdrop-blur-md border border-border/50",
+      "hover": "hover:border-primary/50 hover:bg-card/80 transition-all duration-300"
+    },
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20",
+      "outline": "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+      "ghost": "hover:bg-accent hover:text-accent-foreground"
+    },
+    "inputs": {
+      "style": "bg-background/50 border-input focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+    }
+  },
+  "assets": {
+    "images": {
+      "login_bg": {
+        "url": "https://images.unsplash.com/photo-1647356191320-d7a1f80ca777?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMGRhdGElMjB2aXN1YWxpemF0aW9uJTIwZGFyayUyMGFlc3RoZXRpYyUyMG5ldHdvcmt8ZW58MHx8fHwxNzcwMjk5NzEyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract purple and blue network pattern for login background"
+      },
+      "dashboard_empty": {
+        "url": "https://images.unsplash.com/photo-1762279388956-1c098163a2a8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzJ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRhdGElMjB2aXN1YWxpemF0aW9uJTIwZGFyayUyMGFlc3RoZXRpYyUyMG5ldHdvcmt8ZW58MHx8fHwxNzcwMjk5NzEyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract neon lines for empty states or loading screens"
+      },
+      "landing_hero": {
+        "url": "https://images.unsplash.com/photo-1576768199624-133c63936c46?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwzfHxzYXRlbGxpdGUlMjB2aWV3JTIwYWZyaWNhJTIwZWFydGglMjBuaWdodCUyMGxpZ2h0c3xlbnwwfHx8fDE3NzAyOTk3MTB8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Satellite view of land for hero section"
+      },
+      "human_context": {
+        "url": "https://images.unsplash.com/photo-1741940365831-1a1fdc2e33ff?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwxfHxkaXZlcnNlJTIwZmllbGQlMjByZXNlYXJjaGVycyUyMHRhYmxldCUyMGFmcmljYSUyMHJ1cmFsfGVufDB8fHx8MTc3MDI5OTcxMXww&ixlib=rb-4.1.0&q=85",
+        "description": "Woman and child, humanizing the data collection context"
+      }
+    },
+    "icons": {
+      "library": "lucide-react",
+      "instructions": "Use consistent stroke width (1.5px or 2px). Do NOT mix filled and outlined styles randomly."
+    }
+  },
+  "libraries": {
+    "charts": "recharts",
+    "maps": "react-map-gl (if 3D needed) or leaflet/react-leaflet (for lightweight)",
+    "tables": "@tanstack/react-table",
+    "forms": "react-hook-form + zod",
+    "animation": "framer-motion"
+  },
+  "universal_guidelines": [
+    "TACTICAL PRECISION: Use monospace fonts for all data/numbers.",
+    "DARK MODE FIRST: Design complex views in dark mode first, then invert for light mode.",
+    "NO GRADIENT TEXT: Keep text solid for readability against complex data backgrounds.",
+    "BORDERS OVER SHADOWS: In dark mode, use 1px subtle borders (white/10) to define hierarchy, not shadows.",
+    "DENSE BUT BREATHABLE: Use 'compact' mode for tables (py-2) but 'comfortable' mode for page layout (gap-6).",
+    "INTERACTIVE FEEDBACK: Every click must have visual feedback (ripple or scale-down).",
+    "ACCESSIBILITY: Ensure 4.5:1 contrast for all text. Use 'sonner' for toast notifications."
+  ],
+  "instructions_to_main_agent": [
+    "Install 'lucide-react', 'recharts', 'framer-motion', 'clsx', 'tailwind-merge' if not present.",
+    "Use the provided image URLs for specific sections.",
+    "Implement the 'Barlow Condensed' font for all headings.",
+    "Follow the 'Bento Grid' strategy for the main dashboard overview.",
+    "Ensure the 'Form Builder' uses a clean, spreadsheet-like layout (minimal borders, high focus)."
+  ]
+}
