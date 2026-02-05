@@ -161,37 +161,13 @@ const FieldRenderer = ({ field, value, onChange, language, errors }) => {
 
       case 'gps':
         return (
-          <div className="space-y-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                if (navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                      onChange(field.id, {
-                        latitude: pos.coords.latitude,
-                        longitude: pos.coords.longitude,
-                        accuracy: pos.coords.accuracy
-                      });
-                      toast.success('Location captured');
-                    },
-                    (err) => toast.error('Failed to get location')
-                  );
-                }
-              }}
-            >
-              <MapPin className="w-4 h-4 mr-2" />
-              Capture Location
-            </Button>
-            {value && (
-              <div className="text-sm text-gray-400">
-                Lat: {value.latitude?.toFixed(6)}, Lng: {value.longitude?.toFixed(6)}
-                <br />
-                Accuracy: {value.accuracy?.toFixed(0)}m
-              </div>
-            )}
-          </div>
+          <GpsCapture
+            value={value}
+            onChange={(gpsData) => onChange(field.id, gpsData)}
+            required={field.required}
+            minAccuracy={field.validation?.min_accuracy || 50}
+            label={label}
+          />
         );
 
       case 'photo':
@@ -231,26 +207,24 @@ const FieldRenderer = ({ field, value, onChange, language, errors }) => {
 
       case 'audio':
         return (
-          <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-            <Mic className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-            <p className="text-sm text-gray-400 mb-2">Record audio</p>
-            <Button type="button" variant="outline" size="sm">
-              <Mic className="w-4 h-4 mr-2" />
-              Start Recording
-            </Button>
-          </div>
+          <AudioRecorder
+            value={value}
+            onChange={(audioData) => onChange(field.id, audioData)}
+            required={field.required}
+            maxDuration={field.validation?.max_duration || 300}
+            label={label}
+          />
         );
 
       case 'video':
         return (
-          <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-            <Video className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-            <p className="text-sm text-gray-400 mb-2">Record video</p>
-            <Button type="button" variant="outline" size="sm">
-              <Video className="w-4 h-4 mr-2" />
-              Start Recording
-            </Button>
-          </div>
+          <VideoRecorder
+            value={value}
+            onChange={(videoData) => onChange(field.id, videoData)}
+            required={field.required}
+            maxDuration={field.validation?.max_duration || 120}
+            label={label}
+          />
         );
 
       case 'note':
