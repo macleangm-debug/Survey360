@@ -52,8 +52,13 @@ import {
 } from './ui/select';
 import { Skeleton } from './ui/skeleton';
 import { toast } from 'sonner';
+import { useAuthStore } from '../store';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+const getAuthHeaders = () => ({
+  'Authorization': `Bearer ${useAuthStore.getState().token}`
+});
 
 const COLORS = ['#22c55e', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899'];
 
