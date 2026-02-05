@@ -45,6 +45,8 @@ from routes.logic_routes import router as logic_router
 from routes.widget_routes import router as widget_router
 from routes.case_import_routes import router as case_import_router
 from routes.collaboration_routes import router as collaboration_router
+from routes.duplicate_routes import router as duplicate_router
+from routes.versioning_routes import router as versioning_router
 
 # Include all route modules
 api_router.include_router(auth_router)
@@ -62,6 +64,8 @@ api_router.include_router(logic_router)
 api_router.include_router(widget_router)
 api_router.include_router(case_import_router)
 api_router.include_router(collaboration_router)
+api_router.include_router(duplicate_router)
+api_router.include_router(versioning_router)
 
 
 # Health check endpoint
