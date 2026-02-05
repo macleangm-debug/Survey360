@@ -465,7 +465,7 @@ export function FormBuilderPage() {
         <div className="flex items-center justify-center h-[60vh]">
           <div className="text-center">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading form...</p>
+            <p className="text-gray-400">Loading form...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -485,11 +485,11 @@ export function FormBuilderPage() {
               <Input
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                className="font-barlow text-2xl font-bold border-0 border-b border-transparent hover:border-border focus:border-primary bg-transparent px-0 h-auto"
+                className="font-barlow text-2xl font-bold border-0 border-b border-transparent hover:border-border focus:border-primary bg-transparent px-0 h-auto text-white"
                 placeholder="Form Name"
                 data-testid="form-title-input"
               />
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-gray-400 mt-1">
                 {currentForm?.status} • v{currentForm?.version}
               </p>
             </div>
@@ -514,7 +514,7 @@ export function FormBuilderPage() {
           {/* Field Types Palette */}
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
             <CardHeader>
-              <CardTitle className="font-barlow text-lg">Add Fields</CardTitle>
+              <CardTitle className="font-barlow text-lg text-white">Add Fields</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-2">
