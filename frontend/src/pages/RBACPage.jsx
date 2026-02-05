@@ -166,7 +166,7 @@ export function RBACPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const headers = { 'Authorization': `Bearer ${localStorage.getItem('token')}` };
+      const headers = getAuthHeaders();
       
       const [rolesRes, permsRes, membersRes] = await Promise.all([
         fetch(`${API_URL}/api/rbac/roles/${currentOrg.id}`, { headers }),
