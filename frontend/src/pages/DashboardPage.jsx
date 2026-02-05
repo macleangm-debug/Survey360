@@ -318,7 +318,7 @@ export function DashboardPage() {
                   </div>
                 </>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">No data yet</p>
+                <p className="text-sm text-gray-400 text-center py-8">No data yet</p>
               )}
             </CardContent>
           </Card>
@@ -330,8 +330,8 @@ export function DashboardPage() {
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="font-barlow">Recent Activity</CardTitle>
-                <CardDescription>Latest submissions</CardDescription>
+                <CardTitle className="font-barlow text-white">Recent Activity</CardTitle>
+                <CardDescription className="text-gray-400">Latest submissions</CardDescription>
               </div>
               <Button variant="ghost" size="sm" onClick={() => navigate('/submissions')}>
                 View all
@@ -359,8 +359,8 @@ export function DashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Database className="w-12 h-12 text-muted-foreground/50 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No recent activity</p>
+                  <Database className="w-12 h-12 text-gray-600 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">No recent activity</p>
                 </div>
               )}
             </CardContent>
@@ -369,7 +369,7 @@ export function DashboardPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle className="font-barlow">Quick Actions</CardTitle>
+              <CardTitle className="font-barlow text-white">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/projects/new')}>
