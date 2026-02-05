@@ -210,7 +210,7 @@ export function WorkflowsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const headers = { 'Authorization': `Bearer ${localStorage.getItem('token')}` };
+      const headers = getAuthHeaders();
       
       const [workflowsRes, templatesRes, triggersRes, actionsRes, operatorsRes] = await Promise.all([
         fetch(`${API_URL}/api/workflows/${currentOrg.id}`, { headers }),
