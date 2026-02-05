@@ -43,10 +43,15 @@ import {
 import { Checkbox } from '../components/ui/checkbox';
 import { Skeleton } from '../components/ui/skeleton';
 import { DashboardLayout } from '../layouts/DashboardLayout';
-import { useOrgStore } from '../store';
+import { useOrgStore, useAuthStore } from '../store';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+const getAuthHeaders = () => ({
+  'Authorization': `Bearer ${useAuthStore.getState().token}`,
+  'Content-Type': 'application/json'
+});
 
 const PermissionItem = ({ permission, isChecked, onToggle, disabled }) => (
   <label className={`flex items-center gap-3 p-2 rounded-lg hover:bg-accent/50 cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
