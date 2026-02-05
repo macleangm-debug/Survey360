@@ -566,24 +566,24 @@ export function CasesPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
-            <Card>
+            <Card className="h-full">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Cases</p>
-                    <p className="text-2xl font-barlow font-bold">{stats.total}</p>
+                    <p className="text-sm text-gray-400">Total Cases</p>
+                    <p className="text-2xl font-barlow font-bold text-white">{stats.total}</p>
                   </div>
-                  <Briefcase className="w-8 h-8 text-muted-foreground/30" />
+                  <Briefcase className="w-8 h-8 text-gray-600" />
                 </div>
               </CardContent>
             </Card>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Card>
+            <Card className="h-full">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Open</p>
+                    <p className="text-sm text-gray-400">Open</p>
                     <p className="text-2xl font-barlow font-bold text-blue-500">{stats.open}</p>
                   </div>
                   <Clock className="w-8 h-8 text-blue-500/30" />
@@ -592,11 +592,11 @@ export function CasesPage() {
             </Card>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Card>
+            <Card className="h-full">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">In Progress</p>
+                    <p className="text-sm text-gray-400">In Progress</p>
                     <p className="text-2xl font-barlow font-bold text-yellow-500">{stats.in_progress}</p>
                   </div>
                   <Clock className="w-8 h-8 text-yellow-500/30" />
