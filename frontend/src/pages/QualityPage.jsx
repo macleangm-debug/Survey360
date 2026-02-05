@@ -423,8 +423,8 @@ export function QualityPage() {
               {/* Submission Status Pie */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-barlow">Submission Status</CardTitle>
-                  <CardDescription>Distribution by review status</CardDescription>
+                  <CardTitle className="font-barlow text-white">Submission Status</CardTitle>
+                  <CardDescription className="text-gray-400">Distribution by review status</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {loading ? (
