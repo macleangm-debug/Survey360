@@ -12,6 +12,7 @@ import { FormTemplatesPage } from './pages/FormTemplatesPage';
 import { SubmissionsPage } from './pages/SubmissionsPage';
 import { TeamPage, CreateOrganizationPage } from './pages/TeamPage';
 import { CasesPage } from './pages/CasesPage';
+import { CaseImportPage } from './pages/CaseImportPage';
 import { QualityPage } from './pages/QualityPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { GPSMapPage } from './pages/GPSMapPage';
