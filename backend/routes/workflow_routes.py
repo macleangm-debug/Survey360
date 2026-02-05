@@ -147,6 +147,94 @@ async def get_condition_operators():
     }
 
 
+@router.get("/{org_id}/templates")
+async def get_workflow_templates(org_id: str):
+    """Get pre-built workflow templates"""
+    
+    templates = [
+        {
+            "id": "quality_gate",
+            "name": "Quality Gate",
+            "description": "Auto-approve high quality, flag low quality submissions",
+            "category": "Quality",
+            "workflow": {
+                "trigger_type": "submission_created",
+                "conditions": [],
+                "actions": [
+                    {
+                        "action_type": "auto_approve",
+                        "config": {},
+                        "condition": {"field": "quality_score", "operator": "greater_than", "value": 90}
+                    },
+                    {
+                        "action_type": "flag_review",
+                        "config": {"reason": "Quality score below threshold"},
+                        "condition": {"field": "quality_score", "operator": "less_than", "value": 70}
+                    }
+                ]
+            }
+        },
+        {
+            "id": "supervisor_review",
+            "name": "Supervisor Review",
+            "description": "Route submissions to supervisor based on form type",
+            "category": "Routing",
+            "workflow": {
+                "trigger_type": "submission_created",
+                "conditions": [],
+                "actions": [
+                    {
+                        "action_type": "assign_reviewer",
+                        "config": {"assignment_type": "supervisor"}
+                    }
+                ]
+            }
+        },
+        {
+            "id": "case_followup",
+            "name": "Case Follow-up",
+            "description": "Create case for submissions requiring follow-up",
+            "category": "Cases",
+            "workflow": {
+                "trigger_type": "field_value",
+                "trigger_config": {"field": "requires_followup", "value": True},
+                "conditions": [],
+                "actions": [
+                    {
+                        "action_type": "create_case",
+                        "config": {
+                            "category": "Follow-up Required",
+                            "priority": "high"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "id": "notification_alert",
+            "name": "Alert Notification",
+            "description": "Send alerts for critical submissions",
+            "category": "Notifications",
+            "workflow": {
+                "trigger_type": "field_value",
+                "trigger_config": {"field": "is_urgent", "value": True},
+                "conditions": [],
+                "actions": [
+                    {
+                        "action_type": "send_notification",
+                        "config": {
+                            "notification_type": "email",
+                            "subject": "Urgent Submission Alert"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+    
+    return {"templates": templates}
+
+
 @router.get("/{org_id}")
 async def get_workflows(
     request: Request,
