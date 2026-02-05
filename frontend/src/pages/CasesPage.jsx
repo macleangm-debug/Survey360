@@ -605,11 +605,11 @@ export function CasesPage() {
             </Card>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Card>
+            <Card className="h-full">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">Completed</p>
+                    <p className="text-sm text-gray-400">Completed</p>
                     <p className="text-2xl font-barlow font-bold text-green-500">{stats.completed}</p>
                   </div>
                   <CheckCircle className="w-8 h-8 text-green-500/30" />
