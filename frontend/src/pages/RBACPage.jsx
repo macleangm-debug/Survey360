@@ -226,7 +226,7 @@ export function RBACPage() {
         `${API_URL}/api/rbac/roles/${currentOrg.id}/${role.id}`,
         {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          headers: getAuthHeaders()
         }
       );
       
