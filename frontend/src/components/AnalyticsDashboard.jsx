@@ -135,7 +135,7 @@ export function AnalyticsDashboard({ orgId }) {
     try {
       const response = await fetch(
         `${API_URL}/api/analytics/export/${orgId}?period=${period}&format=${format}`,
-        { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
+        { headers: getAuthHeaders() }
       );
       
       if (format === 'csv') {
