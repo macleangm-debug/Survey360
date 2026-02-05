@@ -146,5 +146,13 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `/app/frontend/public/sw.js` - Service worker
 - `/app/frontend/src/lib/offlineStorage.js` - IndexedDB service
 - `/app/frontend/src/pages/FormPreviewPage.jsx` - Form preview
+- `/app/frontend/src/pages/FormTemplatesPage.jsx` - Templates library
+- `/app/frontend/src/pages/GPSMapPage.jsx` - GPS visualization
+- `/app/frontend/src/components/SkipLogicEditor.jsx` - Skip logic UI
+- `/app/frontend/src/components/CalculatedFieldEditor.jsx` - Calculation UI
 - `/app/frontend/src/components/MediaUpload.jsx` - Media upload
 - `/app/backend/routes/media_routes.py` - Media API
+- `/app/backend/routes/template_routes.py` - Templates API
+- `/app/backend/routes/logic_routes.py` - Logic/Calculate API
+- `/app/backend/routes/gps_routes.py` - GPS API
+- `/app/backend/logic_engine.py` - Calculation & skip logic engine
