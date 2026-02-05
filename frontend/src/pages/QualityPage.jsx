@@ -614,8 +614,8 @@ export function QualityPage() {
                   </Table>
                 ) : (
                   <div className="text-center py-12">
-                    <Users className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-                    <p className="text-muted-foreground">No enumerator data available</p>
+                    <Users className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-400">No enumerator data available</p>
                   </div>
                 )}
               </CardContent>
