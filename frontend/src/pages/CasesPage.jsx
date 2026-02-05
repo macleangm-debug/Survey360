@@ -149,7 +149,7 @@ const CaseRow = ({ caseItem, onStatusChange, onView, isSelected }) => {
 const CaseDetailPanel = ({ caseItem, onClose, onStatusChange }) => {
   const [activeTab, setActiveTab] = useState('details');
   const [note, setNote] = useState('');
-  const [notes, setNotes] = useState([
+  const [notes, setNotes] = useState(() => [
     { id: 1, text: 'Initial contact made via phone', date: new Date(Date.now() - 86400000 * 3), author: 'John Doe' },
     { id: 2, text: 'Scheduled follow-up visit for next week', date: new Date(Date.now() - 86400000), author: 'Jane Smith' },
   ]);
@@ -167,11 +167,11 @@ const CaseDetailPanel = ({ caseItem, onClose, onStatusChange }) => {
     toast.success('Note added');
   };
 
-  // Mock visit history
-  const visitHistory = [
+  // Mock visit history (using useMemo would be better but for demo purposes)
+  const visitHistory = React.useMemo(() => [
     { id: 1, date: new Date(Date.now() - 86400000 * 7), form: 'Baseline Survey', status: 'completed', quality: 92 },
     { id: 2, date: new Date(Date.now() - 86400000 * 14), form: 'Screening Form', status: 'completed', quality: 88 },
-  ];
+  ], []);
 
   if (!caseItem) return null;
 
