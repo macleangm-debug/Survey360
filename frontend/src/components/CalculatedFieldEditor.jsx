@@ -60,7 +60,7 @@ const EXAMPLES = [
   { label: 'Total Cost', formula: 'quantity * unit_price', fields: ['quantity', 'unit_price'] },
   { label: 'Average Score', formula: 'round((score1 + score2 + score3) / 3, 1)', fields: ['score1', 'score2', 'score3'] },
   { label: 'Age from DOB', formula: 'age(date_of_birth)', fields: ['date_of_birth'] },
-  { label: 'Pass/Fail', formula: "if(score >= 50, 'Pass', 'Fail')", fields: ['score'] },
+  { label: 'Pass/Fail', formula: "iif(gte(score, 50), 'Pass', 'Fail')", fields: ['score'] },
   { label: 'Percentage', formula: 'round((correct / total) * 100, 0)', fields: ['correct', 'total'] },
 ];
 
