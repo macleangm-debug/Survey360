@@ -10,13 +10,16 @@ import {
   AlertCircle,
   ArrowUpRight,
   Plus,
-  Activity
+  Activity,
+  LayoutGrid,
+  List
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Skeleton } from '../components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import {
   AreaChart,
   Area,
@@ -27,6 +30,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { DashboardLayout } from '../layouts/DashboardLayout';
+import { CustomDashboard } from '../components/CustomDashboard';
 import { useOrgStore } from '../store';
 import { dashboardAPI, orgAPI } from '../lib/api';
 import { formatRelativeTime, getQualityColor } from '../lib/utils';
