@@ -55,10 +55,15 @@ import {
 import { Textarea } from '../components/ui/textarea';
 import { Skeleton } from '../components/ui/skeleton';
 import { DashboardLayout } from '../layouts/DashboardLayout';
-import { useOrgStore } from '../store';
+import { useOrgStore, useAuthStore } from '../store';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+const getAuthHeaders = () => ({
+  'Authorization': `Bearer ${useAuthStore.getState().token}`,
+  'Content-Type': 'application/json'
+});
 
 const WorkflowCard = ({ workflow, onEdit, onDelete, onToggle, onDuplicate }) => (
   <motion.div
