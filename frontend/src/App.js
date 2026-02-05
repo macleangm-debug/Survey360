@@ -9,6 +9,9 @@ import { FormsPage } from './pages/FormsPage';
 import { FormBuilderPage } from './pages/FormBuilderPage';
 import { SubmissionsPage } from './pages/SubmissionsPage';
 import { TeamPage, CreateOrganizationPage } from './pages/TeamPage';
+import { CasesPage } from './pages/CasesPage';
+import { QualityPage } from './pages/QualityPage';
+import { SettingsPage } from './pages/SettingsPage';
 import '@/App.css';
 
 // Protected Route wrapper
