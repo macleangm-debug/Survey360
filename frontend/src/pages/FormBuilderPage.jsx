@@ -791,6 +791,77 @@ export function FormBuilderPage() {
             onClose={() => setEditingField(null)}
           />
         )}
+
+        {/* Version History Sheet */}
+        {showVersionHistory && (
+          <Sheet open={showVersionHistory} onOpenChange={setShowVersionHistory}>
+            <SheetContent className="w-[400px]">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2">
+                  <History className="w-5 h-5" />
+                  Version History
+                </SheetTitle>
+                <SheetDescription>View and restore previous versions</SheetDescription>
+              </SheetHeader>
+              <div className="mt-4">
+                <VersionHistory
+                  formId={formId}
+                  currentVersion={currentForm?.version}
+                  onSelectVersion={(v) => setSelectedVersion(v)}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+
+        {/* Version Comparison */}
+        {showVersionComparison && (
+          <Sheet open={showVersionComparison} onOpenChange={setShowVersionComparison}>
+            <SheetContent className="w-[600px] sm:max-w-[600px]">
+              <SheetHeader>
+                <SheetTitle>Compare Versions</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4">
+                <VersionComparison formId={formId} />
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+
+        {/* Save Version Dialog */}
+        {showSaveVersion && (
+          <SaveVersionDialog
+            formId={formId}
+            onSave={() => {
+              setShowSaveVersion(false);
+              loadForm();
+            }}
+            onClose={() => setShowSaveVersion(false)}
+          />
+        )}
+
+        {/* Restore Version Dialog */}
+        {selectedVersion && (
+          <RestoreVersionDialog
+            formId={formId}
+            version={selectedVersion}
+            onRestore={() => {
+              setSelectedVersion(null);
+              setShowVersionHistory(false);
+              loadForm();
+            }}
+            onClose={() => setSelectedVersion(null)}
+          />
+        )}
+
+        {/* Duplicate Detection Rules */}
+        {showDuplicateRules && (
+          <DuplicateRulesConfig
+            formId={formId}
+            fields={fields}
+            onClose={() => setShowDuplicateRules(false)}
+          />
+        )}
       </div>
     </DashboardLayout>
   );
