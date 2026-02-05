@@ -290,16 +290,7 @@ export function AuthCallbackPage() {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
 
-  React.useEffect(() => {
-    const code = searchParams.get('code');
-    if (code) {
-      handleSSOCallback(code);
-    } else {
-      navigate('/login');
-    }
-  }, []);
-
-  const handleSSOCallback = async (code) => {
+  const handleSSOCallback = React.useCallback(async (code) => {
     try {
       const redirectUri = `${window.location.origin}/auth/callback`;
       const response = await authAPI.ssoCallback(code, redirectUri);
