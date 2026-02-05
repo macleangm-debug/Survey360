@@ -554,6 +554,11 @@ export function FormBuilderPage() {
   const [editingField, setEditingField] = useState(null);
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showVersionComparison, setShowVersionComparison] = useState(false);
+  const [showSaveVersion, setShowSaveVersion] = useState(false);
+  const [showDuplicateRules, setShowDuplicateRules] = useState(false);
+  const [selectedVersion, setSelectedVersion] = useState(null);
 
   const loadForm = useCallback(async () => {
     setLoading(true);
