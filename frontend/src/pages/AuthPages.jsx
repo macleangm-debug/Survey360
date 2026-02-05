@@ -46,8 +46,8 @@ export function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left side - Clean branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-card border-r border-border">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/3" />
+      <div className="hidden lg:flex lg:w-1/2 relative bg-primary/5">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
         
         <div className="relative z-10 flex flex-col justify-center p-12 w-full">
           <motion.div
@@ -59,14 +59,14 @@ export function LoginPage() {
               <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
                 <Activity className="w-7 h-7 text-primary-foreground" />
               </div>
-              <span className="font-barlow text-3xl font-bold tracking-tight">DataPulse</span>
+              <span className="font-barlow text-3xl font-bold tracking-tight text-foreground">DataPulse</span>
             </div>
             <h1 className="font-barlow text-4xl font-bold tracking-tight mb-4 text-foreground">
               Field Data Collection
               <br />
               Reimagined
             </h1>
-            <p className="text-lg text-muted-foreground max-w-md">
+            <p className="text-lg text-foreground/70 max-w-md">
               Enterprise-grade platform for research, monitoring & evaluation. 
               Collect data anywhere, even offline.
             </p>
@@ -74,8 +74,8 @@ export function LoginPage() {
             {/* Feature highlights */}
             <div className="mt-10 space-y-4">
               {['Offline-first data collection', 'Real-time quality monitoring', 'Multi-language support (EN/SW)'].map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-3 text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <div key={idx} className="flex items-center gap-3 text-foreground/70">
+                  <div className="w-2 h-2 rounded-full bg-primary" />
                   <span className="text-sm">{feature}</span>
                 </div>
               ))}
