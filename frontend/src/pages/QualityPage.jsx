@@ -535,8 +535,8 @@ export function QualityPage() {
           <TabsContent value="enumerators" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="font-barlow">Enumerator Performance</CardTitle>
-                <CardDescription>Individual performance metrics for the last {days} days</CardDescription>
+                <CardTitle className="font-barlow text-white">Enumerator Performance</CardTitle>
+                <CardDescription className="text-gray-400">Individual performance metrics for the last {days} days</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
                 {loading ? (
