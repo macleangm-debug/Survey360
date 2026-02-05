@@ -286,8 +286,8 @@ export function QualityPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="font-barlow text-3xl font-bold tracking-tight">Data Quality</h1>
-            <p className="text-muted-foreground">Monitor data quality and enumerator performance</p>
+            <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Data Quality</h1>
+            <p className="text-gray-400">Monitor data quality and enumerator performance</p>
           </div>
           <div className="flex gap-2">
             <Select value={selectedProject} onValueChange={setSelectedProject}>
