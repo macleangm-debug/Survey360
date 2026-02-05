@@ -541,11 +541,7 @@ export function FormBuilderPage() {
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
 
-  useEffect(() => {
-    loadForm();
-  }, [formId]);
-
-  const loadForm = async () => {
+  const loadForm = useCallback(async () => {
     setLoading(true);
     try {
       const response = await formAPI.get(formId);
