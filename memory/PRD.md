@@ -10,158 +10,114 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - Market research firms
 - Health & education programs
 
-## User Personas & Roles
-1. **Super Admin** - Platform owner with full access
-2. **Organization Admin** - Manages org settings, users, billing
-3. **Project Manager** - Creates/manages projects and forms
-4. **Data Analyst** - Views data, creates exports, analyzes quality
-5. **Field Enumerator** - Collects data using mobile/web app
-6. **Read-Only Stakeholder** - Views dashboards and reports
-
 ## Architecture
 - **Frontend**: React + TailwindCSS + Shadcn UI
 - **Backend**: FastAPI (Python)
 - **Database**: MongoDB (multi-tenant)
 - **Auth**: JWT + SSO (Software Galaxy integration ready)
+- **PWA**: Service Worker + IndexedDB for offline support
 
 ## What's Been Implemented (Feb 5, 2026)
 
-### Authentication & Organizations
-- [x] User registration (email/password)
-- [x] User login with JWT tokens
-- [x] SSO integration architecture (Software Galaxy ready)
+### Core Features
+- [x] User registration and JWT authentication
 - [x] Multi-tenant organization system
-- [x] Organization CRUD operations
-- [x] Organization member management
-- [x] Role-based access control (RBAC)
+- [x] Role-based access control
+- [x] Project management
+- [x] Drag-and-drop Form Builder with 14+ field types
+- [x] Data submission and review workflow
+- [x] Quality scoring and flagging
+- [x] Export (CSV, XLSX, JSON)
+- [x] Case management for longitudinal tracking
+- [x] Quality Dashboard with comprehensive metrics
+- [x] Settings page with API key management
 
-### Form Builder
-- [x] Form CRUD operations
-- [x] Multi-field type support:
+### PWA & Offline Support (NEW - Feb 5, 2026)
+- [x] PWA manifest.json with app icons
+- [x] Service Worker for caching and offline support
+- [x] IndexedDB storage for offline forms and submissions
+- [x] Sync manager for background synchronization
+- [x] Network status indicator
+- [x] PWA install prompt
+- [x] Offline fallback page
+
+### Form Preview (NEW - Feb 5, 2026)
+- [x] Mobile/Desktop device preview toggle
+- [x] Language toggle (English/Swahili)
+- [x] All field type renderers:
   - Text, Number, Date, Textarea
-  - Select, Radio, Checkbox (single/multi)
-  - GPS Location, Photo, Audio, Video
-  - Barcode, Signature, Calculate, Note
-  - Group, Repeat (nested fields)
-- [x] Multi-language support (English + Swahili)
-- [x] Validation rules (required, min/max, patterns)
-- [x] Skip logic architecture
-- [x] Form versioning
-- [x] Form publishing workflow
+  - Select, Radio, Checkbox
+  - GPS Location capture
+  - Photo capture/upload
+  - Audio/Video placeholders
+  - Note display
+  - Group/Repeat structures
+- [x] Form validation with error display
+- [x] Test Submit simulation
+- [x] Reset form functionality
+- [x] Debug panel showing form data
 
-### Data Collection
-- [x] Submission API (online)
-- [x] Bulk submission sync
-- [x] GPS capture and storage
-- [x] Quality scoring algorithm
-- [x] Quality flags detection
-- [x] Submission review workflow (approve/reject/flag)
+### Media Upload (NEW - Feb 5, 2026)
+- [x] File upload API with chunked upload support
+- [x] File type validation:
+  - Photos: JPEG, PNG, WebP, HEIC (10MB limit)
+  - Audio: MP3, WAV, OGG, WebM (25MB limit)
+  - Video: MP4, WebM, MOV, AVI (50MB limit)
+  - Documents: PDF, DOC, DOCX (25MB limit)
+- [x] Progress indicator during upload
+- [x] File preview after upload
+- [x] Delete uploaded files
+- [x] Audio recorder component
 
-### Dashboard & Analytics
-- [x] Organization-level dashboard
-- [x] Statistics cards (projects, forms, submissions, reviews)
-- [x] Submission trends chart (14-day view)
-- [x] Data quality metrics panel
-- [x] Recent activity feed
-- [x] GPS location visualization (API ready)
+## File Upload Limits (Industry Standard)
+| Type | Limit | Formats |
+|------|-------|---------|
+| Photo | 10MB | JPEG, PNG, WebP, HEIC |
+| Audio | 25MB | MP3, WAV, OGG, WebM |
+| Video | 50MB | MP4, WebM, MOV, AVI |
+| Document | 25MB | PDF, DOC, DOCX |
 
-### Exports & Integration
-- [x] CSV export
-- [x] Excel (XLSX) export
-- [x] JSON export
-- [x] Export history tracking
+## API Endpoints
 
-### Case Management (NEW - Feb 5, 2026)
-- [x] Case creation with unique respondent IDs
-- [x] Case status tracking (open, in_progress, completed, closed)
-- [x] Case assignment to enumerators
-- [x] Multi-visit/longitudinal data support
-- [x] Case detail slide-out panel
-- [x] Visit history tracking
-- [x] Case notes and annotations
-- [x] Case tagging system
-- [x] Contact information management
-
-### Quality Dashboard (ENHANCED - Feb 5, 2026)
-- [x] 8 metric cards:
-  - Average Quality Score
-  - Total Submissions
-  - Completion Rate
-  - Avg Response Time
-  - Flagged Issues
-  - Rejection Rate
-  - Active Enumerators
-  - Validation Score
-- [x] Quality Score gauge visualization
-- [x] Score Distribution chart
-- [x] Submission Status pie chart
-- [x] Quality Flags bar chart
-- [x] Tabbed interface (Overview, Enumerators, Trends)
-- [x] Enumerator performance table
-- [x] Submission trends area chart
-- [x] GPS Accuracy breakdown
-- [x] Anomaly detection alerts
-
-### Settings Page (ENHANCED - Feb 5, 2026)
-- [x] 5 comprehensive tabs:
-  - Profile (avatar, name, email, language)
-  - Appearance (theme, compact mode, animations)
-  - Alerts (email & push notifications)
-  - Organization (data settings, security)
-  - API & Export (new)
-- [x] API Key management (show/hide, copy, regenerate)
-- [x] Export settings configuration:
-  - Default format (CSV, XLSX, JSON, Stata, SPSS)
-  - Date format (ISO, US, EU, Unix)
-  - Timezone settings
-  - Metadata inclusion toggle
-- [x] Data management options
+### Media API
+- `POST /api/media/upload` - Upload single file
+- `POST /api/media/upload/init` - Initialize chunked upload
+- `POST /api/media/upload/chunk/{upload_id}/{chunk_index}` - Upload chunk
+- `POST /api/media/upload/complete/{upload_id}` - Complete chunked upload
+- `GET /api/media/file/{file_id}` - Get file
+- `GET /api/media/thumbnail/{file_id}` - Get thumbnail
+- `DELETE /api/media/{file_id}` - Delete file
+- `GET /api/media/limits` - Get upload limits
 
 ## Backlog - P0 (Critical)
-- [ ] Mobile PWA for offline data collection
-- [ ] Offline sync engine with conflict resolution
-- [ ] Form preview in builder
-- [ ] Media file upload (photos, audio, video)
+- [ ] Complete offline sync with conflict resolution
+- [ ] Real GPS capture in form preview
+- [ ] Audio/Video recording implementation
 
 ## Backlog - P1 (High Priority)
 - [ ] Calculated fields evaluation
 - [ ] Advanced skip logic editor
-- [ ] Audit logs viewing UI
-- [ ] User invitation emails
 - [ ] GPS accuracy visualization on map
 - [ ] Duplicate detection alerts
+- [ ] Form versioning comparison
 
 ## Backlog - P2 (Medium Priority)
 - [ ] Form templates library
 - [ ] Custom dashboard widgets
 - [ ] Webhook configuration
-- [ ] API keys management (backend implementation)
-- [ ] Stata/SPSS export formats (backend)
+- [ ] Stata/SPSS export formats
 - [ ] Batch case import from CSV
-
-## Backlog - P3 (Nice to Have)
-- [ ] AI-assisted form creation
-- [ ] AI data anomaly detection
-- [ ] Real-time collaboration
-- [ ] Custom branding per organization
-- [ ] Subscription & billing
-
-## Tech Debt
-- Add proper HTTP status codes (201 for POST)
-- Add useCallback for effect dependencies in some components
-- Add comprehensive API rate limiting
-- Add request logging middleware
-
-## Next Steps
-1. Build Mobile PWA with offline-first architecture
-2. Add form preview functionality
-3. Implement media file upload with cloud storage
-4. Add map visualization for GPS submissions
-5. Implement backend for API key management
-6. Add Stata/SPSS export formats
 
 ## Test Credentials
 - **Email**: test@datapulse.io
 - **Password**: password123
 - **Organization**: Test Organization
 - **Project**: Health Survey 2026
+
+## Key Files
+- `/app/frontend/public/manifest.json` - PWA manifest
+- `/app/frontend/public/sw.js` - Service worker
+- `/app/frontend/src/lib/offlineStorage.js` - IndexedDB service
+- `/app/frontend/src/pages/FormPreviewPage.jsx` - Form preview
+- `/app/frontend/src/components/MediaUpload.jsx` - Media upload
+- `/app/backend/routes/media_routes.py` - Media API
