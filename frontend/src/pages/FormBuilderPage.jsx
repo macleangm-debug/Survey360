@@ -227,7 +227,7 @@ const FieldEditor = ({ field, allFields, onChange, onClose }) => {
                         ))}
                         {options.length === 0 && (
                           <p className="text-sm text-gray-500 text-center py-4">
-                            No options yet. Click "Add Option" to create choices.
+                            No options yet. Click &quot;Add Option&quot; to create choices.
                           </p>
                         )}
                       </div>
