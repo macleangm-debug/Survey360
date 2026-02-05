@@ -56,6 +56,11 @@ const PublicRoute = ({ children }) => {
 function App() {
   const { theme } = useUIStore();
 
+  // Register service worker on mount
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>
       <BrowserRouter>
