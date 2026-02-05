@@ -234,8 +234,8 @@ export function DashboardPage() {
           {/* Submission Trends */}
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle className="font-barlow">Submission Trends</CardTitle>
-              <CardDescription>Last 14 days</CardDescription>
+              <CardTitle className="font-barlow text-white">Submission Trends</CardTitle>
+              <CardDescription className="text-gray-400">Last 14 days</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -281,8 +281,8 @@ export function DashboardPage() {
           {/* Data Quality */}
           <Card>
             <CardHeader>
-              <CardTitle className="font-barlow">Data Quality</CardTitle>
-              <CardDescription>Overall quality metrics</CardDescription>
+              <CardTitle className="font-barlow text-white">Data Quality</CardTitle>
+              <CardDescription className="text-gray-400">Overall quality metrics</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {loading ? (
@@ -295,7 +295,7 @@ export function DashboardPage() {
                 <>
                   <div>
                     <div className="flex justify-between mb-2">
-                      <span className="text-sm text-muted-foreground">Avg Quality Score</span>
+                      <span className="text-sm text-gray-400">Avg Quality Score</span>
                       <span className={`text-sm font-mono font-medium ${getQualityColor(quality.avg_quality_score)}`}>
                         {quality.avg_quality_score}%
                       </span>
@@ -304,17 +304,17 @@ export function DashboardPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-3 rounded-lg bg-green-500/10">
-                      <p className="text-2xl font-barlow font-bold text-green-600">{quality.approved_count}</p>
-                      <p className="text-xs text-muted-foreground">Approved</p>
+                      <p className="text-2xl font-barlow font-bold text-green-500">{quality.approved_count}</p>
+                      <p className="text-xs text-gray-400">Approved</p>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-red-500/10">
                       <p className="text-2xl font-barlow font-bold text-red-500">{quality.rejected_count}</p>
-                      <p className="text-xs text-muted-foreground">Rejected</p>
+                      <p className="text-xs text-gray-400">Rejected</p>
                     </div>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-yellow-500/10">
-                    <p className="text-2xl font-barlow font-bold text-yellow-600">{quality.flagged_count}</p>
-                    <p className="text-xs text-muted-foreground">Flagged for Review</p>
+                    <p className="text-2xl font-barlow font-bold text-yellow-500">{quality.flagged_count}</p>
+                    <p className="text-xs text-gray-400">Flagged for Review</p>
                   </div>
                 </>
               ) : (
