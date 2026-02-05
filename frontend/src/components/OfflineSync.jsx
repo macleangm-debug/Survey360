@@ -53,6 +53,15 @@ export function NetworkStatusBanner() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingCount, setPendingCount] = useState(0);
 
+  const loadPendingCount = async () => {
+    try {
+      const pending = await offlineStorage.getPendingSubmissions();
+      setPendingCount(pending.length);
+    } catch (error) {
+      console.error('Failed to load pending count');
+    }
+  };
+
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -76,15 +85,6 @@ export function NetworkStatusBanner() {
       unsubscribe();
     };
   }, []);
-
-  const loadPendingCount = async () => {
-    try {
-      const pending = await offlineStorage.getPendingSubmissions();
-      setPendingCount(pending.length);
-    } catch (error) {
-      console.error('Failed to load pending count');
-    }
-  };
 
   if (isOnline && pendingCount === 0) {
     return null;
