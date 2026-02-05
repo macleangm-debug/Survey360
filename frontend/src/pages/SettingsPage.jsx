@@ -123,8 +123,8 @@ export function SettingsPage() {
       <div className="space-y-6 max-w-4xl" data-testid="settings-page">
         {/* Header */}
         <div>
-          <h1 className="font-barlow text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground">Manage your account and preferences</p>
+          <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Settings</h1>
+          <p className="text-gray-400">Manage your account and preferences</p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
