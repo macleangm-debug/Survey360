@@ -18,6 +18,7 @@ import {
   MapPin,
   Camera,
   Mic,
+  Video,
   FileText,
   Calculator,
   AlignLeft,
