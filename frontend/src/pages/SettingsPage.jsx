@@ -82,6 +82,11 @@ export function SettingsPage() {
   const [apiKey, setApiKey] = useState('dp_sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx');
   const [showApiKey, setShowApiKey] = useState(false);
   
+  const [webhooks, setWebhooks] = useState([
+    { id: '1', url: 'https://api.example.com/webhook', events: ['submission.created'], active: true, lastTriggered: '2024-01-15T10:30:00Z' },
+  ]);
+  const [newWebhook, setNewWebhook] = useState({ url: '', events: [] });
+  
   const [saving, setSaving] = useState(false);
 
   const handleSaveProfile = async () => {
