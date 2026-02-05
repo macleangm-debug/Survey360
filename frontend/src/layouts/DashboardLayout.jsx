@@ -17,7 +17,9 @@ import {
   Globe,
   Activity,
   Download,
-  Briefcase
+  Briefcase,
+  Map,
+  Layout
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -35,9 +37,11 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Projects', href: '/projects', icon: FolderKanban },
   { name: 'Forms', href: '/forms', icon: FileText },
+  { name: 'Templates', href: '/templates', icon: Layout },
   { name: 'Submissions', href: '/submissions', icon: Database },
   { name: 'Cases', href: '/cases', icon: Briefcase },
   { name: 'Quality', href: '/quality', icon: Activity },
+  { name: 'GPS Map', href: '/map', icon: Map },
   { name: 'Exports', href: '/exports', icon: Download },
   { name: 'Team', href: '/team', icon: Users },
   { name: 'Settings', href: '/settings', icon: Settings },
