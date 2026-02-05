@@ -150,6 +150,8 @@ export function DashboardPage() {
     }
   };
 
+  const [viewMode, setViewMode] = useState('standard');
+
   if (!currentOrg) {
     return (
       <DashboardLayout>
@@ -179,7 +181,19 @@ export function DashboardPage() {
             <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Dashboard</h1>
             <p className="text-gray-400">{currentOrg.name} overview</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <Tabs value={viewMode} onValueChange={setViewMode} className="mr-4">
+              <TabsList>
+                <TabsTrigger value="standard" className="gap-2">
+                  <List className="w-4 h-4" />
+                  Standard
+                </TabsTrigger>
+                <TabsTrigger value="widgets" className="gap-2" data-testid="widgets-view-toggle">
+                  <LayoutGrid className="w-4 h-4" />
+                  Widgets
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
             <Button variant="outline" onClick={() => navigate('/projects')}>
               <FolderKanban className="w-4 h-4 mr-2" />
               Projects
@@ -191,6 +205,14 @@ export function DashboardPage() {
           </div>
         </div>
 
+        {/* Widgets Dashboard View */}
+        {viewMode === 'widgets' && (
+          <CustomDashboard orgId={currentOrg.id} />
+        )}
+
+        {/* Standard Dashboard View */}
+        {viewMode === 'standard' && (
+          <>
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {loading ? (
