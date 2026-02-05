@@ -554,7 +554,11 @@ export function FormBuilderPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formId, navigate, setForm]);
+
+  useEffect(() => {
+    loadForm();
+  }, [loadForm]);
 
   const handleAddField = (type) => {
     const newField = {
