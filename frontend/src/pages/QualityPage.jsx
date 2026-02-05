@@ -670,7 +670,7 @@ export function QualityPage() {
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                  <div className="h-[300px] flex items-center justify-center text-gray-400">
                     No trend data available
                   </div>
                 )}
