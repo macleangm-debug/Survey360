@@ -626,8 +626,8 @@ export function QualityPage() {
           <TabsContent value="trends" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="font-barlow">Submission Trends</CardTitle>
-                <CardDescription>Daily submission volume over the last {days} days</CardDescription>
+                <CardTitle className="font-barlow text-white">Submission Trends</CardTitle>
+                <CardDescription className="text-gray-400">Daily submission volume over the last {days} days</CardDescription>
               </CardHeader>
               <CardContent>
                 {loading ? (
