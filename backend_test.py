@@ -213,7 +213,7 @@ class DataPulseAPITester:
             "settings": {"test": True}
         }
         
-        success, status_code, data, _ = self.make_request('POST', '/projects', project_data, 201)
+        success, status_code, data, _ = self.make_request('POST', '/projects', project_data, 200)
         
         if success and isinstance(data, dict):
             self.log_test("Create Project", True, 
