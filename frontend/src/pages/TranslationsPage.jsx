@@ -164,7 +164,7 @@ export function TranslationsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const headers = { 'Authorization': `Bearer ${localStorage.getItem('token')}` };
+      const headers = getAuthHeaders();
       
       const [langsRes, glossaryRes, formsRes] = await Promise.all([
         fetch(`${API_URL}/api/translations/languages`, { headers }),
