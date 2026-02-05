@@ -172,6 +172,26 @@ function App() {
               <SettingsPage />
             </ProtectedRoute>
           } />
+          <Route path="/analytics" element={
+            <ProtectedRoute>
+              <AnalyticsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/rbac" element={
+            <ProtectedRoute>
+              <RBACPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/workflows" element={
+            <ProtectedRoute>
+              <WorkflowsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/translations" element={
+            <ProtectedRoute>
+              <TranslationsPage />
+            </ProtectedRoute>
+          } />
           <Route path="/organizations/new" element={
             <ProtectedRoute>
               <CreateOrganizationPage />
