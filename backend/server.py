@@ -38,6 +38,7 @@ from routes.submission_routes import router as submission_router
 from routes.case_routes import router as case_router
 from routes.export_routes import router as export_router
 from routes.dashboard_routes import router as dashboard_router
+from routes.media_routes import router as media_router
 
 # Include all route modules
 api_router.include_router(auth_router)
@@ -48,6 +49,7 @@ api_router.include_router(submission_router)
 api_router.include_router(case_router)
 api_router.include_router(export_router)
 api_router.include_router(dashboard_router)
+api_router.include_router(media_router)
 
 
 # Health check endpoint
