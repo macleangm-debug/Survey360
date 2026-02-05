@@ -466,8 +466,8 @@ export function QualityPage() {
               {/* Score Distribution */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-barlow">Score Distribution</CardTitle>
-                  <CardDescription>Quality scores breakdown</CardDescription>
+                  <CardTitle className="font-barlow text-white">Score Distribution</CardTitle>
+                  <CardDescription className="text-gray-400">Quality scores breakdown</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {loading ? (
