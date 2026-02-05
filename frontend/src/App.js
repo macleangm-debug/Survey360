@@ -136,6 +136,16 @@ function App() {
               <QualityPage />
             </ProtectedRoute>
           } />
+          <Route path="/map" element={
+            <ProtectedRoute>
+              <GPSMapPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/templates" element={
+            <ProtectedRoute>
+              <FormTemplatesPage />
+            </ProtectedRoute>
+          } />
           <Route path="/exports" element={
             <ProtectedRoute>
               <SubmissionsPage />
