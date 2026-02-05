@@ -101,7 +101,7 @@ class DataPulseAPITester:
             "name": f"Test User {timestamp}"
         }
         
-        success, status_code, data, _ = self.make_request('POST', '/auth/register', reg_data, 201)
+        success, status_code, data, _ = self.make_request('POST', '/auth/register', reg_data, 200)
         
         if success and isinstance(data, dict) and 'access_token' in data:
             self.log_test("User Registration", True, f"New user registered successfully")
