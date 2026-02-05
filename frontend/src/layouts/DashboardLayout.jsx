@@ -40,6 +40,7 @@ import { cn } from '../lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
   { name: 'Projects', href: '/projects', icon: FolderKanban },
   { name: 'Forms', href: '/forms', icon: FileText },
   { name: 'Templates', href: '/templates', icon: Layout },
@@ -48,8 +49,11 @@ const navigation = [
   { name: 'Import Cases', href: '/cases/import', icon: Upload },
   { name: 'Quality', href: '/quality', icon: Activity },
   { name: 'GPS Map', href: '/map', icon: Map },
+  { name: 'Workflows', href: '/workflows', icon: Workflow },
   { name: 'Exports', href: '/exports', icon: Download },
   { name: 'Team', href: '/team', icon: Users },
+  { name: 'Roles', href: '/rbac', icon: Shield },
+  { name: 'Translations', href: '/translations', icon: Languages },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
