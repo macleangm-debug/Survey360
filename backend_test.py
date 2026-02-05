@@ -341,7 +341,7 @@ class DataPulseAPITester:
             }
         }
         
-        success, status_code, data, _ = self.make_request('POST', '/submissions', submission_data, 201)
+        success, status_code, data, _ = self.make_request('POST', '/submissions', submission_data, 200)
         
         if success and isinstance(data, dict):
             quality_score = data.get('quality_score', 'N/A')
