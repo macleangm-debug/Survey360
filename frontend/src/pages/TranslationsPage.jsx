@@ -45,10 +45,15 @@ import { Textarea } from '../components/ui/textarea';
 import { Skeleton } from '../components/ui/skeleton';
 import { Progress } from '../components/ui/progress';
 import { DashboardLayout } from '../layouts/DashboardLayout';
-import { useOrgStore } from '../store';
+import { useOrgStore, useAuthStore } from '../store';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+const getAuthHeaders = () => ({
+  'Authorization': `Bearer ${useAuthStore.getState().token}`,
+  'Content-Type': 'application/json'
+});
 
 const LanguageCard = ({ language, isDefault, onSetDefault, progress }) => (
   <motion.div
