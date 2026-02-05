@@ -1,52 +1,147 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import { useAuthStore, useUIStore } from './store';
+import { LoginPage, RegisterPage, AuthCallbackPage } from './pages/AuthPages';
+import { DashboardPage } from './pages/DashboardPage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { FormsPage } from './pages/FormsPage';
+import { FormBuilderPage } from './pages/FormBuilderPage';
+import { SubmissionsPage } from './pages/SubmissionsPage';
+import { TeamPage, CreateOrganizationPage } from './pages/TeamPage';
+import '@/App.css';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Protected Route wrapper
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuthStore();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
+// Public Route wrapper (redirect to dashboard if authenticated)
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuthStore();
+  
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
 };
 
 function App() {
+  const { theme } = useUIStore();
+
   return (
-    <div className="App">
+    <div className={theme === 'dark' ? 'dark' : ''}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          {/* Public Routes */}
+          <Route path="/login" element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          } />
+          <Route path="/register" element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          } />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/projects" element={
+            <ProtectedRoute>
+              <ProjectsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/projects/:projectId" element={
+            <ProtectedRoute>
+              <ProjectsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/forms" element={
+            <ProtectedRoute>
+              <FormsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/forms/new" element={
+            <ProtectedRoute>
+              <FormsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/forms/:formId" element={
+            <ProtectedRoute>
+              <FormBuilderPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/forms/:formId/edit" element={
+            <ProtectedRoute>
+              <FormBuilderPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/submissions" element={
+            <ProtectedRoute>
+              <SubmissionsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/cases" element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/quality" element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/exports" element={
+            <ProtectedRoute>
+              <SubmissionsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/team" element={
+            <ProtectedRoute>
+              <TeamPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/organizations/new" element={
+            <ProtectedRoute>
+              <CreateOrganizationPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Default redirect */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
+      
+      <Toaster 
+        position="top-right" 
+        richColors 
+        toastOptions={{
+          style: {
+            background: 'hsl(var(--card))',
+            border: '1px solid hsl(var(--border))',
+            color: 'hsl(var(--foreground))'
+          }
+        }}
+      />
     </div>
   );
 }
