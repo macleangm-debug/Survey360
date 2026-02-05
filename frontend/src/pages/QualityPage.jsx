@@ -519,7 +519,7 @@ export function QualityPage() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                  <div className="h-[250px] flex items-center justify-center text-gray-400">
                     <div className="text-center">
                       <CheckCircle className="w-12 h-12 mx-auto mb-2 text-green-500" />
                       <p>No quality flags detected</p>
