@@ -38,6 +38,9 @@ import {
 } from '../components/ui/select';
 import { Skeleton } from '../components/ui/skeleton';
 import { DashboardLayout } from '../layouts/DashboardLayout';
+import { GpsCapture } from '../components/GpsCapture';
+import { AudioRecorder } from '../components/AudioRecorder';
+import { VideoRecorder } from '../components/VideoRecorder';
 import { formAPI } from '../lib/api';
 import { toast } from 'sonner';
 
