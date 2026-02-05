@@ -39,6 +39,9 @@ from routes.case_routes import router as case_router
 from routes.export_routes import router as export_router
 from routes.dashboard_routes import router as dashboard_router
 from routes.media_routes import router as media_router
+from routes.gps_routes import router as gps_router
+from routes.template_routes import router as template_router
+from routes.logic_routes import router as logic_router
 
 # Include all route modules
 api_router.include_router(auth_router)
@@ -50,6 +53,9 @@ api_router.include_router(case_router)
 api_router.include_router(export_router)
 api_router.include_router(dashboard_router)
 api_router.include_router(media_router)
+api_router.include_router(gps_router)
+api_router.include_router(template_router)
+api_router.include_router(logic_router)
 
 
 # Health check endpoint
