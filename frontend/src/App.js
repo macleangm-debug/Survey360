@@ -109,6 +109,11 @@ function App() {
               <FormBuilderPage />
             </ProtectedRoute>
           } />
+          <Route path="/forms/:formId/preview" element={
+            <ProtectedRoute>
+              <FormPreviewPage />
+            </ProtectedRoute>
+          } />
           <Route path="/submissions" element={
             <ProtectedRoute>
               <SubmissionsPage />
