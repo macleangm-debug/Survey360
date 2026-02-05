@@ -282,7 +282,7 @@ export function FormsPage() {
     return (
       <DashboardLayout>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Please select an organization first</p>
+          <p className="text-gray-400">Please select an organization first</p>
         </div>
       </DashboardLayout>
     );
@@ -294,8 +294,8 @@ export function FormsPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="font-barlow text-3xl font-bold tracking-tight">Forms</h1>
-            <p className="text-muted-foreground">Design and manage your data collection forms</p>
+            <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Forms</h1>
+            <p className="text-gray-400">Design and manage your data collection forms</p>
           </div>
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
