@@ -132,6 +132,11 @@ function App() {
               <CasesPage />
             </ProtectedRoute>
           } />
+          <Route path="/cases/import" element={
+            <ProtectedRoute>
+              <CaseImportPage />
+            </ProtectedRoute>
+          } />
           <Route path="/quality" element={
             <ProtectedRoute>
               <QualityPage />
