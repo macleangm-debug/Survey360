@@ -145,7 +145,13 @@ async def get_available_functions():
             {"name": "year", "syntax": "year(date)", "description": "Extract year from date"},
             {"name": "month", "syntax": "month(date)", "description": "Extract month from date"},
             {"name": "day", "syntax": "day(date)", "description": "Extract day from date"},
-            {"name": "if", "syntax": "if(condition, true_value, false_value)", "description": "Conditional"},
+            {"name": "iif", "syntax": "iif(condition, true_value, false_value)", "description": "Conditional (use gte, gt, lte, lt for comparisons)"},
+            {"name": "gte", "syntax": "gte(a, b)", "description": "Greater than or equal (a >= b)"},
+            {"name": "gt", "syntax": "gt(a, b)", "description": "Greater than (a > b)"},
+            {"name": "lte", "syntax": "lte(a, b)", "description": "Less than or equal (a <= b)"},
+            {"name": "lt", "syntax": "lt(a, b)", "description": "Less than (a < b)"},
+            {"name": "eq", "syntax": "eq(a, b)", "description": "Equals (a == b)"},
+            {"name": "ne", "syntax": "ne(a, b)", "description": "Not equals (a != b)"},
             {"name": "coalesce", "syntax": "coalesce(a, b, ...)", "description": "First non-null value"},
             {"name": "concat", "syntax": "concat(a, b, ...)", "description": "Join strings"},
             {"name": "upper", "syntax": "upper(text)", "description": "Convert to uppercase"},
@@ -159,7 +165,7 @@ async def get_available_functions():
             {"description": "Total cost", "formula": "quantity * unit_price"},
             {"description": "Average score", "formula": "round((score1 + score2 + score3) / 3, 1)"},
             {"description": "Age from DOB", "formula": "age(date_of_birth)"},
-            {"description": "Pass/Fail", "formula": "if(score >= 50, 'Pass', 'Fail')"},
+            {"description": "Pass/Fail", "formula": "iif(gte(score, 50), 'Pass', 'Fail')"},
             {"description": "Count symptoms", "formula": "count_selected(symptoms)"}
         ]
     }
