@@ -86,7 +86,7 @@ export function Sidebar() {
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
               <Activity className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-barlow text-xl font-bold tracking-tight">DataPulse</span>
+            <span className="font-barlow text-xl font-bold tracking-tight text-white">DataPulse</span>
           </Link>
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={toggleSidebar}>
             <X className="w-5 h-5" />
@@ -97,7 +97,7 @@ export function Sidebar() {
         <div className="p-4 border-b border-border">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-between">
+              <Button variant="outline" className="w-full justify-between bg-secondary/50 border-border text-foreground hover:bg-secondary">
                 <span className="truncate">{currentOrg?.name || 'Select Organization'}</span>
                 <ChevronDown className="w-4 h-4 ml-2 shrink-0" />
               </Button>
