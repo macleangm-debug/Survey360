@@ -19,7 +19,8 @@ import {
   Download,
   Briefcase,
   Map,
-  Layout
+  Layout,
+  Upload
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
