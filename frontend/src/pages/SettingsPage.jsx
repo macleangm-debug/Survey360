@@ -128,6 +128,34 @@ export function SettingsPage() {
     toast.success('API key copied to clipboard');
   };
 
+  const webhookEvents = [
+    { value: 'submission.created', label: 'New Submission' },
+    { value: 'submission.approved', label: 'Submission Approved' },
+    { value: 'submission.rejected', label: 'Submission Rejected' },
+    { value: 'form.published', label: 'Form Published' },
+    { value: 'case.created', label: 'Case Created' },
+    { value: 'case.resolved', label: 'Case Resolved' },
+  ];
+
+  const handleAddWebhook = () => {
+    if (!newWebhook.url || newWebhook.events.length === 0) {
+      toast.error('Please provide a URL and select at least one event');
+      return;
+    }
+    setWebhooks([...webhooks, { ...newWebhook, id: Date.now().toString(), active: true, lastTriggered: null }]);
+    setNewWebhook({ url: '', events: [] });
+    toast.success('Webhook added');
+  };
+
+  const handleDeleteWebhook = (id) => {
+    setWebhooks(webhooks.filter(w => w.id !== id));
+    toast.success('Webhook removed');
+  };
+
+  const handleToggleWebhook = (id) => {
+    setWebhooks(webhooks.map(w => w.id === id ? { ...w, active: !w.active } : w));
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6 max-w-4xl" data-testid="settings-page">
