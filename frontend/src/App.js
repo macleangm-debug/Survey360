@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useAuthStore, useUIStore } from './store';
@@ -17,6 +17,7 @@ import { QualityPage } from './pages/QualityPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { GPSMapPage } from './pages/GPSMapPage';
 import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
+import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
 import '@/App.css';
 
 // Register service worker
