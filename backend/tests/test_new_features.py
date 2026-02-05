@@ -294,7 +294,7 @@ class TestFormAPI:
 
 
 # Fixtures
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def auth_token():
     """Get authentication token"""
     response = requests.post(
@@ -305,7 +305,10 @@ def auth_token():
         }
     )
     if response.status_code == 200:
-        return response.json().get("access_token")
+        token = response.json().get("access_token")
+        print(f"Auth token obtained: {token[:20]}...")
+        return token
+    print(f"Auth failed: {response.status_code} - {response.text}")
     return None
 
 
