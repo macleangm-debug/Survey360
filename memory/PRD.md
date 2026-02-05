@@ -19,6 +19,30 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 
 ## What's Been Implemented (Feb 5, 2026)
 
+### Advanced Form Logic (NEW - Feb 5, 2026)
+- [x] Form Templates Library with 5 pre-built templates:
+  - Household Survey (Demographics)
+  - Health Screening (Health)
+  - Customer Feedback (Business)
+  - Event Registration (Events)
+  - Agriculture Survey (Agriculture)
+- [x] Calculated Fields Engine with functions:
+  - Math: round, abs, min, max, sqrt, pow, floor, ceil
+  - Conditional: iif, gte, gt, lte, lt, eq, ne
+  - Date: today, now, year, month, day, age
+  - String: concat, upper, lower, contains
+  - Selection: selected, count_selected, coalesce
+- [x] Skip Logic Engine with operators:
+  - ==, !=, >, >=, <, <=
+  - contains, not_contains
+  - is_empty, is_not_empty
+  - selected, not_selected
+- [x] GPS Map Visualization with:
+  - Cluster/Points view modes
+  - Project and time period filters
+  - Enumerator coverage stats
+  - Accuracy distribution
+
 ### Core Features
 - [x] User registration and JWT authentication
 - [x] Multi-tenant organization system
