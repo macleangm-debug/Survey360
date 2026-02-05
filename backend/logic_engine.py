@@ -35,7 +35,7 @@ class CalculationEngine:
         'month': lambda d: int(d[5:7]) if isinstance(d, str) and len(d) >= 7 else None,
         'day': lambda d: int(d[8:10]) if isinstance(d, str) and len(d) >= 10 else None,
         'age': lambda dob: calculate_age(dob),
-        'if': lambda cond, true_val, false_val: true_val if cond else false_val,
+        'iif': lambda cond, true_val, false_val: true_val if cond else false_val,
         'coalesce': lambda *args: next((a for a in args if a is not None), None),
         'concat': lambda *args: ''.join(str(a) for a in args if a is not None),
         'upper': lambda s: s.upper() if isinstance(s, str) else s,
@@ -43,6 +43,16 @@ class CalculationEngine:
         'contains': lambda s, sub: sub in s if isinstance(s, str) else False,
         'selected': lambda val, opt: opt in val if isinstance(val, list) else val == opt,
         'count_selected': lambda val: len(val) if isinstance(val, list) else (1 if val else 0),
+        # Comparison functions for conditional expressions
+        'gte': lambda a, b: a >= b,
+        'gt': lambda a, b: a > b,
+        'lte': lambda a, b: a <= b,
+        'lt': lambda a, b: a < b,
+        'eq': lambda a, b: a == b,
+        'ne': lambda a, b: a != b,
+        # Boolean values
+        'True': True,
+        'False': False,
     }
     
     def __init__(self):
