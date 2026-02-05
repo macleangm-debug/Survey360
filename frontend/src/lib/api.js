@@ -119,4 +119,24 @@ export const dashboardAPI = {
     api.get('/dashboard/recent-activity', { params: { org_id: orgId, limit } }),
 };
 
+// ============= MEDIA API =============
+export const mediaAPI = {
+  upload: (file, mediaType, fieldId = null, submissionId = null) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('media_type', mediaType);
+    formData.append('user_id', localStorage.getItem('user_id') || 'anonymous');
+    if (fieldId) formData.append('field_id', fieldId);
+    if (submissionId) formData.append('submission_id', submissionId);
+    return api.post('/media/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  getFile: (fileId) => api.get(`/media/file/${fileId}`, { responseType: 'blob' }),
+  getThumbnail: (fileId) => api.get(`/media/thumbnail/${fileId}`, { responseType: 'blob' }),
+  delete: (fileId) => api.delete(`/media/${fileId}`),
+  getBySubmission: (submissionId) => api.get(`/media/submission/${submissionId}`),
+  getLimits: () => api.get('/media/limits'),
+};
+
 export default api;
