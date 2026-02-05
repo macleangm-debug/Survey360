@@ -181,6 +181,9 @@ function App() {
         
         {/* PWA Components */}
         <PWAInstallPrompt />
+        
+        {/* Offline Sync Status */}
+        <NetworkStatusBanner />
       </BrowserRouter>
       
       <Toaster 
