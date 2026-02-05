@@ -110,7 +110,7 @@ export function NetworkStatusBanner() {
           ) : (
             <>
               <WifiOff className="w-4 h-4" />
-              <span className="text-sm font-medium">You're offline</span>
+              <span className="text-sm font-medium">You&apos;re offline</span>
               {pendingCount > 0 && (
                 <Badge variant="secondary" className="bg-white/20">
                   {pendingCount} pending
