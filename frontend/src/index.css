@@ -16,67 +16,67 @@ code {
   font-family: 'JetBrains Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* DataVision Brand Colors:
-   - Primary Red: #E53935 (vibrant red)
-   - Navy Blue: #1A237E (deep navy)
-   - Gray: #78909C (blue-gray)
-   - Light Gray: #B0BEC5
+/* 
+  DataVision Brand Colors (used subtly):
+  - Accent Red: #E53935 (sparingly for key actions)
+  - Navy: #1A237E (primary brand color)
+  - Gray: #78909C (neutral)
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 231 48% 20%;
+    --background: 210 20% 98%;
+    --foreground: 220 20% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 231 48% 20%;
+    --card-foreground: 220 20% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 231 48% 20%;
-    --primary: 1 77% 55%;
+    --popover-foreground: 220 20% 15%;
+    --primary: 231 48% 30%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 231 48% 30%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 200 18% 90%;
-    --muted-foreground: 200 10% 40%;
-    --accent: 200 18% 94%;
-    --accent-foreground: 231 48% 20%;
-    --destructive: 1 77% 55%;
+    --secondary: 210 15% 95%;
+    --secondary-foreground: 220 20% 15%;
+    --muted: 210 15% 95%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 210 15% 93%;
+    --accent-foreground: 220 20% 15%;
+    --destructive: 1 70% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 200 18% 85%;
-    --input: 200 18% 85%;
-    --ring: 1 77% 55%;
-    --chart-1: 1 77% 55%;
-    --chart-2: 231 48% 30%;
-    --chart-3: 200 18% 46%;
-    --chart-4: 1 77% 70%;
-    --chart-5: 231 48% 50%;
+    --border: 210 15% 90%;
+    --input: 210 15% 90%;
+    --ring: 231 48% 30%;
+    --chart-1: 231 48% 30%;
+    --chart-2: 1 70% 50%;
+    --chart-3: 200 15% 50%;
+    --chart-4: 231 48% 50%;
+    --chart-5: 200 15% 40%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 231 48% 8%;
-    --foreground: 200 18% 96%;
-    --card: 231 48% 12%;
-    --card-foreground: 200 18% 96%;
-    --popover: 231 48% 12%;
-    --popover-foreground: 200 18% 96%;
-    --primary: 1 77% 55%;
+    --background: 220 20% 7%;
+    --foreground: 210 15% 95%;
+    --card: 220 20% 10%;
+    --card-foreground: 210 15% 95%;
+    --popover: 220 20% 10%;
+    --popover-foreground: 210 15% 95%;
+    --primary: 231 48% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 200 18% 20%;
-    --secondary-foreground: 200 18% 96%;
-    --muted: 231 30% 18%;
-    --muted-foreground: 200 18% 65%;
-    --accent: 231 30% 18%;
-    --accent-foreground: 200 18% 96%;
-    --destructive: 1 77% 45%;
+    --secondary: 220 15% 15%;
+    --secondary-foreground: 210 15% 95%;
+    --muted: 220 15% 15%;
+    --muted-foreground: 210 10% 60%;
+    --accent: 220 15% 18%;
+    --accent-foreground: 210 15% 95%;
+    --destructive: 1 60% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 231 30% 22%;
-    --input: 231 30% 22%;
-    --ring: 1 77% 55%;
-    --chart-1: 1 77% 55%;
-    --chart-2: 231 48% 50%;
-    --chart-3: 200 18% 55%;
-    --chart-4: 1 77% 70%;
-    --chart-5: 231 48% 70%;
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
+    --ring: 231 48% 55%;
+    --chart-1: 231 48% 55%;
+    --chart-2: 1 60% 55%;
+    --chart-3: 200 15% 55%;
+    --chart-4: 231 48% 65%;
+    --chart-5: 200 15% 50%;
   }
 }
 
@@ -98,91 +98,22 @@ code {
   font-family: 'Manrope', sans-serif;
 }
 
-/* DataVision Brand Gradients */
-.gradient-brand {
-  background: linear-gradient(135deg, #E53935 0%, #1A237E 100%);
+/* Subtle brand accent */
+.accent-primary {
+  color: hsl(var(--primary));
 }
 
-.gradient-brand-reverse {
-  background: linear-gradient(135deg, #1A237E 0%, #E53935 100%);
-}
-
-.gradient-brand-soft {
-  background: linear-gradient(135deg, rgba(229, 57, 53, 0.1) 0%, rgba(26, 35, 126, 0.1) 100%);
-}
-
-.gradient-red {
-  background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
-}
-
-.gradient-navy {
-  background: linear-gradient(135deg, #1A237E 0%, #0D47A1 100%);
-}
-
-.gradient-gray {
-  background: linear-gradient(135deg, #78909C 0%, #546E7A 100%);
-}
-
-.text-gradient-brand {
-  background: linear-gradient(135deg, #E53935 0%, #1A237E 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Brand Colors */
-.text-brand-red {
-  color: #E53935;
-}
-
-.text-brand-navy {
-  color: #1A237E;
-}
-
-.text-brand-gray {
-  color: #78909C;
-}
-
-.bg-brand-red {
-  background-color: #E53935;
-}
-
-.bg-brand-navy {
-  background-color: #1A237E;
-}
-
-.bg-brand-gray {
-  background-color: #78909C;
-}
-
-/* Border gradients */
-.border-gradient {
-  border: 2px solid transparent;
-  background: linear-gradient(var(--background), var(--background)) padding-box,
-              linear-gradient(135deg, #E53935 0%, #1A237E 100%) border-box;
+.accent-destructive {
+  color: hsl(var(--destructive));
 }
 
 @layer base {
   [data-debug-wrapper="true"] {
     display: contents !important;
   }
-
-  [data-debug-wrapper="true"] > * {
-    margin-left: inherit;
-    margin-right: inherit;
-    margin-top: inherit;
-    margin-bottom: inherit;
-    padding-left: inherit;
-    padding-right: inherit;
-    padding-top: inherit;
-    padding-bottom: inherit;
-    column-gap: inherit;
-    row-gap: inherit;
-    gap: inherit;
-  }
 }
 
-/* Custom scrollbar with brand colors */
+/* Custom scrollbar - subtle */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -194,29 +125,16 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #E53935 0%, #1A237E 100%);
+  background: hsl(var(--border));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #C62828 0%, #0D47A1 100%);
+  background: hsl(var(--muted-foreground) / 0.3);
 }
 
-/* Selection with brand color */
+/* Selection */
 ::selection {
-  background: rgba(229, 57, 53, 0.3);
+  background: hsl(var(--primary) / 0.15);
   color: hsl(var(--foreground));
-}
-
-/* Glowing effects */
-.glow-red {
-  box-shadow: 0 0 20px -5px rgba(229, 57, 53, 0.5);
-}
-
-.glow-navy {
-  box-shadow: 0 0 20px -5px rgba(26, 35, 126, 0.5);
-}
-
-.glow-brand {
-  box-shadow: 0 0 30px -5px rgba(229, 57, 53, 0.3), 0 0 30px -5px rgba(26, 35, 126, 0.3);
 }
