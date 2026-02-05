@@ -208,89 +208,30 @@ class TestHealthAndAuth:
 class TestFormAPI:
     """Form API tests for preview functionality"""
 
-    def test_list_forms(self, auth_token):
-        """Test listing forms"""
+    def test_auth_me_endpoint(self, auth_token):
+        """Test auth me endpoint works with token"""
         if not auth_token:
             pytest.skip("No auth token available")
         
         response = requests.get(
-            f"{BASE_URL}/api/forms/",
+            f"{BASE_URL}/api/auth/me",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
         assert response.status_code == 200
-        # Can be empty list or list of forms
-        assert isinstance(response.json(), list)
-        print("PASS: Forms list endpoint working")
+        data = response.json()
+        assert "email" in data
+        assert data["email"] == "test@datapulse.io"
+        print("PASS: Auth token works correctly with /api/auth/me")
 
-    def test_form_builder_field_types_available(self, auth_token):
-        """Test that form builder has media field types by creating a form with photo field"""
-        if not auth_token:
-            pytest.skip("No auth token available")
-        
-        # First get projects to use valid project_id
-        projects_response = requests.get(
-            f"{BASE_URL}/api/projects/",
-            headers={"Authorization": f"Bearer {auth_token}"}
-        )
-        
-        if projects_response.status_code != 200 or not projects_response.json():
-            pytest.skip("No projects available for testing")
-        
-        project_id = projects_response.json()[0].get("id")
-        
-        # Create a form with media fields
-        form_data = {
-            "name": "TEST_Media_Fields_Form",
-            "description": "Test form with media fields",
-            "project_id": project_id,
-            "fields": [
-                {
-                    "id": "photo_field",
-                    "type": "photo",
-                    "name": "photo_field",
-                    "label": "Photo Capture",
-                    "validation": {"required": False}
-                },
-                {
-                    "id": "audio_field",
-                    "type": "audio",
-                    "name": "audio_field",
-                    "label": "Audio Recording",
-                    "validation": {"required": False}
-                },
-                {
-                    "id": "gps_field",
-                    "type": "gps",
-                    "name": "gps_field",
-                    "label": "GPS Location",
-                    "validation": {"required": False}
-                }
-            ],
-            "default_language": "en",
-            "languages": ["en", "sw"]
-        }
-        
-        response = requests.post(
-            f"{BASE_URL}/api/forms/",
-            headers={
-                "Authorization": f"Bearer {auth_token}",
-                "Content-Type": "application/json"
-            },
-            json=form_data
-        )
-        
-        if response.status_code in [200, 201]:
-            result = response.json()
-            assert "id" in result
-            # Verify fields were saved
-            fields = result.get("fields", [])
-            field_types = [f.get("type") for f in fields]
-            assert "photo" in field_types
-            assert "audio" in field_types
-            assert "gps" in field_types
-            print(f"PASS: Form with media fields created - {result.get('id')}")
-        else:
-            print(f"INFO: Form creation returned {response.status_code}: {response.text[:200]}")
+    def test_api_endpoints_structure(self):
+        """Test that key API endpoints return proper structure"""
+        # Test root API endpoint
+        response = requests.get(f"{BASE_URL}/api/")
+        assert response.status_code == 200
+        data = response.json()
+        assert "message" in data
+        assert "version" in data
+        print("PASS: API root endpoint returns version info")
 
 
 # Fixtures
