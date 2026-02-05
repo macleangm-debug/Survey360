@@ -123,20 +123,21 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - [x] Complete offline sync with conflict resolution ✅ (Feb 5, 2026)
 - [x] Webhook configuration ✅ (Feb 5, 2026)
 - [x] Audio/Video recording components ✅ (Feb 5, 2026)
-- [ ] Real GPS capture in form preview (component ready, needs integration)
+- [x] GPS, Audio, Video capture in Form Preview ✅ (Feb 5, 2026)
+- [x] Custom dashboard widgets ✅ (Feb 5, 2026)
+- [x] Stata/SPSS export formats ✅ (Feb 5, 2026)
+- [x] Batch case import from CSV ✅ (Feb 5, 2026)
+- [x] Real-time collaboration features ✅ (Feb 5, 2026)
 
 ## Backlog - P1 (High Priority)
-- [ ] Integrate GPS Capture component into Form Filling
-- [ ] Integrate Audio Recorder into Form Filling
-- [ ] Integrate Video Recorder into Form Filling
 - [ ] Duplicate detection alerts
 - [ ] Form versioning comparison
+- [ ] Enhanced offline conflict resolution UI
 
 ## Backlog - P2 (Medium Priority)
-- [ ] Custom dashboard widgets
-- [ ] Stata/SPSS export formats
-- [ ] Batch case import from CSV
-- [ ] Real-time collaboration
+- [ ] Advanced dashboard widget customization (drag-drop resize)
+- [ ] Native mobile app
+- [ ] Multi-language AI translations
 
 ## Test Credentials
 - **Email**: test@datapulse.io
