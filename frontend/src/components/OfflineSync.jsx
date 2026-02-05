@@ -368,6 +368,25 @@ export function SyncStatusPanel({ isOpen, onClose }) {
   });
   const [selectedConflict, setSelectedConflict] = useState(null);
 
+  const loadSyncState = async () => {
+    try {
+      const pending = await offlineStorage.getPendingSubmissions();
+      const synced = await offlineStorage.getSyncedSubmissions?.() || [];
+      const failed = await offlineStorage.getFailedSubmissions?.() || [];
+      const conflicts = syncManager.getConflictQueue();
+
+      setSyncState(prev => ({
+        ...prev,
+        pendingSubmissions: pending,
+        syncedSubmissions: synced,
+        failedSubmissions: failed,
+        conflicts
+      }));
+    } catch (error) {
+      console.error('Failed to load sync state');
+    }
+  };
+
   useEffect(() => {
     loadSyncState();
 
@@ -394,25 +413,6 @@ export function SyncStatusPanel({ isOpen, onClose }) {
 
     return () => unsubscribe();
   }, []);
-
-  const loadSyncState = async () => {
-    try {
-      const pending = await offlineStorage.getPendingSubmissions();
-      const synced = await offlineStorage.getSyncedSubmissions?.() || [];
-      const failed = await offlineStorage.getFailedSubmissions?.() || [];
-      const conflicts = syncManager.getConflictQueue();
-
-      setSyncState(prev => ({
-        ...prev,
-        pendingSubmissions: pending,
-        syncedSubmissions: synced,
-        failedSubmissions: failed,
-        conflicts
-      }));
-    } catch (error) {
-      console.error('Failed to load sync state');
-    }
-  };
 
   const handleSync = () => {
     syncManager.syncPendingSubmissions();
