@@ -118,22 +118,25 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - [x] Advanced skip logic editor ✅ (Feb 5, 2026)
 - [x] GPS accuracy visualization on map ✅ (Feb 5, 2026)
 - [x] Form templates library ✅ (Feb 5, 2026)
-- [ ] Complete offline sync with conflict resolution
-- [ ] Real GPS capture in form preview
-- [ ] Audio/Video recording implementation
+- [x] Integrate Skip Logic Editor into Form Builder ✅ (Feb 5, 2026)
+- [x] Integrate Calculated Field Editor into Form Builder ✅ (Feb 5, 2026)
+- [x] Complete offline sync with conflict resolution ✅ (Feb 5, 2026)
+- [x] Webhook configuration ✅ (Feb 5, 2026)
+- [x] Audio/Video recording components ✅ (Feb 5, 2026)
+- [ ] Real GPS capture in form preview (component ready, needs integration)
 
 ## Backlog - P1 (High Priority)
-- [ ] Integrate Skip Logic Editor into Form Builder
-- [ ] Integrate Calculated Field Editor into Form Builder
-- [ ] Integrate GPS Capture into Form Filling
+- [ ] Integrate GPS Capture component into Form Filling
+- [ ] Integrate Audio Recorder into Form Filling
+- [ ] Integrate Video Recorder into Form Filling
 - [ ] Duplicate detection alerts
 - [ ] Form versioning comparison
 
 ## Backlog - P2 (Medium Priority)
 - [ ] Custom dashboard widgets
-- [ ] Webhook configuration
 - [ ] Stata/SPSS export formats
 - [ ] Batch case import from CSV
+- [ ] Real-time collaboration
 
 ## Test Credentials
 - **Email**: test@datapulse.io
