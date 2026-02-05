@@ -147,12 +147,17 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 ## Key Files
 - `/app/frontend/public/manifest.json` - PWA manifest
 - `/app/frontend/public/sw.js` - Service worker
-- `/app/frontend/src/lib/offlineStorage.js` - IndexedDB service
+- `/app/frontend/src/lib/offlineStorage.js` - IndexedDB service with conflict resolution
 - `/app/frontend/src/pages/FormPreviewPage.jsx` - Form preview
+- `/app/frontend/src/pages/FormBuilderPage.jsx` - Form builder with integrated logic editors
 - `/app/frontend/src/pages/FormTemplatesPage.jsx` - Templates library
 - `/app/frontend/src/pages/GPSMapPage.jsx` - GPS visualization
+- `/app/frontend/src/pages/SettingsPage.jsx` - Settings with webhooks configuration
 - `/app/frontend/src/components/SkipLogicEditor.jsx` - Skip logic UI
 - `/app/frontend/src/components/CalculatedFieldEditor.jsx` - Calculation UI
+- `/app/frontend/src/components/GpsCapture.jsx` - GPS capture component
+- `/app/frontend/src/components/AudioRecorder.jsx` - Audio recording component
+- `/app/frontend/src/components/VideoRecorder.jsx` - Video recording component
 - `/app/frontend/src/components/MediaUpload.jsx` - Media upload
 - `/app/backend/routes/media_routes.py` - Media API
 - `/app/backend/routes/template_routes.py` - Templates API
