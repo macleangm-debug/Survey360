@@ -16,67 +16,60 @@ code {
   font-family: 'JetBrains Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* 
-  DataVision Brand Colors (used subtly):
-  - Accent Red: #E53935 (sparingly for key actions)
-  - Navy: #1A237E (primary brand color)
-  - Gray: #78909C (neutral)
-*/
-
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 20% 15%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 15%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 15%;
-    --primary: 231 48% 30%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 15% 95%;
-    --secondary-foreground: 220 20% 15%;
-    --muted: 210 15% 95%;
-    --muted-foreground: 220 10% 45%;
-    --accent: 210 15% 93%;
-    --accent-foreground: 220 20% 15%;
-    --destructive: 1 70% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 210 15% 90%;
-    --input: 210 15% 90%;
-    --ring: 231 48% 30%;
-    --chart-1: 231 48% 30%;
-    --chart-2: 1 70% 50%;
-    --chart-3: 200 15% 50%;
-    --chart-4: 231 48% 50%;
-    --chart-5: 200 15% 40%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    --chart-1: 221 83% 53%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 220 20% 7%;
-    --foreground: 210 15% 95%;
-    --card: 220 20% 10%;
-    --card-foreground: 210 15% 95%;
-    --popover: 220 20% 10%;
-    --popover-foreground: 210 15% 95%;
-    --primary: 231 48% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 210 15% 95%;
-    --muted: 220 15% 15%;
-    --muted-foreground: 210 10% 60%;
-    --accent: 220 15% 18%;
-    --accent-foreground: 210 15% 95%;
-    --destructive: 1 60% 45%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 231 48% 55%;
-    --chart-1: 231 48% 55%;
-    --chart-2: 1 60% 55%;
-    --chart-3: 200 15% 55%;
-    --chart-4: 231 48% 65%;
-    --chart-5: 200 15% 50%;
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --card: 224 71% 6%;
+    --card-foreground: 213 31% 91%;
+    --popover: 224 71% 6%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 222 47% 15%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 223 47% 15%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 222 47% 15%;
+    --accent-foreground: 213 31% 91%;
+    --destructive: 0 63% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 216 34% 20%;
+    --input: 216 34% 20%;
+    --ring: 217 91% 60%;
+    --chart-1: 217 91% 60%;
+    --chart-2: 160 60% 50%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -98,22 +91,13 @@ code {
   font-family: 'Manrope', sans-serif;
 }
 
-/* Subtle brand accent */
-.accent-primary {
-  color: hsl(var(--primary));
-}
-
-.accent-destructive {
-  color: hsl(var(--destructive));
-}
-
 @layer base {
   [data-debug-wrapper="true"] {
     display: contents !important;
   }
 }
 
-/* Custom scrollbar - subtle */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -125,16 +109,16 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: hsl(var(--muted-foreground) / 0.3);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.3);
+  background: hsl(var(--muted-foreground) / 0.5);
 }
 
 /* Selection */
 ::selection {
-  background: hsl(var(--primary) / 0.15);
+  background: hsl(var(--primary) / 0.2);
   color: hsl(var(--foreground));
 }
