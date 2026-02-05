@@ -41,6 +41,7 @@ const navigation = [
   { name: 'Templates', href: '/templates', icon: Layout },
   { name: 'Submissions', href: '/submissions', icon: Database },
   { name: 'Cases', href: '/cases', icon: Briefcase },
+  { name: 'Import Cases', href: '/cases/import', icon: Upload },
   { name: 'Quality', href: '/quality', icon: Activity },
   { name: 'GPS Map', href: '/map', icon: Map },
   { name: 'Exports', href: '/exports', icon: Download },
