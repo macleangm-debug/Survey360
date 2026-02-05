@@ -91,13 +91,13 @@ const MetricCard = ({ title, value, subtitle, icon: Icon, trend, color = 'primar
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="hover:shadow-lg transition-shadow">
+      <Card className="hover:shadow-lg transition-shadow h-full">
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">{title}</p>
-              <p className="text-3xl font-barlow font-bold mt-1">{value}</p>
-              {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
+              <p className="text-sm text-gray-400">{title}</p>
+              <p className="text-3xl font-barlow font-bold mt-1 text-white">{value}</p>
+              {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
             </div>
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClasses[color]}`}>
               <Icon className="w-5 h-5" />
@@ -113,7 +113,7 @@ const MetricCard = ({ title, value, subtitle, icon: Icon, trend, color = 'primar
               <span className={`text-sm ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                 {trend >= 0 ? '+' : ''}{trend}%
               </span>
-              <span className="text-xs text-muted-foreground ml-1">vs last period</span>
+              <span className="text-xs text-gray-500 ml-1">vs last period</span>
             </div>
           )}
         </CardContent>
