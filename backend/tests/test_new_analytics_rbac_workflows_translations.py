@@ -40,9 +40,12 @@ class TestAuth:
         """Get test organization ID"""
         response = requests.get(f"{BASE_URL}/api/organizations", headers=auth_headers)
         if response.status_code == 200:
-            orgs = response.json().get("organizations", [])
-            if orgs:
+            orgs = response.json()
+            # Handle if response is a list or dict
+            if isinstance(orgs, list) and orgs:
                 return orgs[0]["id"]
+            elif isinstance(orgs, dict) and orgs.get("organizations"):
+                return orgs["organizations"][0]["id"]
         # Use a default org_id if not found
         return "test_org_123"
 
