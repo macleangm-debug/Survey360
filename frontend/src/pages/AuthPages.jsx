@@ -301,7 +301,16 @@ export function AuthCallbackPage() {
       toast.error('SSO authentication failed');
       navigate('/login');
     }
-  };
+  }, [navigate, setAuth]);
+
+  React.useEffect(() => {
+    const code = searchParams.get('code');
+    if (code) {
+      handleSSOCallback(code);
+    } else {
+      navigate('/login');
+    }
+  }, [searchParams, navigate, handleSSOCallback]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
