@@ -195,7 +195,7 @@ export function TeamPage() {
     return (
       <DashboardLayout>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Please select an organization first</p>
+          <p className="text-gray-400">Please select an organization first</p>
         </div>
       </DashboardLayout>
     );
@@ -207,8 +207,8 @@ export function TeamPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="font-barlow text-3xl font-bold tracking-tight">Team</h1>
-            <p className="text-muted-foreground">Manage team members and permissions</p>
+            <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Team</h1>
+            <p className="text-gray-400">Manage team members and permissions</p>
           </div>
           <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
             <DialogTrigger asChild>
