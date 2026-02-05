@@ -240,8 +240,8 @@ export function ProjectsPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="font-barlow text-3xl font-bold tracking-tight">Projects</h1>
-            <p className="text-muted-foreground">Manage your data collection projects</p>
+            <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Projects</h1>
+            <p className="text-gray-400">Manage your data collection projects</p>
           </div>
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
