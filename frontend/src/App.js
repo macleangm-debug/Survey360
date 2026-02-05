@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useAuthStore, useUIStore } from './store';
@@ -7,12 +7,29 @@ import { DashboardPage } from './pages/DashboardPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { FormsPage } from './pages/FormsPage';
 import { FormBuilderPage } from './pages/FormBuilderPage';
+import { FormPreviewPage } from './pages/FormPreviewPage';
 import { SubmissionsPage } from './pages/SubmissionsPage';
 import { TeamPage, CreateOrganizationPage } from './pages/TeamPage';
 import { CasesPage } from './pages/CasesPage';
 import { QualityPage } from './pages/QualityPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import '@/App.css';
+
+// Register service worker
+const registerServiceWorker = async () => {
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('Service Worker registered:', registration);
+      
+      // Store registration for background sync
+      window.registration = registration;
+    } catch (error) {
+      console.error('Service Worker registration failed:', error);
+    }
+  }
+};
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
