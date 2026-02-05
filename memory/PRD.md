@@ -90,19 +90,22 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `GET /api/media/limits` - Get upload limits
 
 ## Backlog - P0 (Critical)
+- [x] Calculated fields evaluation ✅ (Feb 5, 2026)
+- [x] Advanced skip logic editor ✅ (Feb 5, 2026)
+- [x] GPS accuracy visualization on map ✅ (Feb 5, 2026)
+- [x] Form templates library ✅ (Feb 5, 2026)
 - [ ] Complete offline sync with conflict resolution
 - [ ] Real GPS capture in form preview
 - [ ] Audio/Video recording implementation
 
 ## Backlog - P1 (High Priority)
-- [ ] Calculated fields evaluation
-- [ ] Advanced skip logic editor
-- [ ] GPS accuracy visualization on map
+- [ ] Integrate Skip Logic Editor into Form Builder
+- [ ] Integrate Calculated Field Editor into Form Builder
+- [ ] Integrate GPS Capture into Form Filling
 - [ ] Duplicate detection alerts
 - [ ] Form versioning comparison
 
 ## Backlog - P2 (Medium Priority)
-- [ ] Form templates library
 - [ ] Custom dashboard widgets
 - [ ] Webhook configuration
 - [ ] Stata/SPSS export formats
