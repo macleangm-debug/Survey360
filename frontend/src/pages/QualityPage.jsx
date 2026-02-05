@@ -496,8 +496,8 @@ export function QualityPage() {
             {/* Quality Flags */}
             <Card>
               <CardHeader>
-                <CardTitle className="font-barlow">Quality Flags</CardTitle>
-                <CardDescription>Most common data issues detected</CardDescription>
+                <CardTitle className="font-barlow text-white">Quality Flags</CardTitle>
+                <CardDescription className="text-gray-400">Most common data issues detected</CardDescription>
               </CardHeader>
               <CardContent>
                 {loading ? (
