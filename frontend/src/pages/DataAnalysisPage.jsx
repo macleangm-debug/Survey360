@@ -121,12 +121,14 @@ export function DataAnalysisPage() {
 
   const fetchForms = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/forms/${currentOrg.id}`, {
+      const response = await fetch(`${API_URL}/api/forms?org_id=${currentOrg.id}`, {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       });
       if (response.ok) {
         const data = await response.json();
         setForms(data || []);
+      } else {
+        console.error('Failed to fetch forms:', await response.text());
       }
     } catch (error) {
       console.error('Failed to fetch forms:', error);
