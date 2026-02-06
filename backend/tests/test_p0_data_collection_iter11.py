@@ -42,20 +42,18 @@ class TestAuthSetup:
         TestAuthSetup.token = token
         TestAuthSetup.user_id = data.get("user", {}).get("id", "user_test123")
         
-        # Get org_id from organizations list
-        orgs = data.get("organizations", [])
-        if orgs:
-            TestAuthSetup.org_id = orgs[0].get("org_id") or orgs[0].get("id")
-        else:
-            # If no orgs in login response, fetch from /api/organizations
-            org_response = requests.get(
-                f"{BASE_URL}/api/organizations",
-                headers={"Authorization": f"Bearer {token}"}
-            )
-            if org_response.status_code == 200:
-                org_data = org_response.json()
-                if org_data.get("organizations"):
-                    TestAuthSetup.org_id = org_data["organizations"][0].get("id")
+        # Get org_id - fetch from /api/organizations
+        org_response = requests.get(
+            f"{BASE_URL}/api/organizations",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        if org_response.status_code == 200:
+            org_data = org_response.json()
+            # Response is a list of organizations
+            if isinstance(org_data, list) and len(org_data) > 0:
+                TestAuthSetup.org_id = org_data[0].get("id")
+            elif isinstance(org_data, dict) and org_data.get("organizations"):
+                TestAuthSetup.org_id = org_data["organizations"][0].get("id")
         
         # Fallback
         if not TestAuthSetup.org_id:
