@@ -277,7 +277,7 @@ async def run_ttest(
             "n": int(len(series)),
             "t_statistic": round(float(t_stat), 4),
             "p_value": round(float(p_value), 4),
-            "significant": p_value < 0.05,
+            "significant": bool(p_value < 0.05),
             "confidence_interval": {
                 "lower": round(float(series.mean() - 1.96 * series.sem()), 4),
                 "upper": round(float(series.mean() + 1.96 * series.sem()), 4)
@@ -301,7 +301,7 @@ async def run_ttest(
         
         # Levene's test for equality of variances
         levene_stat, levene_p = scipy_stats.levene(group1_data, group2_data)
-        equal_var = levene_p > 0.05
+        equal_var = bool(levene_p > 0.05)
         
         # T-test
         t_stat, p_value = scipy_stats.ttest_ind(group1_data, group2_data, equal_var=equal_var)
@@ -341,7 +341,7 @@ async def run_ttest(
             },
             "t_statistic": round(float(t_stat), 4),
             "p_value": round(float(p_value), 4),
-            "significant": p_value < 0.05,
+            "significant": bool(p_value < 0.05),
             "effect_size": effect_size
         }
     
