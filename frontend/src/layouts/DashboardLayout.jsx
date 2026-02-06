@@ -265,6 +265,8 @@ export function DashboardLayout({ children }) {
           </main>
         </div>
       </div>
+      {/* Offline Banner */}
+      <OfflineBanner />
     </div>
   );
 }
