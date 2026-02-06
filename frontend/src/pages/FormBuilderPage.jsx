@@ -560,6 +560,7 @@ export function FormBuilderPage() {
   const [showVersionComparison, setShowVersionComparison] = useState(false);
   const [showSaveVersion, setShowSaveVersion] = useState(false);
   const [showDuplicateRules, setShowDuplicateRules] = useState(false);
+  const [showLogicVisualization, setShowLogicVisualization] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState(null);
 
   const loadForm = useCallback(async () => {
