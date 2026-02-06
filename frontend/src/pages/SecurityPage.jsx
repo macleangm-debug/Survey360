@@ -727,7 +727,7 @@ export function SecurityPage() {
                 API Key Created
               </DialogTitle>
               <DialogDescription>
-                Copy your API key now. You won't be able to see it again!
+                Copy your API key now. You won&apos;t be able to see it again!
               </DialogDescription>
             </DialogHeader>
 
