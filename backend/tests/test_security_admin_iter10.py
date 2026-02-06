@@ -454,7 +454,8 @@ class TestAdminBillingPlans(TestAuth):
         assert "max_users" in pro_plan["features"]
         assert "max_submissions_per_month" in pro_plan["features"]
         
-        print(f"Billing plans: {[f'{p['name']}=${p['price_monthly']}' for p in data['plans']]}")
+        plan_info = [f"{p['name']}=${p['price_monthly']}" for p in data['plans']]
+        print(f"Billing plans: {plan_info}")
 
 
 class TestAdminAlerts(TestAuth):
