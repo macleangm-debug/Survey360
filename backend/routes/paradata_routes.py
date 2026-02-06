@@ -506,7 +506,7 @@ async def get_speeding_report(
 
 # ============ Helper Functions ============
 
-def calculate_session_metrics(events: List[Dict], session_start: datetime, session_end: datetime) -> Dict:
+def calculate_session_metrics(events: List[Dict], session_start, session_end) -> Dict:
     """Calculate aggregated metrics from paradata events"""
     if not events:
         return {
@@ -516,6 +516,18 @@ def calculate_session_metrics(events: List[Dict], session_start: datetime, sessi
             "total_edits": 0,
             "total_backtracking": 0
         }
+    
+    # Handle session_start - may be string, naive datetime, or aware datetime
+    if isinstance(session_start, str):
+        session_start = datetime.fromisoformat(session_start.replace("Z", "+00:00"))
+    if session_start and session_start.tzinfo is None:
+        session_start = session_start.replace(tzinfo=timezone.utc)
+    
+    # Handle session_end - ensure it's timezone aware
+    if isinstance(session_end, str):
+        session_end = datetime.fromisoformat(session_end.replace("Z", "+00:00"))
+    if session_end and session_end.tzinfo is None:
+        session_end = session_end.replace(tzinfo=timezone.utc)
     
     total_duration = (session_end - session_start).total_seconds() if session_start and session_end else 0
     
