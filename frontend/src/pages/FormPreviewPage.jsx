@@ -17,7 +17,9 @@ import {
   Calendar,
   ChevronDown,
   ChevronUp,
-  AlertCircle
+  AlertCircle,
+  ScanLine,
+  PenTool
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -41,6 +43,8 @@ import { DashboardLayout } from '../layouts/DashboardLayout';
 import { GpsCapture } from '../components/GpsCapture';
 import { AudioRecorder } from '../components/AudioRecorder';
 import { VideoRecorder } from '../components/VideoRecorder';
+import { BarcodeCapture } from '../components/BarcodeCapture';
+import { SignatureCapture } from '../components/SignatureCapture';
 import { formAPI } from '../lib/api';
 import { toast } from 'sonner';
 
