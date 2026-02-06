@@ -482,7 +482,7 @@ export function DashboardLayout({ children }) {
                                 className={cn(
                                   "block px-3 py-2 rounded-lg text-sm",
                                   location.pathname === item.path
-                                    ? "bg-violet-50 text-violet-700"
+                                    ? "bg-sky-50 text-sky-600"
                                     : "text-slate-600 hover:bg-slate-50"
                                 )}
                               >
