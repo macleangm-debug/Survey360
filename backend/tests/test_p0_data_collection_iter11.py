@@ -36,11 +36,32 @@ class TestAuthSetup:
         )
         assert response.status_code == 200, f"Login failed: {response.text}"
         data = response.json()
-        assert "token" in data
-        TestAuthSetup.token = data["token"]
-        TestAuthSetup.org_id = data.get("organizations", [{}])[0].get("org_id", "org_test123")
+        # Handle both "token" and "access_token" response formats
+        token = data.get("token") or data.get("access_token")
+        assert token, f"No token in response: {data.keys()}"
+        TestAuthSetup.token = token
         TestAuthSetup.user_id = data.get("user", {}).get("id", "user_test123")
-        print(f"Logged in. Org ID: {TestAuthSetup.org_id}")
+        
+        # Get org_id from organizations list
+        orgs = data.get("organizations", [])
+        if orgs:
+            TestAuthSetup.org_id = orgs[0].get("org_id") or orgs[0].get("id")
+        else:
+            # If no orgs in login response, fetch from /api/organizations
+            org_response = requests.get(
+                f"{BASE_URL}/api/organizations",
+                headers={"Authorization": f"Bearer {token}"}
+            )
+            if org_response.status_code == 200:
+                org_data = org_response.json()
+                if org_data.get("organizations"):
+                    TestAuthSetup.org_id = org_data["organizations"][0].get("id")
+        
+        # Fallback
+        if not TestAuthSetup.org_id:
+            TestAuthSetup.org_id = "org_test_organization"
+            
+        print(f"Logged in. User: {TestAuthSetup.user_id}, Org ID: {TestAuthSetup.org_id}")
 
 
 # ==================== PARADATA API TESTS ====================
