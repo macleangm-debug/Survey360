@@ -50,6 +50,7 @@ const navigation = [
   { name: 'Submissions', href: '/submissions', icon: Database },
   { name: 'Cases', href: '/cases', icon: Briefcase },
   { name: 'Import Cases', href: '/cases/import', icon: Upload },
+  { name: 'Lookup Datasets', href: '/datasets', icon: Table2 },
   { name: 'Quality', href: '/quality', icon: Activity },
   { name: 'GPS Map', href: '/map', icon: Map },
   { name: 'Workflows', href: '/workflows', icon: Workflow },
