@@ -23,6 +23,10 @@ import { TranslationsPage } from './pages/TranslationsPage';
 import { SecurityPage } from './pages/SecurityPage';
 import { SuperAdminPage } from './pages/SuperAdminPage';
 import { DatasetsPage } from './pages/DatasetsPage';
+import { TokenSurveysPage } from './pages/TokenSurveysPage';
+import { CATIPage } from './pages/CATIPage';
+import { BackcheckPage } from './pages/BackcheckPage';
+import { PreloadWritebackPage } from './pages/PreloadWritebackPage';
 import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
 import '@/App.css';
@@ -208,6 +212,26 @@ function App() {
           <Route path="/datasets" element={
             <ProtectedRoute>
               <DatasetsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/token-surveys" element={
+            <ProtectedRoute>
+              <TokenSurveysPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/cati" element={
+            <ProtectedRoute>
+              <CATIPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/backcheck" element={
+            <ProtectedRoute>
+              <BackcheckPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/preload" element={
+            <ProtectedRoute>
+              <PreloadWritebackPage />
             </ProtectedRoute>
           } />
           <Route path="/organizations/new" element={
