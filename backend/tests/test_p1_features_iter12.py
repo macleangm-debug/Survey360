@@ -80,7 +80,8 @@ def project_id(api_client, org_id):
     """Get or create project for testing"""
     res = api_client.get(f"{BASE_URL}/api/projects?org_id={org_id}")
     if res.status_code == 200:
-        projects = res.json().get("projects", [])
+        data = res.json()
+        projects = data if isinstance(data, list) else data.get("projects", [])
         if projects:
             return projects[0]["id"]
     # Create a test project if none exists
