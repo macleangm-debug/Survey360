@@ -31,7 +31,8 @@ import {
   Link2,
   Phone,
   ClipboardCheck,
-  ArrowLeftRight
+  ArrowLeftRight,
+  Brain
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -59,6 +60,7 @@ const navigation = [
   { name: 'CATI Center', href: '/cati', icon: Phone },
   { name: 'Back-check', href: '/backcheck', icon: ClipboardCheck },
   { name: 'Preload/Writeback', href: '/preload', icon: ArrowLeftRight },
+  { name: 'Quality AI', href: '/quality-ai', icon: Brain },
   { name: 'Quality', href: '/quality', icon: Activity },
   { name: 'GPS Map', href: '/map', icon: Map },
   { name: 'Workflows', href: '/workflows', icon: Workflow },
