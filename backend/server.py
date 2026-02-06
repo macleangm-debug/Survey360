@@ -76,6 +76,8 @@ api_router.include_router(analytics_router)
 api_router.include_router(rbac_router)
 api_router.include_router(workflow_router)
 api_router.include_router(translation_router)
+api_router.include_router(security_router)
+api_router.include_router(admin_router)
 
 
 # Health check endpoint
