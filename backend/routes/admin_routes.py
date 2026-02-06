@@ -110,7 +110,7 @@ async def get_admin_dashboard(request: Request):
     recent_orgs = await db.organizations.find().sort("created_at", -1).limit(10).to_list(10)
     for org in recent_orgs:
         org["_id"] = str(org.get("_id", ""))
-        if org.get("created_at"):
+        if org.get("created_at") and hasattr(org["created_at"], 'isoformat'):
             org["created_at"] = org["created_at"].isoformat()
     
     # Revenue calculation (mock)
@@ -168,7 +168,7 @@ async def list_all_organizations(
     # Enrich with usage data
     for org in orgs:
         org["_id"] = str(org.get("_id", ""))
-        if org.get("created_at"):
+        if org.get("created_at") and hasattr(org["created_at"], 'isoformat'):
             org["created_at"] = org["created_at"].isoformat()
         
         # Get usage stats
