@@ -156,6 +156,21 @@ async def startup_db_client():
         # Audit Logs
         await db.audit_logs.create_index([("org_id", 1), ("timestamp", -1)])
         
+        # API Keys
+        await db.api_keys.create_index("key_hash", unique=True)
+        await db.api_keys.create_index([("org_id", 1), ("is_active", 1)])
+        
+        # API Audit Logs
+        await db.api_audit_logs.create_index([("org_id", 1), ("timestamp", -1)])
+        await db.api_audit_logs.create_index([("timestamp", -1)])
+        
+        # Invoices
+        await db.invoices.create_index("id", unique=True)
+        await db.invoices.create_index([("org_id", 1), ("created_at", -1)])
+        
+        # Billing Events
+        await db.billing_events.create_index([("org_id", 1), ("timestamp", -1)])
+        
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")
