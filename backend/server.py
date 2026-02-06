@@ -209,6 +209,44 @@ async def startup_db_client():
         # Dataset Write-back Log
         await db.dataset_write_back_log.create_index([("dataset_id", 1), ("timestamp", -1)])
         
+        # Survey Distributions (Token/Panel Surveys)
+        await db.survey_distributions.create_index("id", unique=True)
+        await db.survey_distributions.create_index([("org_id", 1), ("status", 1)])
+        await db.survey_invites.create_index("id", unique=True)
+        await db.survey_invites.create_index("token_hash", unique=True)
+        await db.survey_invites.create_index([("distribution_id", 1), ("status", 1)])
+        await db.survey_panels.create_index("id", unique=True)
+        await db.panel_members.create_index("id", unique=True)
+        await db.panel_members.create_index([("panel_id", 1), ("status", 1)])
+        
+        # CATI (Computer-Assisted Telephone Interviewing)
+        await db.cati_projects.create_index("id", unique=True)
+        await db.cati_projects.create_index([("org_id", 1), ("status", 1)])
+        await db.cati_queue.create_index("id", unique=True)
+        await db.cati_queue.create_index([("project_id", 1), ("status", 1), ("priority", -1)])
+        await db.cati_queue.create_index([("locked_by", 1), ("status", 1)])
+        await db.cati_calls.create_index("id", unique=True)
+        await db.cati_calls.create_index([("project_id", 1), ("start_time", -1)])
+        await db.cati_calls.create_index([("interviewer_id", 1), ("start_time", -1)])
+        
+        # Back-check Module
+        await db.backcheck_configs.create_index("id", unique=True)
+        await db.backcheck_configs.create_index([("org_id", 1), ("project_id", 1)])
+        await db.backchecks.create_index("id", unique=True)
+        await db.backchecks.create_index([("config_id", 1), ("status", 1)])
+        await db.backchecks.create_index([("assigned_to", 1), ("status", 1)])
+        await db.backchecks.create_index([("original_enumerator_id", 1)])
+        await db.enumerator_quality.create_index("enumerator_id", unique=True)
+        
+        # Preload/Write-back
+        await db.preload_configs.create_index("id", unique=True)
+        await db.preload_configs.create_index([("org_id", 1), ("form_id", 1)])
+        await db.writeback_configs.create_index("id", unique=True)
+        await db.writeback_configs.create_index([("org_id", 1), ("form_id", 1)])
+        await db.preload_logs.create_index([("form_id", 1), ("timestamp", -1)])
+        await db.writeback_logs.create_index([("form_id", 1), ("timestamp", -1)])
+        await db.external_api_configs.create_index("id", unique=True)
+        
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")
