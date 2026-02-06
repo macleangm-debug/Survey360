@@ -56,7 +56,9 @@ const navigation = [
   { name: 'Team', href: '/team', icon: Users },
   { name: 'Roles', href: '/rbac', icon: Shield },
   { name: 'Translations', href: '/translations', icon: Languages },
+  { name: 'API Security', href: '/security', icon: Key },
   { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Super Admin', href: '/admin', icon: Crown },
 ];
 
 export function Sidebar() {
