@@ -258,10 +258,10 @@ export function DashboardPage() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Submission Trends */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 bg-white border border-slate-200">
             <CardHeader>
-              <CardTitle className="font-barlow text-white">Submission Trends</CardTitle>
-              <CardDescription className="text-gray-400">Last 14 days</CardDescription>
+              <CardTitle className="text-slate-900">Submission Trends</CardTitle>
+              <CardDescription className="text-slate-500">Last 14 days</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -271,29 +271,29 @@ export function DashboardPage() {
                   <AreaChart data={trends}>
                     <defs>
                       <linearGradient id="colorSubmissions" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="hsl(var(--muted-foreground))" 
+                      stroke="#94a3b8" 
                       fontSize={12}
                       tickFormatter={(val) => new Date(val).toLocaleDateString('en', { day: 'numeric', month: 'short' })}
                     />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <YAxis stroke="#94a3b8" fontSize={12} />
                     <Tooltip 
                       contentStyle={{ 
-                        backgroundColor: 'hsl(var(--card))', 
-                        border: '1px solid hsl(var(--border))',
+                        backgroundColor: '#ffffff', 
+                        border: '1px solid #e2e8f0',
                         borderRadius: '8px'
                       }}
                     />
                     <Area 
                       type="monotone" 
                       dataKey="count" 
-                      stroke="hsl(var(--primary))" 
+                      stroke="#0ea5e9" 
                       strokeWidth={2}
                       fillOpacity={1} 
                       fill="url(#colorSubmissions)" 
@@ -305,10 +305,10 @@ export function DashboardPage() {
           </Card>
 
           {/* Data Quality */}
-          <Card>
+          <Card className="bg-white border border-slate-200">
             <CardHeader>
-              <CardTitle className="font-barlow text-white">Data Quality</CardTitle>
-              <CardDescription className="text-gray-400">Overall quality metrics</CardDescription>
+              <CardTitle className="text-slate-900">Data Quality</CardTitle>
+              <CardDescription className="text-slate-500">Overall quality metrics</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {loading ? (
@@ -321,7 +321,7 @@ export function DashboardPage() {
                 <>
                   <div>
                     <div className="flex justify-between mb-2">
-                      <span className="text-sm text-gray-400">Avg Quality Score</span>
+                      <span className="text-sm text-slate-500">Avg Quality Score</span>
                       <span className={`text-sm font-mono font-medium ${getQualityColor(quality.avg_quality_score)}`}>
                         {quality.avg_quality_score}%
                       </span>
@@ -329,22 +329,22 @@ export function DashboardPage() {
                     <Progress value={quality.avg_quality_score} className="h-2" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 rounded-lg bg-green-500/10">
-                      <p className="text-2xl font-barlow font-bold text-green-500">{quality.approved_count}</p>
-                      <p className="text-xs text-gray-400">Approved</p>
+                    <div className="text-center p-3 rounded-lg bg-emerald-50 border border-emerald-100">
+                      <p className="text-2xl font-semibold text-emerald-600">{quality.approved_count}</p>
+                      <p className="text-xs text-slate-500">Approved</p>
                     </div>
-                    <div className="text-center p-3 rounded-lg bg-red-500/10">
-                      <p className="text-2xl font-barlow font-bold text-red-500">{quality.rejected_count}</p>
-                      <p className="text-xs text-gray-400">Rejected</p>
+                    <div className="text-center p-3 rounded-lg bg-red-50 border border-red-100">
+                      <p className="text-2xl font-semibold text-red-600">{quality.rejected_count}</p>
+                      <p className="text-xs text-slate-500">Rejected</p>
                     </div>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-yellow-500/10">
-                    <p className="text-2xl font-barlow font-bold text-yellow-500">{quality.flagged_count}</p>
-                    <p className="text-xs text-gray-400">Flagged for Review</p>
+                  <div className="text-center p-3 rounded-lg bg-amber-50 border border-amber-100">
+                    <p className="text-2xl font-semibold text-amber-600">{quality.flagged_count}</p>
+                    <p className="text-xs text-slate-500">Flagged for Review</p>
                   </div>
                 </>
               ) : (
-                <p className="text-sm text-gray-400 text-center py-8">No data yet</p>
+                <p className="text-sm text-slate-400 text-center py-8">No data yet</p>
               )}
             </CardContent>
           </Card>
