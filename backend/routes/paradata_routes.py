@@ -395,7 +395,8 @@ async def get_form_question_stats(
             
             if event_type == "question_blur":
                 # Calculate time spent if we have metadata
-                duration = event.get("metadata", {}).get("duration_seconds")
+                metadata = event.get("metadata") or {}
+                duration = metadata.get("duration_seconds")
                 if duration:
                     question_stats[q_name]["focus_times"].append(duration)
             
@@ -405,8 +406,10 @@ async def get_form_question_stats(
             elif event_type == "validation_fail":
                 question_stats[q_name]["validation_failures"] += 1
             
-            elif event_type == "nav_jump" and event.get("metadata", {}).get("skipped"):
-                question_stats[q_name]["skip_count"] += 1
+            elif event_type == "nav_jump":
+                metadata = event.get("metadata") or {}
+                if metadata.get("skipped"):
+                    question_stats[q_name]["skip_count"] += 1
     
     # Calculate averages
     results = []
@@ -610,11 +613,12 @@ def calculate_paradata_summary(sessions: List[Dict]) -> Dict:
     if not sessions:
         return {}
     
-    total_duration = sum(s.get("total_duration_seconds", 0) for s in sessions)
-    total_active = sum(s.get("active_duration_seconds", 0) for s in sessions)
-    total_pause = sum(s.get("pause_duration_seconds", 0) for s in sessions)
-    total_edits = sum(s.get("total_edits", 0) for s in sessions)
-    total_backtracks = sum(s.get("total_backtracking", 0) for s in sessions)
+    # Handle None values that may be returned from database
+    total_duration = sum(s.get("total_duration_seconds") or 0 for s in sessions)
+    total_active = sum(s.get("active_duration_seconds") or 0 for s in sessions)
+    total_pause = sum(s.get("pause_duration_seconds") or 0 for s in sessions)
+    total_edits = sum(s.get("total_edits") or 0 for s in sessions)
+    total_backtracks = sum(s.get("total_backtracking") or 0 for s in sessions)
     
     return {
         "total_sessions": len(sessions),
