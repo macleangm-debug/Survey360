@@ -64,6 +64,10 @@ from routes.quality_ai_routes import router as quality_ai_router
 from routes.cawi_routes import router as cawi_router
 from routes.simulation_routes import router as simulation_router
 from routes.device_routes import router as device_router
+from routes.analysis_routes import router as analysis_router
+from routes.stats_routes import router as stats_router
+from routes.ai_copilot_routes import router as ai_copilot_router
+from routes.analysis_export_routes import router as analysis_export_router
 
 # Include all route modules
 api_router.include_router(auth_router)
@@ -100,6 +104,10 @@ api_router.include_router(quality_ai_router)
 api_router.include_router(cawi_router)
 api_router.include_router(simulation_router)
 api_router.include_router(device_router)
+api_router.include_router(analysis_router)
+api_router.include_router(stats_router)
+api_router.include_router(ai_copilot_router)
+api_router.include_router(analysis_export_router)
 
 
 # Health check endpoint
