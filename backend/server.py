@@ -60,6 +60,7 @@ from routes.survey_routes import router as survey_router
 from routes.cati_routes import router as cati_router
 from routes.backcheck_routes import router as backcheck_router
 from routes.preload_routes import router as preload_router
+from routes.quality_ai_routes import router as quality_ai_router
 
 # Include all route modules
 api_router.include_router(auth_router)
@@ -92,6 +93,7 @@ api_router.include_router(survey_router)
 api_router.include_router(cati_router)
 api_router.include_router(backcheck_router)
 api_router.include_router(preload_router)
+api_router.include_router(quality_ai_router)
 
 
 # Health check endpoint
