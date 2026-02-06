@@ -189,43 +189,46 @@ export function DashboardLayout({ children }) {
   return (
     <TooltipProvider>
       <div className="flex h-screen bg-slate-50">
-        {/* Rail - Thin icon sidebar */}
-        <aside className="hidden lg:flex flex-col items-center w-[72px] bg-white border-r border-slate-100 py-4">
+        {/* Rail - Thin icon sidebar with labels */}
+        <aside className="hidden lg:flex flex-col items-center w-[80px] bg-white border-r border-slate-100 py-4">
           {/* Logo */}
-          <Link to="/dashboard" className="mb-6">
+          <Link to="/dashboard" className="mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-sky-500/20">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
           </Link>
 
           {/* Create Button */}
-          <Button
+          <button
             onClick={() => navigate('/forms/new')}
-            className="w-12 h-12 rounded-xl bg-sky-500 hover:bg-sky-600 text-white shadow-md shadow-sky-500/20 mb-6"
-            size="icon"
+            className="w-14 h-14 rounded-xl bg-sky-500 hover:bg-sky-600 text-white shadow-md shadow-sky-500/20 mb-4 flex flex-col items-center justify-center gap-0.5 transition-colors"
           >
             <Plus className="w-5 h-5" />
-          </Button>
+            <span className="text-[9px] font-medium">Create</span>
+          </button>
 
-          {/* Navigation Rail Items */}
-          <nav className="flex-1 flex flex-col items-center gap-1">
+          {/* Navigation Rail Items with Labels */}
+          <nav className="flex-1 flex flex-col items-center gap-1 overflow-y-auto">
             {NAVIGATION.map((group) => {
               const Icon = group.icon;
               const isActive = activeGroup === group.id;
               
               return (
-                <Tooltip key={group.id} delayDuration={0}>
+                <Tooltip key={group.id} delayDuration={300}>
                   <TooltipTrigger asChild>
                     <button
                       onClick={() => handleRailClick(group)}
                       className={cn(
-                        "w-11 h-11 flex items-center justify-center rounded-xl transition-colors",
+                        "w-16 py-2 flex flex-col items-center justify-center gap-1 rounded-xl transition-colors",
                         isActive 
-                          ? "bg-sky-100 text-sky-600" 
-                          : "text-slate-500 hover:bg-sky-50 hover:text-sky-500"
+                          ? "bg-sky-50 text-sky-600" 
+                          : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                       )}
                     >
                       <Icon className="w-5 h-5" />
+                      <span className="text-[10px] font-medium leading-tight text-center">
+                        {group.label}
+                      </span>
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="bg-slate-900 text-white">
