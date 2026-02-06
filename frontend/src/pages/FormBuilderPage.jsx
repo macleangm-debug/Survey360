@@ -420,6 +420,98 @@ const FieldEditor = ({ field, allFields, onChange, onClose }) => {
                     </div>
                   </div>
                 )}
+
+                {field.type === 'barcode' && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Accepted Barcode Formats</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a', 'upc_e'].map((format) => (
+                          <div key={format} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`format-${format}`}
+                              checked={(localField.validation?.accepted_formats || ['ean_13', 'qr_code']).includes(format)}
+                              onCheckedChange={(checked) => {
+                                const current = localField.validation?.accepted_formats || ['ean_13', 'qr_code'];
+                                const newFormats = checked
+                                  ? [...current, format]
+                                  : current.filter(f => f !== format);
+                                setLocalField({
+                                  ...localField,
+                                  validation: { ...localField.validation, accepted_formats: newFormats }
+                                });
+                              }}
+                            />
+                            <Label htmlFor={`format-${format}`} className="text-sm cursor-pointer">
+                              {format.replace('_', '-').toUpperCase()}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Barcode Pattern (Regex)</Label>
+                      <Input
+                        value={localField.validation?.barcode_pattern || ''}
+                        onChange={(e) => 
+                          setLocalField({
+                            ...localField,
+                            validation: { ...localField.validation, barcode_pattern: e.target.value }
+                          })
+                        }
+                        placeholder="e.g., ^[0-9]{13}$"
+                      />
+                      <p className="text-xs text-gray-500">Validate barcode format with regex</p>
+                    </div>
+                  </div>
+                )}
+
+                {field.type === 'signature' && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Stroke Color</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="color"
+                          value={localField.settings?.stroke_color || '#000000'}
+                          onChange={(e) => 
+                            setLocalField({
+                              ...localField,
+                              settings: { ...localField.settings, stroke_color: e.target.value }
+                            })
+                          }
+                          className="w-16 h-10 p-1"
+                        />
+                        <Input
+                          value={localField.settings?.stroke_color || '#000000'}
+                          onChange={(e) => 
+                            setLocalField({
+                              ...localField,
+                              settings: { ...localField.settings, stroke_color: e.target.value }
+                            })
+                          }
+                          placeholder="#000000"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Stroke Width (px)</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={10}
+                        value={localField.settings?.stroke_width || 2}
+                        onChange={(e) => 
+                          setLocalField({
+                            ...localField,
+                            settings: { ...localField.settings, stroke_width: parseInt(e.target.value) || 2 }
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
               </TabsContent>
 
               {/* Logic Tab */}
