@@ -272,6 +272,18 @@ async def startup_db_client():
         await db.cawi_sessions.create_index([("form_id", 1), ("token", 1)])
         await db.cawi_sessions.create_index([("form_id", 1), ("status", 1)])
         
+        # AI Field Simulation
+        await db.simulation_reports.create_index("id", unique=True)
+        await db.simulation_reports.create_index([("org_id", 1), ("form_id", 1)])
+        await db.simulation_reports.create_index([("created_at", -1)])
+        
+        # Device Management & Remote Wipe
+        await db.devices.create_index("id", unique=True)
+        await db.devices.create_index([("org_id", 1), ("user_id", 1)])
+        await db.devices.create_index([("org_id", 1), ("status", 1)])
+        await db.device_activity_logs.create_index([("device_id", 1), ("timestamp", -1)])
+        await db.device_activity_logs.create_index([("org_id", 1), ("timestamp", -1)])
+        
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")
