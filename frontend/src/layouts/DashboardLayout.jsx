@@ -33,7 +33,9 @@ import {
   ClipboardCheck,
   ArrowLeftRight,
   Brain,
-  Puzzle
+  Puzzle,
+  Route,
+  Smartphone
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -63,6 +65,7 @@ const navigation = [
   { name: 'Back-check', href: '/backcheck', icon: ClipboardCheck },
   { name: 'Preload/Writeback', href: '/preload', icon: ArrowLeftRight },
   { name: 'Quality AI', href: '/quality-ai', icon: Brain },
+  { name: 'Field Simulation', href: '/simulation', icon: Route },
   { name: 'Plugins', href: '/plugins', icon: Puzzle },
   { name: 'Quality', href: '/quality', icon: Activity },
   { name: 'GPS Map', href: '/map', icon: Map },
@@ -72,6 +75,7 @@ const navigation = [
   { name: 'Roles', href: '/rbac', icon: Shield },
   { name: 'Translations', href: '/translations', icon: Languages },
   { name: 'API Security', href: '/security', icon: Key },
+  { name: 'Device Management', href: '/devices', icon: Smartphone },
   { name: 'Settings', href: '/settings', icon: Settings },
   { name: 'Super Admin', href: '/admin', icon: Crown },
 ];
