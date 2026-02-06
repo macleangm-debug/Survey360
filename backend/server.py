@@ -177,6 +177,30 @@ async def startup_db_client():
         # Billing Events
         await db.billing_events.create_index([("org_id", 1), ("timestamp", -1)])
         
+        # Paradata Sessions
+        await db.paradata_sessions.create_index("id", unique=True)
+        await db.paradata_sessions.create_index([("submission_id", 1)])
+        await db.paradata_sessions.create_index([("enumerator_id", 1), ("session_start", -1)])
+        await db.paradata_sessions.create_index([("form_id", 1), ("session_start", -1)])
+        
+        # Submission Revisions
+        await db.submission_revisions.create_index("id", unique=True)
+        await db.submission_revisions.create_index([("submission_id", 1), ("version", 1)])
+        
+        # Revision Audit Trail
+        await db.revision_audit_trail.create_index([("submission_id", 1), ("timestamp", 1)])
+        
+        # Correction Requests
+        await db.correction_requests.create_index("id", unique=True)
+        await db.correction_requests.create_index([("enumerator_id", 1), ("status", 1)])
+        
+        # Lookup Datasets
+        await db.lookup_datasets.create_index("id", unique=True)
+        await db.lookup_datasets.create_index([("org_id", 1), ("is_active", 1)])
+        
+        # Dataset Write-back Log
+        await db.dataset_write_back_log.create_index([("dataset_id", 1), ("timestamp", -1)])
+        
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")
