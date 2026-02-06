@@ -289,7 +289,7 @@ async def bulk_add_to_queue(
     return {"message": f"Added {len(items_to_add)} items to queue"}
 
 
-@router.get("/projects/{project_id}/queue")
+@router.get("/queue/{project_id}")
 async def get_queue(
     request: Request,
     project_id: str,
