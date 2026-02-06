@@ -460,13 +460,23 @@ async def get_speeding_report(
         return {"message": "No sessions found", "flagged": []}
     
     # Calculate duration percentiles
-    durations = [(s["id"], s.get("enumerator_id"), s.get("total_duration_seconds", 0)) 
+    durations = [(s["id"], s.get("enumerator_id"), s.get("total_duration_seconds") or 0) 
                  for s in sessions if s.get("total_duration_seconds")]
     
     if not durations:
         return {"message": "No duration data", "flagged": []}
     
     duration_values = [d[2] for d in durations]
+    
+    # Need at least 2 data points for quantiles
+    if len(duration_values) < 2:
+        return {
+            "message": "Insufficient data for statistical analysis (need at least 2 sessions)",
+            "flagged": [],
+            "total_sessions": len(sessions),
+            "threshold_seconds": 0
+        }
+    
     threshold = statistics.quantiles(duration_values, n=100)[int(threshold_percentile) - 1]
     
     # Flag sessions below threshold
