@@ -318,3 +318,132 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `/app/backend/routes/dataset_routes.py` - Lookup datasets (schools, facilities, sampling frames with offline support)
 - `/app/frontend/src/components/ParadataViewer.jsx` - Paradata visualization component
 - `/app/frontend/src/pages/DatasetsPage.jsx` - Lookup datasets management page
+
+## P1 Essential Field Features (NEW - Feb 6, 2026)
+
+### Token/Panel Surveys
+- [x] Token Surveys page at /token-surveys
+- [x] Survey Distribution Management:
+  - Create distributions with unique access tokens
+  - Multiple modes: Token-based, CAWI, Panel, Public Link
+  - Allow multiple submissions toggle
+  - Save & continue functionality
+  - Automated reminder settings
+- [x] Invite Management:
+  - Single and bulk invite creation
+  - CSV import for invites
+  - Status tracking (pending, sent, opened, started, complete, expired)
+  - Response rate calculations
+- [x] Panel Surveys:
+  - Create panels for longitudinal studies
+  - Configure total waves and wave intervals
+  - Member management
+  - Wave tracking
+
+### CATI (Computer-Assisted Telephone Interviewing)
+- [x] CATI Center page at /cati
+- [x] CATI Project Management:
+  - Create CATI projects with form selection
+  - Configurable call attempt limits
+  - Working hours settings
+  - Project activation/deactivation
+- [x] Interviewer Workstation:
+  - Next call retrieval from queue
+  - Call timer with start/end controls
+  - Respondent information display
+  - Call script reference
+- [x] Call Disposition System (15 standard codes):
+  - Complete, Partial Complete, Callback Requested
+  - No Answer, Busy, Voicemail, Disconnected
+  - Wrong Number, Respondent Unavailable, Language Barrier
+  - Soft/Hard Refusal, Refused (Gatekeeper), Ineligible, System Error
+- [x] Callback scheduling with date/time selection
+- [x] Call queue management with priority
+- [x] Statistics dashboard
+
+### Back-check Quality Control
+- [x] Back-check Center page at /backcheck
+- [x] Back-check Configuration:
+  - Sampling methods: Random, Stratified, Systematic, Targeted
+  - Configurable sample percentage
+  - Min/max checks per enumerator
+  - Verification field selection
+  - Key field designation (higher weight)
+  - Auto-flag on critical discrepancies
+  - Supervisor review requirement
+- [x] Sample Generation:
+  - Automated random sampling
+  - Stratified by enumerator
+  - Systematic (every Nth)
+  - Manual selection
+- [x] Discrepancy Detection:
+  - Match rate calculation
+  - Severity levels: Minor, Moderate, Major, Critical
+  - Field-by-field comparison
+  - Verification notes
+- [x] Back-check Queue:
+  - Status filters (pending, assigned, completed, verified, flagged)
+  - Verifier assignment
+  - Due date tracking
+- [x] Quality Reports:
+  - Summary statistics
+  - Enumerator performance rankings
+  - Common discrepancy fields
+  - Weekly trends
+
+### Preload & Write-back
+- [x] Preload/Writeback page at /preload
+- [x] Preload Configuration:
+  - Multiple source types: Case, Dataset, Previous Submission, External API, Manual
+  - Field mapping with transformations
+  - Transformation types: Direct, Format, Calculate, Lookup, Conditional
+  - Default values for missing data
+  - Required field validation
+- [x] Write-back Configuration:
+  - Target types: Dataset, Case, External API
+  - Trigger options: On Submit, On Approve, On Review, Manual
+  - Field mappings with transformations
+  - Match field specification for updates
+  - Create if missing option
+- [x] Execution Logging:
+  - Preload execution history
+  - Write-back execution history
+  - Success/failure tracking
+- [x] External API Integration:
+  - API configuration management
+  - Auth types: Bearer, Basic, API Key
+  - Configurable headers and timeout
+
+### P1 Feature Files
+- `/app/frontend/src/pages/TokenSurveysPage.jsx` - Token/Panel Surveys UI
+- `/app/frontend/src/pages/CATIPage.jsx` - CATI Center with workstation
+- `/app/frontend/src/pages/BackcheckPage.jsx` - Back-check quality control UI
+- `/app/frontend/src/pages/PreloadWritebackPage.jsx` - Preload/Write-back management
+- `/app/backend/routes/survey_routes.py` - Token/Panel Survey API (~870 lines)
+- `/app/backend/routes/cati_routes.py` - CATI API with workstation (~780 lines)
+- `/app/backend/routes/backcheck_routes.py` - Back-check API (~600 lines)
+- `/app/backend/routes/preload_routes.py` - Preload/Write-back API (~620 lines)
+
+## Backlog - P1 (High Priority) - UPDATED
+- [x] Advanced analytics and reporting ✅ (Feb 5, 2026)
+- [x] Role-based access control refinement ✅ (Feb 5, 2026)
+- [x] Submission workflow automation ✅ (Feb 5, 2026)
+- [x] Token/Panel Surveys ✅ (Feb 6, 2026)
+- [x] CATI Module ✅ (Feb 6, 2026)
+- [x] Back-check Quality Control ✅ (Feb 6, 2026)
+- [x] Preload/Write-back ✅ (Feb 6, 2026)
+
+## Backlog - P2 (Quality & AI Features)
+- [ ] Interview speeding detection
+- [ ] Configurable audio audit
+- [ ] AI Monitoring Assistant for anomaly detection
+- [ ] Barcode capture widget
+- [ ] Signature capture widget
+- [ ] Native mobile app
+
+## Backlog - P3 (Future)
+- [ ] True Offline-First CAPI (encrypted local DB, resilient sync)
+- [ ] Plugin/Widget SDK for custom question types
+- [ ] CAWI enhancements
+- [ ] Advanced security policies
+
