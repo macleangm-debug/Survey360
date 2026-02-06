@@ -657,7 +657,7 @@ function InterviewerWorkstation({ projects, interviewerId }) {
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Today's Stats</CardTitle>
+            <CardTitle className="text-base">Today&apos;s Stats</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -689,10 +689,10 @@ function InterviewerWorkstation({ projects, interviewerId }) {
             <div className="p-3 bg-muted rounded-lg text-sm">
               <p className="font-medium mb-2">Introduction:</p>
               <p className="text-muted-foreground">
-                "Hello, my name is [Your Name] calling from [Organization]. 
+                &quot;Hello, my name is [Your Name] calling from [Organization]. 
                 We are conducting a survey about [Topic]. This call may be 
                 recorded for quality purposes. Do you have a few minutes to 
-                participate?"
+                participate?&quot;
               </p>
             </div>
           </CardContent>
