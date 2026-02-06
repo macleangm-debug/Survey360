@@ -53,6 +53,9 @@ from routes.workflow_routes import router as workflow_router
 from routes.translation_routes import router as translation_router
 from routes.security_routes import router as security_router
 from routes.admin_routes import router as admin_router
+from routes.paradata_routes import router as paradata_router
+from routes.revision_routes import router as revision_router
+from routes.dataset_routes import router as dataset_router
 
 # Include all route modules
 api_router.include_router(auth_router)
