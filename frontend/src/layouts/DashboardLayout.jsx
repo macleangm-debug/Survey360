@@ -399,7 +399,7 @@ export function DashboardLayout({ children }) {
             <div className="flex items-center gap-2">
               <button className="p-2 rounded-lg hover:bg-slate-100 text-slate-500 relative">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-violet-600 rounded-full" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-sky-500 rounded-full" />
               </button>
 
               {/* Desktop Profile */}
