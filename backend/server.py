@@ -51,6 +51,8 @@ from routes.analytics_routes import router as analytics_router
 from routes.rbac_routes import router as rbac_router
 from routes.workflow_routes import router as workflow_router
 from routes.translation_routes import router as translation_router
+from routes.security_routes import router as security_router
+from routes.admin_routes import router as admin_router
 
 # Include all route modules
 api_router.include_router(auth_router)
