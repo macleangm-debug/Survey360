@@ -306,13 +306,14 @@ class TestCATIQueue:
     def test_add_to_queue(self, api_client, org_id):
         """Test adding item to CATI queue"""
         list_res = api_client.get(f"{BASE_URL}/api/cati/projects/{org_id}")
-        projects = list_res.json().get("projects", [])
+        data = list_res.json()
+        projects = data if isinstance(data, list) else data.get("projects", [])
         
         if not projects:
             pytest.skip("No CATI projects available")
         
-        project_id = projects[0]["id"]
-        response = api_client.post(f"{BASE_URL}/api/cati/projects/{project_id}/queue", json={
+        cati_project_id = projects[0]["id"]
+        response = api_client.post(f"{BASE_URL}/api/cati/projects/{cati_project_id}/queue", json={
             "case_id": "TEST_case_001",
             "phone_primary": "555-0101",
             "phone_secondary": "555-0102",
