@@ -32,6 +32,7 @@ import { PluginsPage } from './pages/PluginsPage';
 import { CAWISurveyPage, SurveyCompletePage } from './pages/CAWISurveyPage';
 import { SimulationPage } from './pages/SimulationPage';
 import { DeviceManagementPage } from './pages/DeviceManagementPage';
+import { DataAnalysisPage } from './pages/DataAnalysisPage';
 import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
 import '@/App.css';
@@ -257,6 +258,11 @@ function App() {
           <Route path="/devices" element={
             <ProtectedRoute>
               <DeviceManagementPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/analysis" element={
+            <ProtectedRoute>
+              <DataAnalysisPage />
             </ProtectedRoute>
           } />
           {/* Public CAWI Survey Routes */}
