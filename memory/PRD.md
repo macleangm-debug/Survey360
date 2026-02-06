@@ -11,11 +11,12 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - Health & education programs
 
 ## Architecture
-- **Frontend**: React + TailwindCSS + Shadcn UI
+- **Frontend**: React + TailwindCSS + Shadcn UI + Canva-style Navigation
 - **Backend**: FastAPI (Python)
 - **Database**: MongoDB (multi-tenant)
 - **Auth**: JWT + SSO (Software Galaxy integration ready)
 - **PWA**: Service Worker + IndexedDB for offline support (with encryption)
+- **UI Theme**: Violet/Purple color scheme inspired by Canva
 
 ---
 
