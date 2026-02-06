@@ -311,3 +311,10 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `/app/frontend/src/pages/SuperAdminPage.jsx` - Super Admin Dashboard
 - `/app/backend/routes/security_routes.py` - API key, rate limiting, audit logs
 - `/app/backend/routes/admin_routes.py` - Super Admin billing and organization management
+
+### P0 Data Collection Module Files (Feb 6, 2026)
+- `/app/backend/routes/paradata_routes.py` - Industry-standard paradata capture (time on question, navigation, edits, pauses, GPS trail)
+- `/app/backend/routes/revision_routes.py` - Submission revision chain (v1→v2→v3, diffs, locking, correction workflow)
+- `/app/backend/routes/dataset_routes.py` - Lookup datasets (schools, facilities, sampling frames with offline support)
+- `/app/frontend/src/components/ParadataViewer.jsx` - Paradata visualization component
+- `/app/frontend/src/pages/DatasetsPage.jsx` - Lookup datasets management page
