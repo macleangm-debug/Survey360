@@ -301,7 +301,7 @@ export function DashboardLayout({ children }) {
                         className={cn(
                           "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                           isActive 
-                            ? "bg-violet-50 text-violet-700 font-medium" 
+                            ? "bg-sky-50 text-sky-600 font-medium" 
                             : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         )}
                       >
