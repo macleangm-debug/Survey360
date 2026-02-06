@@ -433,13 +433,84 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - [x] Back-check Quality Control ✅ (Feb 6, 2026)
 - [x] Preload/Write-back ✅ (Feb 6, 2026)
 
-## Backlog - P2 (Quality & AI Features)
-- [ ] Interview speeding detection
-- [ ] Configurable audio audit
-- [ ] AI Monitoring Assistant for anomaly detection
-- [ ] Barcode capture widget
-- [ ] Signature capture widget
-- [ ] Native mobile app
+## Backlog - P2 (Quality & AI Features) - COMPLETED (Feb 6, 2026)
+
+### Interview Speeding Detection
+- [x] Quality AI page at /quality-ai
+- [x] Speeding Detection Configuration:
+  - Min expected completion time
+  - Warning threshold (% of median)
+  - Critical threshold (% of median)
+  - Auto-flag critical submissions
+  - Exclude specific fields from timing
+- [x] Automatic median time calculation from recent submissions
+- [x] Speed ratio calculation
+- [x] Alert generation for speeding violations
+
+### Audio Audit
+- [x] Audio Audit Configuration:
+  - Audio field selection
+  - Minimum duration requirement
+  - Sample percentage
+  - Full recording requirement option
+- [x] Audio compliance checking
+- [x] Missing audio detection
+- [x] Short audio detection
+- [x] Audit queue management
+
+### AI Monitoring Assistant (GPT-5.2)
+- [x] AI Monitoring Configuration:
+  - Detect speeding toggle
+  - Detect straight-lining toggle
+  - Detect response anomalies toggle
+  - Detect GPS anomalies toggle
+  - Detect duplicates toggle
+- [x] Straight-lining Detection:
+  - Pattern analysis for repeated responses
+  - Same value threshold detection
+- [x] Response Anomaly Detection:
+  - Validation against field constraints
+  - Suspicious short text detection
+- [x] GPS Anomaly Detection:
+  - Duplicate location detection
+  - Office location flagging
+- [x] AI Deep Analysis (GPT-5.2):
+  - Configurable sample rate
+  - Background processing
+  - Quality score generation
+  - Issue identification
+  - Action recommendations
+
+### Barcode Capture Widget
+- [x] BarcodeCapture component (/app/frontend/src/components/BarcodeCapture.jsx)
+- [x] Camera-based scanning using BarcodeDetector API
+- [x] Manual entry fallback
+- [x] Supported formats: EAN-13, EAN-8, Code 128, Code 39, QR Code, UPC-A, UPC-E
+- [x] Format detection display
+- [x] Rescan capability
+
+### Signature Capture Widget
+- [x] SignatureCapture component (/app/frontend/src/components/SignatureCapture.jsx)
+- [x] Canvas-based drawing
+- [x] Touch support for mobile
+- [x] Mouse support for desktop
+- [x] Configurable stroke color and width
+- [x] Signature line with X marker
+- [x] Clear/Save/Edit/Remove actions
+- [x] PNG export format
+
+### Quality Alert System
+- [x] Alert types: speeding, audio_missing, audio_short, pattern_anomaly, response_anomaly, gps_anomaly, duplicate_pattern, straight_lining
+- [x] Severity levels: low, medium, high, critical
+- [x] Alert listing with filters
+- [x] Alert resolution workflow
+- [x] Summary dashboard with trends
+
+### P2 Feature Files
+- `/app/frontend/src/pages/QualityAIPage.jsx` - Quality & AI Monitoring UI
+- `/app/frontend/src/components/BarcodeCapture.jsx` - Barcode scanning widget
+- `/app/frontend/src/components/SignatureCapture.jsx` - Signature capture widget
+- `/app/backend/routes/quality_ai_routes.py` - Quality AI API (~700 lines)
 
 ## Backlog - P3 (Future)
 - [ ] True Offline-First CAPI (encrypted local DB, resilient sync)
