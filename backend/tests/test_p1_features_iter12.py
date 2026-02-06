@@ -54,17 +54,19 @@ def org_id(api_client):
 
 
 @pytest.fixture(scope="module")
-def form_id(api_client, org_id):
+def form_id(api_client, org_id, project_id):
     """Get or create form for testing"""
-    res = api_client.get(f"{BASE_URL}/api/forms?org_id={org_id}")
+    res = api_client.get(f"{BASE_URL}/api/forms?org_id={org_id}&project_id={project_id}")
     if res.status_code == 200:
-        forms = res.json().get("forms", [])
+        data = res.json()
+        forms = data if isinstance(data, list) else data.get("forms", [])
         if forms:
             return forms[0]["id"]
     # Create a test form if none exists
     res = api_client.post(f"{BASE_URL}/api/forms", json={
         "name": "TEST_P1_Survey_Form",
         "org_id": org_id,
+        "project_id": project_id,
         "fields": [
             {"id": "q1", "type": "text", "label": "Name"},
             {"id": "q2", "type": "number", "label": "Age"}
