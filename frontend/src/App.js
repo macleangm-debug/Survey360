@@ -28,6 +28,7 @@ import { CATIPage } from './pages/CATIPage';
 import { BackcheckPage } from './pages/BackcheckPage';
 import { PreloadWritebackPage } from './pages/PreloadWritebackPage';
 import { QualityAIPage } from './pages/QualityAIPage';
+import { PluginsPage } from './pages/PluginsPage';
 import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
 import '@/App.css';
@@ -238,6 +239,11 @@ function App() {
           <Route path="/quality-ai" element={
             <ProtectedRoute>
               <QualityAIPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/plugins" element={
+            <ProtectedRoute>
+              <PluginsPage />
             </ProtectedRoute>
           } />
           <Route path="/organizations/new" element={
