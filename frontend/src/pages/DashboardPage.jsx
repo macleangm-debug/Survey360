@@ -75,21 +75,21 @@ const StatCard = ({ title, value, icon: Icon, trend, description, onClick }) => 
 );
 
 const ActivityItem = ({ activity }) => (
-  <div className="flex items-start gap-3 py-3 border-b border-border last:border-0">
-    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-      <Database className="w-4 h-4 text-primary" />
+  <div className="flex items-start gap-3 py-3 border-b border-slate-100 last:border-0">
+    <div className="w-8 h-8 rounded-full bg-sky-50 flex items-center justify-center mt-0.5">
+      <Database className="w-4 h-4 text-sky-500" />
     </div>
     <div className="flex-1 min-w-0">
-      <p className="text-sm">
-        <span className="font-medium">{activity.user_name}</span>
+      <p className="text-sm text-slate-700">
+        <span className="font-medium text-slate-900">{activity.user_name}</span>
         {' submitted to '}
-        <span className="font-medium">{activity.form_name}</span>
+        <span className="font-medium text-slate-900">{activity.form_name}</span>
       </p>
       <div className="flex items-center gap-2 mt-1">
         <Badge variant={activity.status === 'approved' ? 'default' : 'secondary'} className="text-xs">
           {activity.status}
         </Badge>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-slate-400">
           {formatRelativeTime(activity.timestamp)}
         </span>
       </div>
