@@ -409,7 +409,7 @@ async def run_anova(
         "anova": {
             "f_statistic": round(float(f_stat), 4),
             "p_value": round(float(p_value), 4),
-            "significant": p_value < 0.05
+            "significant": bool(p_value < 0.05)
         },
         "effect_size": effect_size
     }
@@ -432,7 +432,7 @@ async def run_anova(
                     "group_b": str(row["B"]),
                     "mean_diff": round(float(row["diff"]), 4),
                     "p_value": round(float(row["p-tukey"]), 4),
-                    "significant": row["p-tukey"] < 0.05
+                    "significant": bool(row["p-tukey"] < 0.05)
                 })
         except Exception as e:
             result["post_hoc_error"] = str(e)
