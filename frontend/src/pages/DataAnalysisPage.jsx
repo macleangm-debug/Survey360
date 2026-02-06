@@ -105,7 +105,19 @@ export function DataAnalysisPage() {
     }
   }, [selectedForm, responsePage, filters]);
 
-  const getToken = () => localStorage.getItem('token');
+  const getToken = () => {
+    // Get token from auth store (persisted in localStorage under 'auth-storage')
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      try {
+        const parsed = JSON.parse(authStorage);
+        return parsed?.state?.token || null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
 
   const fetchForms = async () => {
     try {
