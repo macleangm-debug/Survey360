@@ -97,26 +97,55 @@ async def create_form(
 @router.get("", response_model=List[FormOut])
 async def list_forms(
     request: Request,
-    project_id: str,
+    project_id: Optional[str] = None,
+    org_id: Optional[str] = None,
     status_filter: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """List forms in a project"""
+    """List forms in a project or organization"""
     db = request.app.state.db
     
-    # Check project access
-    membership, project = await check_project_access(
-        db, project_id, current_user["user_id"]
-    )
-    
-    if not membership and not current_user.get("is_superadmin"):
+    # Require at least one filter
+    if not project_id and not org_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not a member of this organization"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either project_id or org_id is required"
         )
     
     # Build query
-    query = {"project_id": project_id}
+    query = {}
+    
+    if project_id:
+        # Check project access
+        membership, project = await check_project_access(
+            db, project_id, current_user["user_id"]
+        )
+        
+        if not membership and not current_user.get("is_superadmin"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not a member of this organization"
+            )
+        query["project_id"] = project_id
+    
+    elif org_id:
+        # Check org membership
+        membership = await db.org_members.find_one({
+            "org_id": org_id, 
+            "user_id": current_user["user_id"]
+        })
+        
+        if not membership and not current_user.get("is_superadmin"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not a member of this organization"
+            )
+        
+        # Get all projects in org
+        projects = await db.projects.find({"org_id": org_id}, {"id": 1}).to_list(1000)
+        project_ids = [p["id"] for p in projects]
+        query["project_id"] = {"$in": project_ids}
+    
     if status_filter:
         query["status"] = status_filter
     
