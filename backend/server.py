@@ -263,6 +263,11 @@ async def startup_db_client():
         await db.quality_alerts.create_index([("submission_id", 1), ("alert_type", 1)])
         await db.ai_analyses.create_index([("submission_id", 1)])
         
+        # CAWI Sessions
+        await db.cawi_sessions.create_index("id", unique=True)
+        await db.cawi_sessions.create_index([("form_id", 1), ("token", 1)])
+        await db.cawi_sessions.create_index([("form_id", 1), ("status", 1)])
+        
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")
