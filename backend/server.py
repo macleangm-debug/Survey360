@@ -249,6 +249,18 @@ async def startup_db_client():
         await db.writeback_logs.create_index([("form_id", 1), ("timestamp", -1)])
         await db.external_api_configs.create_index("id", unique=True)
         
+        # Quality AI Monitoring
+        await db.speeding_configs.create_index("id", unique=True)
+        await db.speeding_configs.create_index([("org_id", 1), ("form_id", 1)])
+        await db.audio_audit_configs.create_index("id", unique=True)
+        await db.audio_audit_configs.create_index([("org_id", 1), ("form_id", 1)])
+        await db.ai_monitoring_configs.create_index("id", unique=True)
+        await db.ai_monitoring_configs.create_index("org_id")
+        await db.quality_alerts.create_index("id", unique=True)
+        await db.quality_alerts.create_index([("org_id", 1), ("status", 1)])
+        await db.quality_alerts.create_index([("submission_id", 1), ("alert_type", 1)])
+        await db.ai_analyses.create_index([("submission_id", 1)])
+        
         logger.info("Database indexes created successfully")
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")
