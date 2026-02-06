@@ -179,7 +179,9 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 ## Backlog - P2 (Medium Priority)
 - [ ] Native mobile app
 - [x] Multi-language AI translations ✅ (Feb 5, 2026)
-- [ ] Advanced form logic branching visualization
+- [x] Advanced form logic branching visualization ✅ (Feb 6, 2026)
+- [x] API Rate Limiting and Security ✅ (Feb 6, 2026)
+- [x] Multi-tenant Billing (Super Admin) ✅ (Feb 6, 2026)
 
 ## Test Credentials
 - **Email**: test@datapulse.io
