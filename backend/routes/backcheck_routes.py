@@ -545,7 +545,6 @@ async def complete_backcheck(
     
     # Determine status
     has_critical = any(d["severity"] == DiscrepancySeverity.CRITICAL for d in discrepancies)
-    has_major = any(d["severity"] == DiscrepancySeverity.MAJOR for d in discrepancies)
     
     if has_critical and config.get("auto_flag_on_critical"):
         status = BackcheckStatus.FLAGGED
