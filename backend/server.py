@@ -62,6 +62,8 @@ from routes.backcheck_routes import router as backcheck_router
 from routes.preload_routes import router as preload_router
 from routes.quality_ai_routes import router as quality_ai_router
 from routes.cawi_routes import router as cawi_router
+from routes.simulation_routes import router as simulation_router
+from routes.device_routes import router as device_router
 
 # Include all route modules
 api_router.include_router(auth_router)
