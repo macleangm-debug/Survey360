@@ -29,7 +29,8 @@ import {
   ChevronRight,
   History,
   Shield,
-  Copy
+  Copy,
+  Network
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -72,6 +73,7 @@ import { SkipLogicEditor, SkipLogicDisplay } from '../components/SkipLogicEditor
 import { CalculatedFieldEditor } from '../components/CalculatedFieldEditor';
 import { VersionHistory, VersionComparison, SaveVersionDialog, RestoreVersionDialog } from '../components/FormVersioning';
 import { DuplicateRulesConfig, DuplicateReviewPanel } from '../components/DuplicateDetection';
+import { FormLogicVisualization } from '../components/FormLogicVisualization';
 import { useFormBuilderStore } from '../store';
 import { formAPI } from '../lib/api';
 import { generateId, cn } from '../lib/utils';
