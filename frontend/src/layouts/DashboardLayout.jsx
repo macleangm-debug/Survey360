@@ -221,8 +221,8 @@ export function DashboardLayout({ children }) {
                       className={cn(
                         "w-11 h-11 flex items-center justify-center rounded-xl transition-colors",
                         isActive 
-                          ? "bg-violet-100 text-violet-700" 
-                          : "text-slate-500 hover:bg-violet-50 hover:text-violet-600"
+                          ? "bg-sky-100 text-sky-600" 
+                          : "text-slate-500 hover:bg-sky-50 hover:text-sky-500"
                       )}
                     >
                       <Icon className="w-5 h-5" />
