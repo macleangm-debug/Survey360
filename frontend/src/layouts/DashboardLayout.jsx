@@ -465,7 +465,7 @@ export function DashboardLayout({ children }) {
                           }}
                           className={cn(
                             "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium",
-                            isActive ? "bg-violet-50 text-violet-700" : "text-slate-700 hover:bg-slate-50"
+                            isActive ? "bg-sky-50 text-sky-600" : "text-slate-700 hover:bg-slate-50"
                           )}
                         >
                           <Icon className="w-5 h-5" />
