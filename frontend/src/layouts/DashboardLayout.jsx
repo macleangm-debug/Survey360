@@ -45,6 +45,7 @@ import {
 } from '../components/ui/dropdown-menu';
 import { useAuthStore, useOrgStore, useUIStore } from '../store';
 import { cn } from '../lib/utils';
+import { OfflineStatusIndicator, OfflineBanner } from '../components/OfflineStatus';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
