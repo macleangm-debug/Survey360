@@ -27,7 +27,11 @@ import {
   Languages,
   Key,
   Crown,
-  Table2
+  Table2,
+  Link2,
+  Phone,
+  ClipboardCheck,
+  ArrowLeftRight
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
@@ -51,6 +55,10 @@ const navigation = [
   { name: 'Cases', href: '/cases', icon: Briefcase },
   { name: 'Import Cases', href: '/cases/import', icon: Upload },
   { name: 'Lookup Datasets', href: '/datasets', icon: Table2 },
+  { name: 'Token Surveys', href: '/token-surveys', icon: Link2 },
+  { name: 'CATI Center', href: '/cati', icon: Phone },
+  { name: 'Back-check', href: '/backcheck', icon: ClipboardCheck },
+  { name: 'Preload/Writeback', href: '/preload', icon: ArrowLeftRight },
   { name: 'Quality', href: '/quality', icon: Activity },
   { name: 'GPS Map', href: '/map', icon: Map },
   { name: 'Workflows', href: '/workflows', icon: Workflow },
