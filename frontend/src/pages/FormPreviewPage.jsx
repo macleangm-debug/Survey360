@@ -239,6 +239,31 @@ const FieldRenderer = ({ field, value, onChange, language, errors }) => {
           </div>
         );
 
+      case 'barcode':
+        return (
+          <BarcodeCapture
+            value={value}
+            onChange={(barcodeValue) => onChange(field.id, barcodeValue)}
+            label={label}
+            required={field.required}
+            disabled={field.readonly}
+            acceptedFormats={field.validation?.accepted_formats || ['ean_13', 'ean_8', 'code_128', 'code_39', 'qr_code', 'upc_a', 'upc_e']}
+          />
+        );
+
+      case 'signature':
+        return (
+          <SignatureCapture
+            value={value}
+            onChange={(signatureData) => onChange(field.id, signatureData)}
+            label={label}
+            required={field.required}
+            disabled={field.readonly}
+            strokeColor={field.settings?.stroke_color || '#000000'}
+            strokeWidth={field.settings?.stroke_width || 2}
+          />
+        );
+
       default:
         return (
           <Input
