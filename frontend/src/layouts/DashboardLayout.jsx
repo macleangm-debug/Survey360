@@ -390,7 +390,7 @@ export function DashboardLayout({ children }) {
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border-0 rounded-lg focus:bg-white focus:ring-2 focus:ring-violet-500/20 transition-all"
+                  className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border-0 rounded-lg focus:bg-white focus:ring-2 focus:ring-sky-500/20 transition-all"
                 />
               </div>
             </div>
