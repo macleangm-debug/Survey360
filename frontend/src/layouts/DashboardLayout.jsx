@@ -338,10 +338,10 @@ export function DashboardLayout({ children }) {
                             key={org.id}
                             onClick={() => setCurrentOrg(org)}
                             className={cn(
-                              currentOrg?.id === org.id && "bg-violet-50"
+                              currentOrg?.id === org.id && "bg-sky-50"
                             )}
                           >
-                            <div className="w-6 h-6 rounded bg-violet-100 flex items-center justify-center text-violet-700 text-xs mr-2">
+                            <div className="w-6 h-6 rounded bg-sky-100 flex items-center justify-center text-sky-600 text-xs mr-2">
                               {org.name?.charAt(0)}
                             </div>
                             {org.name}
