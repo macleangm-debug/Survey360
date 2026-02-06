@@ -178,8 +178,8 @@ export function DashboardPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Dashboard</h1>
-            <p className="text-gray-400">{currentOrg.name} overview</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Dashboard</h1>
+            <p className="text-slate-500">{currentOrg.name} overview</p>
           </div>
           <div className="flex gap-2 items-center">
             <Tabs value={viewMode} onValueChange={setViewMode} className="mr-4">
