@@ -299,3 +299,10 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - `/app/backend/routes/rbac_routes.py` - RBAC management API
 - `/app/backend/routes/workflow_routes.py` - Workflow automation API
 - `/app/backend/routes/translation_routes.py` - Translation API
+
+### NEW Feature Files (Feb 6, 2026)
+- `/app/frontend/src/components/FormLogicVisualization.jsx` - React Flow form visualization
+- `/app/frontend/src/pages/SecurityPage.jsx` - API Security management
+- `/app/frontend/src/pages/SuperAdminPage.jsx` - Super Admin Dashboard
+- `/app/backend/routes/security_routes.py` - API key, rate limiting, audit logs
+- `/app/backend/routes/admin_routes.py` - Super Admin billing and organization management
