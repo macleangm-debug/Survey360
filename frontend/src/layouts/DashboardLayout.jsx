@@ -110,6 +110,7 @@ const NAVIGATION = [
     label: 'Quality & AI',
     icon: Sparkles,
     items: [
+      { label: 'Data Analysis', path: '/analysis', icon: BarChart3 },
       { label: 'Quality AI', path: '/quality-ai', icon: Brain },
       { label: 'Simulation', path: '/simulation', icon: Route },
       { label: 'Analytics', path: '/analytics', icon: BarChart3 },
