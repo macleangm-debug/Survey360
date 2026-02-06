@@ -708,6 +708,10 @@ export function FormBuilderPage() {
                   <Shield className="w-4 h-4 mr-2" />
                   Duplicate Detection
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowLogicVisualization(true)}>
+                  <Network className="w-4 h-4 mr-2" />
+                  Logic Visualization
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Button variant="outline" onClick={() => navigate(`/forms/${formId}/preview`)}>
