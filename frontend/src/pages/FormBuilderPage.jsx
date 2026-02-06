@@ -869,6 +869,13 @@ export function FormBuilderPage() {
             onClose={() => setShowDuplicateRules(false)}
           />
         )}
+
+        {/* Form Logic Visualization */}
+        <FormLogicVisualization
+          form={{ name: formName, fields }}
+          open={showLogicVisualization}
+          onClose={() => setShowLogicVisualization(false)}
+        />
       </div>
     </DashboardLayout>
   );
