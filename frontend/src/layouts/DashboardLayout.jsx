@@ -193,7 +193,7 @@ export function DashboardLayout({ children }) {
         <aside className="hidden lg:flex flex-col items-center w-[72px] bg-white border-r border-slate-100 py-4">
           {/* Logo */}
           <Link to="/dashboard" className="mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-violet-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-sky-500/20">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
           </Link>
@@ -201,7 +201,7 @@ export function DashboardLayout({ children }) {
           {/* Create Button */}
           <Button
             onClick={() => navigate('/forms/new')}
-            className="w-12 h-12 rounded-xl bg-violet-600 hover:bg-violet-700 text-white shadow-md shadow-violet-500/20 mb-6"
+            className="w-12 h-12 rounded-xl bg-sky-500 hover:bg-sky-600 text-white shadow-md shadow-sky-500/20 mb-6"
             size="icon"
           >
             <Plus className="w-5 h-5" />
