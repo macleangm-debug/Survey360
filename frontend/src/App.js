@@ -27,6 +27,7 @@ import { TokenSurveysPage } from './pages/TokenSurveysPage';
 import { CATIPage } from './pages/CATIPage';
 import { BackcheckPage } from './pages/BackcheckPage';
 import { PreloadWritebackPage } from './pages/PreloadWritebackPage';
+import { QualityAIPage } from './pages/QualityAIPage';
 import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
 import '@/App.css';
@@ -232,6 +233,11 @@ function App() {
           <Route path="/preload" element={
             <ProtectedRoute>
               <PreloadWritebackPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/quality-ai" element={
+            <ProtectedRoute>
+              <QualityAIPage />
             </ProtectedRoute>
           } />
           <Route path="/organizations/new" element={
