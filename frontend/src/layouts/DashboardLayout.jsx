@@ -321,7 +321,7 @@ export function DashboardLayout({ children }) {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors text-left">
-                          <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center text-violet-700 font-medium text-xs">
+                          <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sky-600 font-medium text-xs">
                             {currentOrg?.name?.charAt(0) || 'O'}
                           </div>
                           <div className="flex-1 min-w-0">
