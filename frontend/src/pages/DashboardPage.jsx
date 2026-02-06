@@ -353,11 +353,11 @@ export function DashboardPage() {
         {/* Recent Activity & Quick Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Activity */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 bg-white border border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="font-barlow text-white">Recent Activity</CardTitle>
-                <CardDescription className="text-gray-400">Latest submissions</CardDescription>
+                <CardTitle className="text-slate-900">Recent Activity</CardTitle>
+                <CardDescription className="text-slate-500">Latest submissions</CardDescription>
               </div>
               <Button variant="ghost" size="sm" onClick={() => navigate('/submissions')}>
                 View all
@@ -385,32 +385,32 @@ export function DashboardPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Database className="w-12 h-12 text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">No recent activity</p>
+                  <Database className="w-12 h-12 text-slate-300 mx-auto mb-2" />
+                  <p className="text-sm text-slate-400">No recent activity</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Quick Actions */}
-          <Card>
+          <Card className="bg-white border border-slate-200">
             <CardHeader>
-              <CardTitle className="font-barlow text-white">Quick Actions</CardTitle>
+              <CardTitle className="text-slate-900">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/projects/new')}>
+              <Button variant="outline" className="w-full justify-start hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200" onClick={() => navigate('/projects/new')}>
                 <FolderKanban className="w-4 h-4 mr-2" />
                 New Project
               </Button>
-              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/forms/new')}>
+              <Button variant="outline" className="w-full justify-start hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200" onClick={() => navigate('/forms/new')}>
                 <FileText className="w-4 h-4 mr-2" />
                 New Form
               </Button>
-              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/team')}>
+              <Button variant="outline" className="w-full justify-start hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200" onClick={() => navigate('/team')}>
                 <Users className="w-4 h-4 mr-2" />
                 Manage Team
               </Button>
-              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/exports')}>
+              <Button variant="outline" className="w-full justify-start hover:bg-sky-50 hover:text-sky-600 hover:border-sky-200" onClick={() => navigate('/exports')}>
                 <Activity className="w-4 h-4 mr-2" />
                 Export Data
               </Button>
