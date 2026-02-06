@@ -249,6 +249,16 @@ function App() {
               <PluginsPage />
             </ProtectedRoute>
           } />
+          <Route path="/simulation" element={
+            <ProtectedRoute>
+              <SimulationPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/devices" element={
+            <ProtectedRoute>
+              <DeviceManagementPage />
+            </ProtectedRoute>
+          } />
           {/* Public CAWI Survey Routes */}
           <Route path="/survey/:formId" element={<CAWISurveyPage />} />
           <Route path="/survey/complete" element={<SurveyCompletePage />} />
