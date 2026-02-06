@@ -215,9 +215,9 @@ async def get_descriptive_stats(
                 shapiro_stat, shapiro_p = scipy_stats.shapiro(series)
                 stats["normality"] = {
                     "shapiro_wilk": {
-                        "statistic": round(shapiro_stat, 4),
-                        "p_value": round(shapiro_p, 4),
-                        "normal": shapiro_p > 0.05
+                        "statistic": round(float(shapiro_stat), 4),
+                        "p_value": round(float(shapiro_p), 4),
+                        "normal": bool(shapiro_p > 0.05)
                     }
                 }
             
@@ -227,9 +227,9 @@ async def get_descriptive_stats(
                 if "normality" not in stats:
                     stats["normality"] = {}
                 stats["normality"]["dagostino"] = {
-                    "statistic": round(dagostino_stat, 4),
-                    "p_value": round(dagostino_p, 4),
-                    "normal": dagostino_p > 0.05
+                    "statistic": round(float(dagostino_stat), 4),
+                    "p_value": round(float(dagostino_p), 4),
+                    "normal": bool(dagostino_p > 0.05)
                 }
         
         results.append(stats)
