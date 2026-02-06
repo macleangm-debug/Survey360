@@ -178,6 +178,9 @@ export function Sidebar() {
         <div className="p-4 border-t border-border space-y-4">
           {/* Theme & Language */}
           <div className="flex items-center gap-2">
+            {/* Offline Status */}
+            <OfflineStatusIndicator />
+            
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
