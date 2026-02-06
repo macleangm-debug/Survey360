@@ -762,7 +762,7 @@ async def run_mann_whitney(
         },
         "u_statistic": round(float(stat), 4),
         "p_value": round(float(p_value), 4),
-        "significant": p_value < 0.05,
+        "significant": bool(p_value < 0.05),
         "effect_size": {
             "rank_biserial_r": round(float(r), 4),
             "interpretation": "small" if abs(r) < 0.3 else "medium" if abs(r) < 0.5 else "large"
@@ -819,7 +819,7 @@ async def run_kruskal_wallis(
         "group_statistics": group_stats,
         "h_statistic": round(float(h_stat), 4),
         "p_value": round(float(p_value), 4),
-        "significant": p_value < 0.05,
+        "significant": bool(p_value < 0.05),
         "effect_size": {
             "epsilon_squared": round(float(epsilon_sq), 4)
         }
