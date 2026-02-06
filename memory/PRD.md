@@ -488,6 +488,8 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - [x] Supported formats: EAN-13, EAN-8, Code 128, Code 39, QR Code, UPC-A, UPC-E
 - [x] Format detection display
 - [x] Rescan capability
+- [x] **Integrated into Form Builder** - Drag-and-drop "Barcode" field type
+- [x] Field validation options: accepted formats, barcode pattern regex
 
 ### Signature Capture Widget
 - [x] SignatureCapture component (/app/frontend/src/components/SignatureCapture.jsx)
@@ -498,6 +500,8 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - [x] Signature line with X marker
 - [x] Clear/Save/Edit/Remove actions
 - [x] PNG export format
+- [x] **Integrated into Form Builder** - Drag-and-drop "Signature" field type
+- [x] Field settings: stroke color, stroke width
 
 ### Quality Alert System
 - [x] Alert types: speeding, audio_missing, audio_short, pattern_anomaly, response_anomaly, gps_anomaly, duplicate_pattern, straight_lining
