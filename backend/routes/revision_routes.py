@@ -411,14 +411,14 @@ async def create_correction_request(
 async def get_enumerator_corrections(
     request: Request,
     enumerator_id: str,
-    status: str = "pending"
+    filter_status: str = "pending"
 ):
     """Get pending correction requests for an enumerator"""
     db = request.app.state.db
     
     query = {"enumerator_id": enumerator_id}
-    if status:
-        query["status"] = status
+    if filter_status:
+        query["status"] = filter_status
     
     corrections = await db.correction_requests.find(query).sort("created_at", -1).to_list(100)
     
