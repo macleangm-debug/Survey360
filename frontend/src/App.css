@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* DataPulse - Canva-inspired Styles */
+/* DataPulse - Canva-inspired Styles with Original Theme */
 
 /* Font families */
 .font-heading {
@@ -20,20 +20,16 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Root color overrides for Violet theme */
+/* Root color overrides - Original DataPulse Theme */
 :root {
-  --primary: 263 70% 50%;
+  --primary: 199 89% 48%;
   --primary-foreground: 0 0% 100%;
-  --violet-50: #f5f3ff;
-  --violet-100: #ede9fe;
-  --violet-200: #ddd6fe;
-  --violet-300: #c4b5fd;
-  --violet-400: #a78bfa;
-  --violet-500: #8b5cf6;
-  --violet-600: #7c3aed;
-  --violet-700: #6d28d9;
-  --violet-800: #5b21b6;
-  --violet-900: #4c1d95;
+  --dp-primary: #0ea5e9;
+  --dp-primary-dark: #0284c7;
+  --dp-primary-light: #38bdf8;
+  --dp-bg-dark: #0f172a;
+  --dp-bg-darker: #020617;
+  --dp-accent: #22d3ee;
 }
 
 /* Card hover - subtle */
@@ -42,8 +38,8 @@ html {
 }
 
 .card-hover:hover {
-  box-shadow: 0 4px 12px -4px rgba(124, 58, 237, 0.1);
-  border-color: var(--violet-200);
+  box-shadow: 0 4px 12px -4px rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.3);
 }
 
 /* Rail navigation item styles */
@@ -60,13 +56,13 @@ html {
 }
 
 .rail-item:hover {
-  background-color: var(--violet-50);
-  color: var(--violet-600);
+  background-color: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
 }
 
 .rail-item.active {
-  background-color: var(--violet-100);
-  color: var(--violet-700);
+  background-color: rgba(14, 165, 233, 0.15);
+  color: #0284c7;
 }
 
 /* Panel slide animation */
@@ -101,17 +97,17 @@ html {
   animation: slide-up 0.3s ease-out forwards;
 }
 
-/* Form field focus states - violet */
+/* Form field focus states - cyan/sky */
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--violet-500) !important;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
+  border-color: #0ea5e9 !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15) !important;
 }
 
-/* Button primary - violet */
+/* Button primary - sky blue */
 .btn-primary {
-  background-color: var(--violet-600);
+  background-color: #0ea5e9;
   color: white;
   font-weight: 500;
   border-radius: 10px;
@@ -119,30 +115,30 @@ select:focus {
 }
 
 .btn-primary:hover {
-  background-color: var(--violet-700);
+  background-color: #0284c7;
 }
 
 .btn-primary:active {
   transform: scale(0.97);
 }
 
-/* Button secondary - violet tint */
+/* Button secondary */
 .btn-secondary {
-  background-color: var(--violet-50);
-  color: var(--violet-700);
+  background-color: rgba(14, 165, 233, 0.1);
+  color: #0284c7;
   font-weight: 500;
   border-radius: 10px;
   transition: background-color 0.15s ease;
 }
 
 .btn-secondary:hover {
-  background-color: var(--violet-100);
+  background-color: rgba(14, 165, 233, 0.15);
 }
 
 /* Status badge colors */
 .status-draft { background: #f1f5f9; color: #64748b; }
-.status-active { background: rgba(124, 58, 237, 0.1); color: var(--violet-600); }
-.status-published { background: rgba(124, 58, 237, 0.1); color: var(--violet-600); }
+.status-active { background: rgba(14, 165, 233, 0.1); color: #0284c7; }
+.status-published { background: rgba(14, 165, 233, 0.1); color: #0284c7; }
 .status-paused { background: #fef3c7; color: #d97706; }
 .status-archived { background: #f1f5f9; color: #64748b; }
 .status-pending { background: #fef3c7; color: #d97706; }
@@ -187,9 +183,9 @@ select:focus {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-/* Violet glow effect */
-.glow-violet {
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.15);
+/* Sky/Cyan glow effect */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
 }
 
 /* Responsive utilities */
