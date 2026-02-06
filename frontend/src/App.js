@@ -22,6 +22,7 @@ import { WorkflowsPage } from './pages/WorkflowsPage';
 import { TranslationsPage } from './pages/TranslationsPage';
 import { SecurityPage } from './pages/SecurityPage';
 import { SuperAdminPage } from './pages/SuperAdminPage';
+import { DatasetsPage } from './pages/DatasetsPage';
 import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
 import '@/App.css';
