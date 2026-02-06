@@ -33,7 +33,7 @@ class TestQualityAIBackend:
         })
         if response.status_code == 200:
             data = response.json()
-            return data.get("token")
+            return data.get("access_token")
         pytest.skip("Authentication failed")
     
     @pytest.fixture(scope="class")
