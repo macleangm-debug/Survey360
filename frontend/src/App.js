@@ -194,6 +194,16 @@ function App() {
               <TranslationsPage />
             </ProtectedRoute>
           } />
+          <Route path="/security" element={
+            <ProtectedRoute>
+              <SecurityPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <SuperAdminPage />
+            </ProtectedRoute>
+          } />
           <Route path="/organizations/new" element={
             <ProtectedRoute>
               <CreateOrganizationPage />
