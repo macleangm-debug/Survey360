@@ -326,13 +326,14 @@ class TestCATIQueue:
     def test_get_queue(self, api_client, org_id):
         """Test getting CATI queue"""
         list_res = api_client.get(f"{BASE_URL}/api/cati/projects/{org_id}")
-        projects = list_res.json().get("projects", [])
+        data = list_res.json()
+        projects = data if isinstance(data, list) else data.get("projects", [])
         
         if not projects:
             pytest.skip("No CATI projects available")
         
-        project_id = projects[0]["id"]
-        response = api_client.get(f"{BASE_URL}/api/cati/projects/{project_id}/queue")
+        cati_project_id = projects[0]["id"]
+        response = api_client.get(f"{BASE_URL}/api/cati/projects/{cati_project_id}/queue")
         
         assert response.status_code == 200, f"Failed: {response.text}"
         data = response.json()
