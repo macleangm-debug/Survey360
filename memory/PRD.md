@@ -58,6 +58,72 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - [x] Translation Glossary management
 - [x] Set default language functionality
 
+### Form Logic Visualization (NEW - Feb 6, 2026)
+- [x] React Flow integration for interactive flowcharts
+- [x] Accessible from Form Builder > Settings > Logic Visualization
+- [x] Visual representation of form flow (START → Fields → END)
+- [x] Field nodes with type indicators and badges
+- [x] Condition nodes for skip logic (diamond shapes)
+- [x] Calculation nodes with formula display
+- [x] Toggle controls for Skip Logic and Calculations visibility
+- [x] Stats badges showing Fields, Skip Rules, Calculations count
+- [x] Interactive zoom, pan, and minimap controls
+- [x] Color-coded legend for node and edge types
+- [x] Fullscreen mode support
+
+### API Security & Rate Limiting (NEW - Feb 6, 2026)
+- [x] Security page at /security
+- [x] API Key Management:
+  - Create, list, update, revoke API keys
+  - Configurable scopes (read, write, delete, admin)
+  - Rate limit tiers per key (Free: 100/min, Pro: 1000/min, Enterprise: 10000/min)
+  - Key expiration settings (30, 90, 365 days or never)
+  - IP whitelist per key
+- [x] Rate Limit Status:
+  - Real-time usage monitoring
+  - Requests per minute tracking
+  - Visual progress indicator
+- [x] Audit Logs:
+  - Request logging with timestamp, method, path, status, IP
+  - Filtering by method and path
+  - Pagination support
+  - Export functionality
+- [x] Security Settings:
+  - Two-Factor Authentication toggle
+  - Session timeout configuration (30min - 8hrs)
+  - Max failed login attempts (3, 5, 10)
+  - Password policy (min length, special chars, numbers)
+
+### Super Admin / Multi-tenant Billing (NEW - Feb 6, 2026)
+- [x] Super Admin Dashboard at /admin
+- [x] Software Galaxy SSO Management integration
+- [x] Dashboard Overview:
+  - Total Organizations, Users, Submissions stats
+  - Monthly Revenue calculation
+  - Active organizations (30 days)
+  - Billing tier distribution chart
+  - Recent signups list
+- [x] Organization Management:
+  - List all organizations with usage data
+  - Search and filter by tier
+  - View organization details with monthly trends
+  - Change organization billing tier
+  - Generate invoices
+- [x] Billing Plans:
+  - Free tier: 3 users, 2 projects, 1000 submissions/mo, 1GB storage
+  - Pro tier ($49/mo): 25 users, 10 projects, 25000 submissions/mo, 25GB storage
+  - Enterprise tier ($199/mo): Unlimited users/projects/submissions, 500GB storage, SSO
+- [x] Invoice Management:
+  - Generate, list, and manage invoices
+  - Status tracking (pending, paid, overdue, cancelled)
+- [x] Usage Alerts:
+  - Automatic alerts for organizations approaching limits
+  - Severity levels (warning at 80%, critical at 100%)
+- [x] System Analytics:
+  - Daily submissions trend (30 days)
+  - Daily new users chart
+  - API calls tracking
+
 ### Advanced Form Logic (NEW - Feb 5, 2026)
 - [x] Form Templates Library with 5 pre-built templates:
   - Household Survey (Demographics)
