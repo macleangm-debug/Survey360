@@ -30,7 +30,9 @@ import {
   History,
   Shield,
   Copy,
-  Network
+  Network,
+  ScanLine,
+  PenTool
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -91,6 +93,8 @@ const fieldTypes = [
   { type: 'photo', label: 'Photo', icon: Camera },
   { type: 'audio', label: 'Audio', icon: Mic },
   { type: 'video', label: 'Video', icon: Video },
+  { type: 'barcode', label: 'Barcode', icon: ScanLine },
+  { type: 'signature', label: 'Signature', icon: PenTool },
   { type: 'note', label: 'Note', icon: FileText },
   { type: 'calculate', label: 'Calculate', icon: Calculator },
   { type: 'group', label: 'Group', icon: Settings2 },
