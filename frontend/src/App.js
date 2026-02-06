@@ -247,6 +247,9 @@ function App() {
               <PluginsPage />
             </ProtectedRoute>
           } />
+          {/* Public CAWI Survey Routes */}
+          <Route path="/survey/:formId" element={<CAWISurveyPage />} />
+          <Route path="/survey/complete" element={<SurveyCompletePage />} />
           <Route path="/organizations/new" element={
             <ProtectedRoute>
               <CreateOrganizationPage />
