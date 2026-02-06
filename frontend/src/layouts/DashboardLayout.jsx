@@ -245,7 +245,7 @@ export function DashboardLayout({ children }) {
                 <button className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-50">
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={user?.avatar} />
-                    <AvatarFallback className="bg-violet-100 text-violet-700 text-xs">
+                    <AvatarFallback className="bg-sky-100 text-sky-600 text-xs">
                       {user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
