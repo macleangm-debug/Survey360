@@ -559,10 +559,10 @@ async def get_crosstab(
         try:
             chi2, p_value, dof, expected = scipy_stats.chi2_contingency(ct_no_margins)
             chi2_result = {
-                "chi_square": round(chi2, 4),
-                "p_value": round(p_value, 4),
-                "degrees_of_freedom": dof,
-                "significant": p_value < 0.05
+                "chi_square": round(float(chi2), 4),
+                "p_value": round(float(p_value), 4),
+                "degrees_of_freedom": int(dof),
+                "significant": bool(p_value < 0.05)
             }
         except:
             pass
@@ -573,16 +573,16 @@ async def get_crosstab(
         "col_variable": req.col_var,
         "row_labels": [str(x) for x in crosstab.index.tolist()],
         "col_labels": [str(x) for x in crosstab.columns.tolist()],
-        "counts": crosstab.values.tolist(),
+        "counts": [[int(c) for c in row] for row in crosstab.values.tolist()],
         "chi_square_test": chi2_result
     }
     
     # Add percentages
     row_pcts = (crosstab.div(crosstab.iloc[:, -1], axis=0) * 100).round(1)
-    result["row_percentages"] = row_pcts.values.tolist()
+    result["row_percentages"] = [[float(c) for c in row] for row in row_pcts.values.tolist()]
     
     col_pcts = (crosstab.div(crosstab.iloc[-1, :], axis=1) * 100).round(1)
-    result["col_percentages"] = col_pcts.values.tolist()
+    result["col_percentages"] = [[float(c) for c in row] for row in col_pcts.values.tolist()]
     
     return result
 
