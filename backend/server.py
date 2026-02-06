@@ -98,6 +98,8 @@ api_router.include_router(backcheck_router)
 api_router.include_router(preload_router)
 api_router.include_router(quality_ai_router)
 api_router.include_router(cawi_router)
+api_router.include_router(simulation_router)
+api_router.include_router(device_router)
 
 
 # Health check endpoint
