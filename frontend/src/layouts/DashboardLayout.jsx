@@ -501,7 +501,7 @@ export function DashboardLayout({ children }) {
                   <div className="flex items-center gap-3 mb-4">
                     <Avatar>
                       <AvatarImage src={user?.avatar} />
-                      <AvatarFallback className="bg-violet-100 text-violet-700">
+                      <AvatarFallback className="bg-sky-100 text-sky-600">
                         {user?.name?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
