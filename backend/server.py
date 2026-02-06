@@ -56,6 +56,10 @@ from routes.admin_routes import router as admin_router
 from routes.paradata_routes import router as paradata_router
 from routes.revision_routes import router as revision_router
 from routes.dataset_routes import router as dataset_router
+from routes.survey_routes import router as survey_router
+from routes.cati_routes import router as cati_router
+from routes.backcheck_routes import router as backcheck_router
+from routes.preload_routes import router as preload_router
 
 # Include all route modules
 api_router.include_router(auth_router)
@@ -84,6 +88,10 @@ api_router.include_router(admin_router)
 api_router.include_router(paradata_router)
 api_router.include_router(revision_router)
 api_router.include_router(dataset_router)
+api_router.include_router(survey_router)
+api_router.include_router(cati_router)
+api_router.include_router(backcheck_router)
+api_router.include_router(preload_router)
 
 
 # Health check endpoint
