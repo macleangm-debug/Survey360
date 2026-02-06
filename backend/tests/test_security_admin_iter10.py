@@ -7,7 +7,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://multilang-app-8.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://cati-token-module.preview.emergentagent.com').rstrip('/')
 
 # Test credentials
 TEST_EMAIL = "test@datapulse.io"
