@@ -502,15 +502,26 @@ async def run_correlation(
                     "var2": var2,
                     "correlation": round(float(r), 4) if not np.isnan(r) else None,
                     "p_value": round(float(p), 4) if not np.isnan(p) else None,
-                    "significant": p < 0.05 if not np.isnan(p) else None
+                    "significant": bool(p < 0.05) if not np.isnan(p) else None
                 })
+    
+    # Convert correlation matrix to serializable format
+    corr_dict = {}
+    for col in corr_matrix.columns:
+        corr_dict[str(col)] = {str(k): (round(float(v), 4) if not np.isnan(v) else None) 
+                               for k, v in corr_matrix[col].items()}
+    
+    p_val_dict = {}
+    for col in p_values.columns:
+        p_val_dict[str(col)] = {str(k): (round(float(v), 4) if not np.isnan(v) else None) 
+                                for k, v in p_values[col].items()}
     
     return {
         "method": req.method,
         "n": n,
         "variables": valid_vars,
-        "correlation_matrix": corr_matrix.round(4).to_dict(),
-        "p_value_matrix": p_values.round(4).to_dict(),
+        "correlation_matrix": corr_dict,
+        "p_value_matrix": p_val_dict,
         "pairwise_correlations": correlations
     }
 
