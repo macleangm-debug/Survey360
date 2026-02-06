@@ -40,12 +40,16 @@ def api_client(auth_token):
 @pytest.fixture(scope="module")
 def org_id(api_client):
     """Get or create organization for testing"""
-    # List orgs
+    # List orgs - API returns list directly
     res = api_client.get(f"{BASE_URL}/api/organizations")
     if res.status_code == 200:
-        orgs = res.json().get("organizations", [])
-        if orgs:
+        orgs = res.json()
+        if isinstance(orgs, list) and orgs:
             return orgs[0]["id"]
+        elif isinstance(orgs, dict):
+            orgs_list = orgs.get("organizations", [])
+            if orgs_list:
+                return orgs_list[0]["id"]
     pytest.skip("No organization found")
 
 
