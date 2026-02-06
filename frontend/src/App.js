@@ -30,6 +30,8 @@ import { PreloadWritebackPage } from './pages/PreloadWritebackPage';
 import { QualityAIPage } from './pages/QualityAIPage';
 import { PluginsPage } from './pages/PluginsPage';
 import { CAWISurveyPage, SurveyCompletePage } from './pages/CAWISurveyPage';
+import { SimulationPage } from './pages/SimulationPage';
+import { DeviceManagementPage } from './pages/DeviceManagementPage';
 import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
 import '@/App.css';
