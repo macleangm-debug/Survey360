@@ -205,6 +205,11 @@ function App() {
               <SuperAdminPage />
             </ProtectedRoute>
           } />
+          <Route path="/datasets" element={
+            <ProtectedRoute>
+              <DatasetsPage />
+            </ProtectedRoute>
+          } />
           <Route path="/organizations/new" element={
             <ProtectedRoute>
               <CreateOrganizationPage />
