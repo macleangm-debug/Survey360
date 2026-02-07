@@ -605,7 +605,22 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 - ✅ Predictions endpoint - `/api/models/predict`
 - ✅ Frontend UI for GLM/Mixed Models in AdvancedStatsPanel
 
-### Phase 8: Future Enhancements (Backlog)
+### Phase 8: Reports & Reproducibility - FULLY COMPLETE (Feb 7, 2026)
+- ✅ Report Builder with 3 export formats:
+  - PDF (using reportlab - pure Python)
+  - Word/DOCX (using python-docx)
+  - HTML
+- ✅ Report sections: Text, Table, Page Break
+- ✅ Reproducibility Packs:
+  - Creates complete analysis bundles (ZIP)
+  - Includes: README, dataset (CSV/JSON), schema, codebook, scripts, metadata
+  - Hash for integrity verification
+  - Anonymization option for PII redaction
+- ✅ Frontend UI in Reports tab with two sub-tabs:
+  - Reports: Builder with export buttons
+  - Reproducibility: Pack list + creation form
+
+### Phase 9: Future Enhancements (Backlog)
 - Factor Analysis visualization
 - Missing data imputation UI
 - Violin plots, coefficient plots, heatmaps
