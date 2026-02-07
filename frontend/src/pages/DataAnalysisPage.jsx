@@ -168,7 +168,7 @@ export function DataAnalysisPage() {
   };
 
   const fetchResponses = async () => {
-    if (!selectedForm) return;
+    if (!selectedFormId) return;
     
     setLoading(true);
     try {
@@ -179,7 +179,7 @@ export function DataAnalysisPage() {
           'Authorization': `Bearer ${getToken()}`
         },
         body: JSON.stringify({
-          form_id: selectedForm,
+          form_id: selectedFormId,
           page: responsePage,
           page_size: 20,
           ...filters
