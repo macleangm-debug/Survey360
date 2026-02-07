@@ -280,8 +280,8 @@ def export_spss(df: pd.DataFrame, labels: Dict) -> StreamingResponse:
 def export_stata(df: pd.DataFrame, labels: Dict) -> StreamingResponse:
     """Export as Stata .dta file"""
     import pyreadstat
-    
-    buffer = io.BytesIO()
+    import tempfile
+    import os
     
     # Prepare labels
     column_labels = {col: labels.get(col, {}).get("variable_label", col) for col in df.columns}
@@ -292,17 +292,28 @@ def export_stata(df: pd.DataFrame, labels: Dict) -> StreamingResponse:
         if col_val_labels:
             value_labels[col] = {str(k): v for k, v in col_val_labels.items()}
     
-    pyreadstat.write_dta(
-        df,
-        buffer,
-        column_labels=column_labels,
-        variable_value_labels=value_labels
-    )
+    # Write to temp file (pyreadstat doesn't support BytesIO)
+    with tempfile.NamedTemporaryFile(suffix='.dta', delete=False) as tmp:
+        tmp_path = tmp.name
     
-    buffer.seek(0)
+    try:
+        pyreadstat.write_dta(
+            df,
+            tmp_path,
+            column_labels=column_labels,
+            variable_value_labels=value_labels
+        )
+        
+        # Read the file content
+        with open(tmp_path, 'rb') as f:
+            content = f.read()
+    finally:
+        # Clean up temp file
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
     
     return StreamingResponse(
-        buffer,
+        iter([content]),
         media_type="application/octet-stream",
         headers={
             "Content-Disposition": f"attachment; filename=export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.dta"
