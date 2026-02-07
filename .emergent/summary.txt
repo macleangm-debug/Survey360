@@ -1,194 +1,209 @@
-<analysis>original_problem_statement:
-The user has provided two extensive checklists that serve as the Product Requirements Documents for this job.
+<analysis>**original_problem_statement:**
+The user wants to build a comprehensive, end-to-end data analysis module within the existing application. The module should be equivalent to professional statistical software like SPSS or Stata, supporting everything from basic data browsing to advanced statistical modeling, AI-powered analysis, and publication-quality reporting.
 
-**1. Data Collection Module Checklist (Summary):**
-- **Purpose:** Enable research-grade data collection across Web (CAWI), Token/Panel, Offline (CAPI), and Telephone (CATI).
-- **Core Concepts:** Versioned Survey Instruments, Lookup Datasets, Case Management, Submissions with lifecycle states, and extensive Paradata/Audit trails.
-- **Channels:** CAWI, Token/Panel, CAPI, CATI must share a single data model.
-- **Collector App:** Must be offline-first with an encrypted local DB, outbox queue, conflict resolution, and case workflow management.
-- **Form Logic:** Advanced branching, validations, repeat groups/rosters, and preload/write-back capabilities.
-- **Auditing & Quality:** Audio Audits, Paradata trail, and a real-time/batch Quality Rules Engine.
-- **Monitoring:** A live Field Command Center with a data explorer, submission review panel, progress tracking, and a back-check module.
-- **AI Functions:** AI for instrument QA, field simulation (synthetic path testing), and a monitoring assistant to flag anomalies.
-- **Extensibility:** A plugin/widget SDK.
-- **Security:** Encryption at rest/transit, RBAC, PII separation, and retention policies.
-
-**2. Data Analysis Module Checklist (Summary):**
-- **Purpose:** Provide an end-to-end analytics environment from raw data browsing to advanced modeling and reproducible reporting.
-- **Core Concepts:** Raw Response Store -> Immutable Dataset Snapshots -> Versioned Transform Pipelines -> Auditable Output Artifacts.
-- **Baseline Functions:** Response browsing/filtering, quick stats, simple charts, and data exports (CSV, SPSS, Stata).
-- **Advanced Analytics Engine:** Variable View for metadata management, comprehensive data transformations (recode, compute, reshape, merge), weighting, advanced descriptives, hypothesis tests (t-tests, ANOVA), regression models (OLS, Logistic), and complex survey statistics (strata, clustering).
-- **AI Copilot:** A Ask your data feature for natural language to analysis, with strict AI guardrails to ensure traceability and prevent hallucination. AI-assisted data prep and narrative generation.
-- **Graphics & Dashboards:** A publication-quality chart studio and simple drag-and-drop dashboards.
-- **Reproducibility:** A one-click Reproducibility Pack containing the dataset, scripts, and outputs.
-- **Interoperability:** Import/Export for SPSS/Stata/R formats, preserving metadata.
-- **Security:** Role-gated features and audit trails for data access and transformation.
+The detailed requirements were provided in a checklist, covering:
+- **Data Objects:** Raw Response Store, immutable Dataset Snapshots, Transformation Pipelines, and Output Artifacts.
+- **Baseline Analytics:** Response browsing, simple statistics, quick charts, data exports (CSV, Excel, SPSS, Stata), and token tracking.
+- **Advanced Analytics:** A Variable View, data transformations (recode, compute), descriptive statistics, hypothesis tests (t-tests, ANOVA), regression models (OLS, Logistic), and survey statistics.
+- **AI Copilot:** Natural language to analysis, AI guardrails for traceability, AI-assisted data preparation, and evidence-linked narratives.
+- **Graphics & Dashboards:** A chart studio for publication-quality visuals and an interactive dashboard builder.
+- **Reporting & Reproducibility:** A report builder and a one-click reproducibility pack.
+- **Interoperability:** Importing and exporting data with metadata preservation.
+- **Security:** Role-gated features and audit trails.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a sophisticated data collection and analysis platform. Initially, the agent verified that all core features from a previous PRD were complete. The agent then performed a gap analysis against the user's detailed Data Collection Module Checklist and implemented the missing features (Encrypted Storage, AI Field Simulation, Remote Wipe, Enhanced Rosters).
+A significant portion of the Data Analysis Module has been implemented. The frontend features a multi-tab interface integrated into the main application, accessible via the sidebar. This interface supports:
+- Browsing and filtering raw response data.
+- A Variable View to inspect data schema.
+- Basic and advanced statistical analysis (Frequencies, Descriptives, T-tests, ANOVA, Correlation, Regression).
+- Complex survey statistics (design-based means, proportions, regression).
+- A Chart Studio for creating various chart types.
+- An AI Copilot for natural language queries.
+- A Report Builder UI for composing reports.
+- Data and codebook exports in multiple formats (CSV, Excel, SPSS, Stata, Parquet).
 
-Following this, the agent completed a major UI/UX overhaul based on user feedback, redesigning the application to a Canva-style layout with a thin icon sidebar and expandable panels. The color theme was first changed to violet and then reverted to the original sky/cyan theme per user request. UI refinements, such as adding labels to sidebar icons and improving dashboard card aesthetics, were also completed.
-
-The agent has just begun implementing the Data Analysis Module. It has created placeholder backend routes and a skeleton for the main frontend analysis page.
+The backend consists of a comprehensive set of FastAPI endpoints that power all the frontend features, using libraries like Pandas, Statsmodels, and Pyreadstat. Test data has been manually inserted into the MongoDB database to enable testing.
 
 **Last working item**:
-- **Last item agent was working on:** The agent was scaffolding the new **Data Analysis Module**. It had just finished creating the main frontend component, , after creating several new backend route files (, , , ).
+- **Last item agent was working:** The agent started working on Phase 6 (Interactive Dashboard Builder) and Phase 7 (Advanced Models like GLM and Mixed Models). It created the initial backend route files for these advanced models ( and ).
 - **Status:** IN PROGRESS
 - **Agent Testing Done:** N
-- **Which testing method agent to use?** both. The backend logic needs to be implemented and tested via  or python scripts. The frontend needs to be built and tested with the frontend testing agent.
+- **Which testing method agent to use?** backend testing agent
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-There are no outstanding bugs. The primary pending work is the new feature implementation detailed below.
+- **Issue 1:** Integrate and test new backend routes for GLM and Mixed Models (P0)
+- **Issue 2:** T-Test fails with variables having more than two groups (P1)
+- **Issue 3:** Form selection state does not persist across tabs in the UI (P1)
+
+**Issues Detail:**
+- **Issue 1:**
+  - **Attempted fixes:** None. The agent created the files but did not register or test them.
+  - **Next debug checklist:**
+    1. Import the new routers (, ) in .
+    2. Add them to the FastAPI app using , ensuring correct prefixes.
+    3. Restart the backend server.
+    4. Use  or the testing agent to send test requests to the new endpoints to confirm they are reachable and functional.
+  - **Why fix this issue and what will be achieved with the fix?** This will complete the backend setup for Phase 7, enabling the implementation of the frontend UI for running GLM and Mixed Models.
+  - **Status:** NOT STARTED
+  - **Is recurring issue?** N
+  - **Should Test frontend/backend/both after fix?** backend
+  - **Blocked on other issue:** None
+
+- **Issue 2:**
+  - **Attempted fixes:** None. The issue was observed during manual testing. The backend T-test function expects exactly two groups for an independent samples t-test and errors out when given more.
+  - **Next debug checklist:**
+    1. Check , specifically the t-test endpoint.
+    2. Before running the test, validate the number of unique groups in the provided grouping variable.
+    3. If more than two groups are found, return a user-friendly error message (e.g., Independent samples t-test requires exactly two groups. Please use ANOVA for three or more groups.).
+    4. Alternatively, enhance the frontend in  to disable the Run Test button or show a warning if a selected grouping variable has >2 categories.
+  - **Why fix this issue and what will be achieved with the fix?** It will prevent backend errors and provide clear guidance to the user, improving usability.
+  - **Status:** NOT STARTED
+  - **Is recurring issue?** N
+  - **Should Test frontend/backend/both after fix?** both
+  - **Blocked on other issue:** None
+
+- **Issue 3:**
+  - **Attempted fixes:** None. The issue was observed during UI testing.
+  - **Next debug checklist:**
+    1. Review state management in .
+    2. The state for  is likely local to the component and gets reset or is not passed correctly to all child tab components.
+    3. Refactor the state management. Consider lifting the state up or using a dedicated Zustand store for the analysis page to hold , , , etc., so all tabs can subscribe to this shared state.
+  - **Why fix this issue and what will be achieved with the fix?** This will fix a significant UI/UX flaw, providing a smoother user experience where context (like the selected form) is maintained as they navigate between different analysis tabs.
+  - **Status:** NOT STARTED
+  - **Is recurring issue?** N
+  - **Should Test frontend/backend/both after fix?** frontend
+  - **Blocked on other issue:** None
 
 **In progress Task List**:
-- **Task 1: (P0) Implement the Data Analysis Module**
-  - **Where to resume:** The implementation is in its initial phase. The next steps are:
-    1. Flesh out the backend logic in the newly created route files: , , , and . The agent has decided to use , , and  for this.
-    2. Build the multi-tab UI in the new frontend component: .
-    3. Integrate the new page into the application by adding it to the router in  and adding a navigation link in the sidebar ().
-  - **What will be achieved with this?** A comprehensive, research-grade data analysis suite as specified in the user's checklist.
+- **Task 1:** Implement Phase 6 - Interactive Dashboard Builder (P0)
+- **Task 2:** Implement Phase 7 - Advanced Models (Mixed Models, GLM) (P1)
+
+**Task Detail:**
+- **Task 1:**
+  - **Where to resume:** Create a new frontend component for the dashboard builder (e.g., ). This will involve creating a drag-and-drop interface for adding charts and KPIs.
+  - **What will be achieved with this?** Users will be able to create and arrange visualizations into a shareable, interactive dashboard.
+  - **Status:** NOT STARTED
+  - **Should Test frontend/backend/both after fix?** frontend
+  - **Blocked on something:** None.
+
+- **Task 2:**
+  - **Where to resume:** After integrating the backend routes (Pending Issue 1), create the UI for these models within the  component or a new dedicated component. This UI should allow users to specify fixed and random effects (for mixed models) or different family/link functions (for GLM).
+  - **What will be achieved with this?** This will add powerful, research-grade modeling capabilities to the platform, fulfilling a key requirement.
   - **Status:** IN PROGRESS
-  - **Should Test frontend/backend/both after fix?** Both
-  - **Blocked on something:** No
+  - **Should Test frontend/backend/both after fix?** both
+  - **Blocked on something:** Pending Issue 1.
 
 **Upcoming and Future Tasks**
-The implementation of the Data Analysis Module should follow the phased plan created by the agent.
-
-- **Upcoming Tasks (P0):**
-  - **Phase 1: Foundational Backend & Frontend.** Implement the core functionality as defined in the user checklist sections 3.1-3.5:
-    - Response Browsing & Filtering ()
-    - Simple Statistics (Frequencies, Descriptives) ()
-    - Built-in Quick Charts
-    - Data Exports (CSV, Excel, SPSS/Stata) ()
-    - Token/Panel Tracking Reports
-
-- **Future Tasks (P1):**
-  - **Phase 2: Advanced Analytics Engine.** Implement functionality from checklist section 4:
-    - Variable Management View
-    - Data Transformations (Recode, Compute, Reshape)
-    - Advanced Statistics (Crosstabs, Correlations, Regressions) ()
-    - Complex Survey Design Features
-  - **Phase 3: AI Copilot & Graphics.** Implement functionality from checklist sections 5 & 6:
-    - Ask your data Natural Language Interface ()
-    - Publication-quality Chart Studio
-    - Interactive Dashboards
-  - **Phase 4: Reporting & Interoperability.** Implement functionality from checklist sections 7 & 8:
-    - Report Builder
-    - One-click Reproducibility Pack
-    - Enhanced import/export with metadata preservation
+- **Upcoming Tasks (P1):**
+    - **Report Builder Finalization:** Connect the frontend UI to the backend to generate and download PDF/Word reports.
+    - **Reproducibility Pack:** Implement the frontend logic to trigger the creation and download of the reproducibility zip pack.
+    - **Dashboard Features:** Implement filtering and drill-down capabilities for the dashboard.
+    - **Advanced Regression Outputs:** Add support for calculating and displaying margins and predicted probabilities for regression models.
+    - **Data Operations UI:** Create a UI for data reshaping (wide-to-long) and merging datasets.
+- **Future Tasks (P2):**
+    - Missing data imputation UI and backend logic.
+    - Add Poisson and Negative Binomial regression models to the GLM framework.
+    - Expand Chart Studio with violin plots, coefficient plots, and heatmaps.
+    - Implement dashboard sharing and permissions.
+    - Implement a full audit trail for data exports and transformations.
+    - Add role-gating for sensitive analysis features.
 
 **Completed work in this session**
-- **Data Collection Module - Gaps Implemented:**
-  - **Encrypted Local Storage:** Implemented using Web Crypto API in .
-  - **AI Field Simulation:** Created backend () and frontend ().
-  - **Remote Device Wipe:** Added to the device management module (, ).
-  - **Enhanced Roster/Repeat Groups:** Improved component at .
-- **UI/UX Redesign:**
-  - **Canva-Style Layout:** Implemented a new navigation structure with a thin icon rail and expandable panels ().
-  - **Color Theme Management:** Switched to a violet theme and then reverted to the original sky/cyan theme, updating .
-  - **UI Refinements:** Added text labels under sidebar icons and redesigned dashboard cards (, ) for a lighter, more harmonious look.
-- **Data Analysis Module - Scaffolding:**
-  - Created placeholder backend routes and the main frontend component.
+- **Phase 1: Baseline Analytics:** Integrated the main Data Analysis page, response browser, simple stats, and data exports (CSV, Excel, SPSS, Stata, Parquet).
+- **Phase 2: Advanced Statistics:** Implemented the Variable View and Advanced stats tab with T-tests, ANOVA, Correlation, and Regression (OLS, Logistic).
+- **Phase 3: Chart Studio & AI Copilot:** Created the  component with multiple chart types and an enhanced  with auto-execute functionality.
+- **Phase 4 & 5: Reporting & Survey Stats:**
+    - Created backend routes for the Report Builder, Reproducibility Packs, and Complex Survey Statistics.
+    - Integrated the frontend  and  as new tabs into the main UI.
 
 **Earlier issues found/mentioned but not fixed**
-- None.
+- **Issue 1:** The independent samples T-test in  fails if the grouping variable has more than two categories. It should be validated to prevent errors and guide the user.
+- **Issue 2:** The selected form state is not maintained when switching between tabs in , requiring the user to re-select the form repeatedly.
 
 **Known issue recurrence from previous fork**
-- None. The job started from a problem statement, not a previous fork.
+- None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend:** Python (Flask), MongoDB for data storage. Uses , ,  for the new analytics module.
-- **Frontend:** React (Vite), Tailwind CSS, Recharts for charts.
-- **Architecture:** Monorepo with a REST API backend and a Single Page Application (SPA) frontend.
-- **Key Feature:** Offline-first capability for the data collection app using IndexedDB and a sync mechanism.
+- **Backend:** FastAPI, Python, Pandas, Numpy, Statsmodels, Scipy, Pyreadstat, reportlab, python-docx.
+- **Frontend:** React, Zustand (for state management), Tailwind CSS, Tremor (UI components), Recharts.
+- **Database:** MongoDB.
+- **AI Integration:**  library for LLM interactions.
 
 **key DB schema**
-- : User accounts and roles.
-- : Project containers.
-- : Survey instrument definitions (versioned).
-- : Individual interview records.
-- : Master registry for longitudinal tracking.
-- : Reusable lookup tables.
-- : Registered field devices with status.
-- : Records for AI field simulations.
+- **forms:** Stores form definitions, questions, and metadata.
+- **submissions:** Stores individual user responses, linked to  and .
+- **organizations:** Stores organization information.
 
 **changes in tech stack**
-- The upcoming Data Analysis module will introduce a heavy reliance on Python's scientific computing stack: , , , and .
+- None.
 
 **All files of reference**
-- **New/Updated (Data Collection Gaps):**
-  - : Implements client-side database encryption.
-  - , : Backend and frontend for AI simulation feature.
-  - , : Backend and frontend for device management including remote wipe.
-  - : Enhanced component for repeating groups.
-- **New/Updated (UI Redesign):**
-  - : Overhauled to implement the Canva-style navigation.
-  - : Modified to support the new color theme.
-  - , : Updated for the new light-themed card design.
-- **New (Data Analysis Module Stubs):**
-  - 
-  - 
-  - 
-  - 
-  - 
+- : Main server file where all API routers are registered. Needs to be updated for new routes.
+- : The central and most important frontend file, which orchestrates all the analysis tabs and components.
+- : Directory containing all UI panels for different features (stats, charts, AI, etc.).
+- : Directory containing all backend logic for the analysis module, separated by feature.
+- : Updated with  and  for report generation.
+- : Contains the user's checklist and the agent's progress updates against it.
 
 **Areas that need refactoring**:
-- The agent created  but then opted to modify  directly. The  file may be redundant and should be reviewed for cleanup.
+- **:** This component has become very large and manages a lot of state. Refactoring its state management into a dedicated Zustand store would solve the cross-tab state persistence issue (Issue #3) and improve code maintainability.
 
 **key api endpoints**
-- **Completed:**
-  - : POST to run a new AI field simulation.
-  - : GET to list registered devices.
-  - : POST to trigger a remote wipe.
-- **In Progress (Stubs):**
-  - : For basic analysis, filtering, and quick stats.
-  - : For advanced statistics and models.
-  - : For the natural language AI assistant.
-  - : For generating data exports.
+- : Endpoints for fetching data, snapshots, running stats, and generating charts.
+- : Endpoints for data and codebook exports.
+- : Endpoints for report generation and templates.
+- : Endpoints for creating and downloading reproducibility packs.
+- : Endpoints for complex survey statistics calculations.
+- : Endpoint to list forms for an organization.
 
 **Critical Info for New Agent**
-- You are in the middle of a large feature build: the **Data Analysis Module**. Follow the phased plan and the user's detailed checklist.
-- The user is highly engaged with UI/UX. Pay close attention to visual details and be prepared for iterative design changes.
-- The backend for the analysis module should be built using , , and  as planned.
-- The core application is considered feature-complete *except* for the new Data Analysis module. Do not regress existing functionality.
+- The project is large and is being built incrementally in phases based on a detailed user checklist. Refer to  for the full requirements and progress.
+- The immediate next step is to integrate the  and  into  and test them.
+- Be aware of the two key pending UI/UX issues: the T-test validation and the lack of state persistence across tabs. Fixing the state persistence issue should be a high priority as it impacts the usability of the entire module.
+- Test data was inserted manually. This may cause discrepancies between the form schema and the submission data, as seen with the AI Copilot.
 
 **documents and test reports created in this job**
-- : Plan for implementing the data collection gaps.
-- : Design specs for the Canva-style UI.
-- : Phased plan for the Data Analysis Module.
-- : Updated with the completion of the data collection gaps.
-- : Test report run after implementing the collection gaps.
+- : Contains the detailed product requirements and has been updated with the completion status of various features.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1. User: Provides the detailed **Data Analysis Module Checklist**.
-2. Agent: Proposes a phased implementation plan.
-3. User: Agrees to the plan (1 a), wants agent to choose the best libraries (3. Choose the best fir to be competitive).
-4. Agent: Confirms it will proceed and select appropriate libraries.
-5. User: Implement this now (referring to the Data Analysis Module).
+1. : Confirmed to start Phase 6 & 7.
+2. : Confirmed to integrate Phase 4 & 5 frontend.
+3. : Confirmed to build Phase 4 & 5 backend.
+4. : Confirmed to proceed after status update.
+5. : Provided the detailed feature checklist and requested a status update. (Completed)
+6. : Confirmed to finish Phase 3.
+7. : Confirmed to start Phase 3.
+8. : Confirmed to finish Phase 2.
+9. : Confirmed to start Phase 2.
+10. : Confirmed to finish Phase 1.
+All user messages were simple Proceed commands, except for the one providing the detailed requirements checklist, which has been addressed with a status update. There are no pending human messages.
 
 **Project Health Check:**
-- **Working:** Core data collection features, all UI components, login/authentication.
-- **Broken:** The new **Data Analysis Module** is non-functional. The backend routes are stubs, and the frontend page is a skeleton.
-- **Mocked:** None.
+- **Broken:**
+    - Independent Samples T-Test logic for handling >2 groups.
+    - State persistence for form selection across UI tabs.
+    - GLM and Mixed Model routes are not yet integrated into the application.
+- **Mocked:**
+    - Test data was created via direct database insertion, not through application APIs.
 
 **3rd Party Integrations**
-- **OpenAI GPT models (GPT-4/5.2):** Used for the AI Monitoring Assistant and the planned AI Copilot. Uses Emergent LLM Key.
+- **OpenAI (via Emergent):** Used for the AI Copilot feature. Uses Emergent LLM Key.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES. A comprehensive test was run after implementing the data collection gaps and before starting the analysis module.
-- **Troubleshoot agent used after agent stuck in loop:** NO.
-- **Test files created:** None. Testing was done via the testing agent.
+- **Testing agent used after significant changes:** YES
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** None persisted. The testing agent generates them ephemerally.
 - **Known regressions:** None.
 
 **Credentials to test flow:**
-- **Username:** 
-- **Password:** 
+- **email:** 
+- **password:** 
 
 **What agent forgot to execute**
-- The agent has correctly scaffolded the files for the new Data Analysis Module. The immediate next steps, which have not been executed yet, are to integrate the new frontend page () into the application's routing () and navigation menu (). This should be done as part of building out the feature.</analysis>
+- The agent created the backend route files  and  but forgot to register them in the main  file, which is the essential next step to make them active.</analysis>
