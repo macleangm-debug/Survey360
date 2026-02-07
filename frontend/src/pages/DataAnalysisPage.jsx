@@ -364,14 +364,22 @@ export function DataAnalysisPage() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="browse" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               Browse
             </TabsTrigger>
+            <TabsTrigger value="variables" className="flex items-center gap-2">
+              <Columns className="h-4 w-4" />
+              Variables
+            </TabsTrigger>
             <TabsTrigger value="stats" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
-              Statistics
+              Basic Stats
+            </TabsTrigger>
+            <TabsTrigger value="advanced" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Advanced
             </TabsTrigger>
             <TabsTrigger value="charts" className="flex items-center gap-2">
               <PieChart className="h-4 w-4" />
