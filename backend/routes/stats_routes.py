@@ -291,7 +291,18 @@ async def run_ttest(
         
         groups = df[req.group_var].dropna().unique()
         if len(groups) != 2:
-            raise HTTPException(status_code=400, detail="Exactly 2 groups required for independent t-test")
+            if len(groups) > 2:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Independent samples t-test requires exactly 2 groups, but found {len(groups)} groups in '{req.group_var}'. "
+                           f"Please use ANOVA (Analysis of Variance) for comparing 3 or more groups, "
+                           f"or filter your data to include only 2 groups."
+                )
+            else:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Independent samples t-test requires exactly 2 groups, but found only {len(groups)} group(s) in '{req.group_var}'."
+                )
         
         group1_data = pd.to_numeric(df[df[req.group_var] == groups[0]][req.variable], errors='coerce').dropna()
         group2_data = pd.to_numeric(df[df[req.group_var] == groups[1]][req.variable], errors='coerce').dropna()
