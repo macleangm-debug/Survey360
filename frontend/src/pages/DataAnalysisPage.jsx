@@ -56,6 +56,7 @@ import { EnhancedAICopilot } from '../components/analysis/EnhancedAICopilot';
 import { ReportBuilder } from '../components/analysis/ReportBuilder';
 import { SurveyStatsPanel } from '../components/analysis/SurveyStatsPanel';
 import { DashboardBuilder } from '../components/analysis/DashboardBuilder';
+import { FactorAnalysis } from '../components/analysis/FactorAnalysis';
 import {
   BarChart,
   Bar,
