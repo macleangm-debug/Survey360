@@ -368,32 +368,40 @@ export function DataAnalysisPage() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="browse" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-9">
+            <TabsTrigger value="browse" className="flex items-center gap-2 text-xs">
               <Database className="h-4 w-4" />
               Browse
             </TabsTrigger>
-            <TabsTrigger value="variables" className="flex items-center gap-2">
+            <TabsTrigger value="variables" className="flex items-center gap-2 text-xs">
               <Columns className="h-4 w-4" />
               Variables
             </TabsTrigger>
-            <TabsTrigger value="stats" className="flex items-center gap-2">
+            <TabsTrigger value="stats" className="flex items-center gap-2 text-xs">
               <BarChart3 className="h-4 w-4" />
-              Basic Stats
+              Stats
             </TabsTrigger>
-            <TabsTrigger value="advanced" className="flex items-center gap-2">
+            <TabsTrigger value="advanced" className="flex items-center gap-2 text-xs">
               <Calculator className="h-4 w-4" />
               Advanced
             </TabsTrigger>
-            <TabsTrigger value="charts" className="flex items-center gap-2">
+            <TabsTrigger value="survey" className="flex items-center gap-2 text-xs">
+              <Scale className="h-4 w-4" />
+              Survey
+            </TabsTrigger>
+            <TabsTrigger value="charts" className="flex items-center gap-2 text-xs">
               <PieChart className="h-4 w-4" />
               Charts
             </TabsTrigger>
-            <TabsTrigger value="ai" className="flex items-center gap-2">
+            <TabsTrigger value="ai" className="flex items-center gap-2 text-xs">
               <Sparkles className="h-4 w-4" />
-              AI Copilot
+              AI
             </TabsTrigger>
-            <TabsTrigger value="export" className="flex items-center gap-2">
+            <TabsTrigger value="reports" className="flex items-center gap-2 text-xs">
+              <FileText className="h-4 w-4" />
+              Reports
+            </TabsTrigger>
+            <TabsTrigger value="export" className="flex items-center gap-2 text-xs">
               <Download className="h-4 w-4" />
               Export
             </TabsTrigger>
