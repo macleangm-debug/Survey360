@@ -519,9 +519,9 @@ export function DataAnalysisPage() {
                       <div 
                         key={snap.id}
                         className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-                          selectedSnapshot === snap.id ? 'border-sky-500 bg-sky-50' : 'hover:bg-slate-50'
+                          selectedSnapshotId === snap.id ? 'border-sky-500 bg-sky-50' : 'hover:bg-slate-50'
                         }`}
-                        onClick={() => setSelectedSnapshot(snap.id === selectedSnapshot ? '' : snap.id)}
+                        onClick={() => setSelectedSnapshot(snap.id === selectedSnapshotId ? '' : snap.id)}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-2 h-2 rounded-full ${
