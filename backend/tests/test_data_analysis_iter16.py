@@ -31,8 +31,8 @@ class TestDataAnalysisModule:
         })
         assert login_response.status_code == 200, f"Login failed: {login_response.text}"
         
-        token = login_response.json().get("token")
-        assert token, "No token in login response"
+        token = login_response.json().get("access_token")
+        assert token, "No token (access_token) in login response"
         self.session.headers.update({"Authorization": f"Bearer {token}"})
         
         yield
