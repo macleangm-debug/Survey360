@@ -531,15 +531,145 @@ def generate_docx_report(report: dict, snapshot: dict, form: dict, req: Generate
 
 
 def generate_pdf_from_html(html_content: str) -> bytes:
-    """Convert HTML to PDF using WeasyPrint"""
+    """Convert HTML-style report to PDF using reportlab"""
     try:
-        from weasyprint import HTML
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+        from reportlab.lib import colors
+        from reportlab.lib.enums import TA_CENTER, TA_LEFT
+        import re
+        from html.parser import HTMLParser
         
+        # Simple HTML parser to extract text content
+        class HTMLTextExtractor(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.sections = []
+                self.current_section = None
+                self.current_text = ""
+                self.in_title = False
+                self.in_table = False
+                self.table_data = []
+                self.current_row = []
+                
+            def handle_starttag(self, tag, attrs):
+                if tag == 'h1':
+                    self.in_title = True
+                elif tag == 'table':
+                    self.in_table = True
+                    self.table_data = []
+                elif tag == 'tr':
+                    self.current_row = []
+                    
+            def handle_endtag(self, tag):
+                if tag == 'h1':
+                    self.in_title = False
+                    self.sections.append(('title', self.current_text.strip()))
+                    self.current_text = ""
+                elif tag in ('p', 'div'):
+                    if self.current_text.strip():
+                        self.sections.append(('text', self.current_text.strip()))
+                    self.current_text = ""
+                elif tag == 'table':
+                    self.in_table = False
+                    if self.table_data:
+                        self.sections.append(('table', self.table_data))
+                    self.table_data = []
+                elif tag == 'tr':
+                    if self.current_row:
+                        self.table_data.append(self.current_row)
+                    self.current_row = []
+                elif tag in ('td', 'th'):
+                    self.current_row.append(self.current_text.strip())
+                    self.current_text = ""
+                    
+            def handle_data(self, data):
+                self.current_text += data
+        
+        # Parse HTML
+        parser = HTMLTextExtractor()
+        parser.feed(html_content)
+        
+        # Create PDF
         pdf_buffer = io.BytesIO()
-        HTML(string=html_content).write_pdf(pdf_buffer)
+        doc = SimpleDocTemplate(
+            pdf_buffer,
+            pagesize=letter,
+            rightMargin=72,
+            leftMargin=72,
+            topMargin=72,
+            bottomMargin=72
+        )
+        
+        # Styles
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            textColor=colors.HexColor('#0369a1'),
+            spaceAfter=20,
+            alignment=TA_CENTER
+        )
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading2'],
+            fontSize=14,
+            textColor=colors.HexColor('#0369a1'),
+            spaceAfter=12,
+            spaceBefore=20
+        )
+        body_style = ParagraphStyle(
+            'CustomBody',
+            parent=styles['Normal'],
+            fontSize=11,
+            spaceAfter=12,
+            leading=16
+        )
+        
+        # Build content
+        story = []
+        
+        for section_type, content in parser.sections:
+            if section_type == 'title':
+                story.append(Paragraph(content, title_style))
+            elif section_type == 'text':
+                # Check if it looks like a heading
+                if len(content) < 100 and not content.endswith('.'):
+                    story.append(Paragraph(content, heading_style))
+                else:
+                    story.append(Paragraph(content, body_style))
+            elif section_type == 'table':
+                if content:
+                    t = Table(content)
+                    t.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f1f5f9')),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#1e293b')),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('FONTSIZE', (0, 0), (-1, 0), 10),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                        ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor('#334155')),
+                        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                        ('FONTSIZE', (0, 1), (-1, -1), 9),
+                        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+                        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                        ('TOPPADDING', (0, 0), (-1, -1), 8),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                    ]))
+                    story.append(Spacer(1, 12))
+                    story.append(t)
+                    story.append(Spacer(1, 12))
+        
+        # Build PDF
+        doc.build(story)
         pdf_buffer.seek(0)
         
         return pdf_buffer.getvalue()
     except Exception as e:
+        print(f"PDF generation error: {e}")
         # Fallback: return HTML as bytes if PDF generation fails
         return html_content.encode()
