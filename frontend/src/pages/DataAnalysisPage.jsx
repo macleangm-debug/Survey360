@@ -361,7 +361,7 @@ export function DataAnalysisPage() {
             <p className="text-slate-500">Browse, analyze, and export your survey data</p>
           </div>
           <div className="flex items-center gap-2">
-            <Select value={selectedForm} onValueChange={setSelectedForm}>
+            <Select value={selectedFormId} onValueChange={setSelectedForm}>
               <SelectTrigger className="w-[250px]">
                 <SelectValue placeholder="Select a form..." />
               </SelectTrigger>
