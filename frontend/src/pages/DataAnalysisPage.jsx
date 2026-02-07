@@ -44,7 +44,8 @@ import {
   Send,
   Settings2,
   Columns,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Scale
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore, useOrgStore } from '../store';
