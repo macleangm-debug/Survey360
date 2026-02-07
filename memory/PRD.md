@@ -557,47 +557,50 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 
 ## FRONTEND INTEGRATION (COMPLETE - Feb 7, 2026)
 
-### Data Analysis Page Tabs (9 total)
+### Data Analysis Page Tabs (10 total)
 1. **Browse** - Response browsing with pagination
 2. **Variables** - Variable metadata view
 3. **Stats** - Basic statistics (frequencies, descriptives, crosstabs)
-4. **Advanced** - T-tests, ANOVA, Correlation, Regression
+4. **Advanced** - T-tests, ANOVA, Correlation, Regression, **GLM, Mixed Models**
 5. **Survey** - Complex survey statistics (weighted, design-based)
 6. **Charts** - Chart Studio (7 types, 6 palettes)
-7. **AI** - Enhanced AI Copilot (auto-execute, suggestions)
-8. **Reports** - Report Builder (PDF/Word/HTML export)
-9. **Export** - Data exports (CSV, Excel, SPSS, Stata, Parquet)
+7. **Dashboards** - Interactive Dashboard Builder (drag-drop widgets)
+8. **AI** - Enhanced AI Copilot (auto-execute, suggestions)
+9. **Reports** - Report Builder (PDF/Word/HTML export)
+10. **Export** - Data exports (CSV, Excel, SPSS, Stata, Parquet)
 
 ### Components Created
-- `/app/frontend/src/components/analysis/AdvancedStatsPanel.jsx`
+- `/app/frontend/src/components/analysis/AdvancedStatsPanel.jsx` (6 sub-tabs: T-Test, ANOVA, Correlation, Regression, GLM, Mixed)
 - `/app/frontend/src/components/analysis/ChartStudio.jsx`
 - `/app/frontend/src/components/analysis/EnhancedAICopilot.jsx`
 - `/app/frontend/src/components/analysis/ReportBuilder.jsx`
 - `/app/frontend/src/components/analysis/SurveyStatsPanel.jsx`
+- `/app/frontend/src/components/analysis/DashboardBuilder.jsx` (NEW - Feb 7, 2026)
 
 ---
 
-## UPCOMING PHASES (Backlog)
+## PHASE 6 & 7 COMPLETE (Feb 7, 2026)
 
-### Phase 6: Interactive Dashboards (BACKEND COMPLETE - Feb 7, 2026)
+### Phase 6: Interactive Dashboards - FULLY COMPLETE
 - ✅ Dashboard CRUD endpoints (`/api/dashboards/*`)
 - ✅ Widget system (stat, chart, table, text types)
 - ✅ Filter controls with options retrieval
 - ✅ Dashboard data computation with applied filters
 - ✅ Share permissions (viewer, editor, public with password)
-- 🔲 Frontend Dashboard Builder UI (next)
-- 🔲 Drag-and-drop widget placement
-- 🔲 Drill-down capability
+- ✅ Frontend Dashboard Builder UI with drag-drop (react-grid-layout)
+- ✅ Widget configuration dialogs (stat, chart, table, text)
+- 🔲 Drill-down capability (future)
 
-### Phase 7: Advanced Models (BACKEND COMPLETE - Feb 7, 2026)
+### Phase 7: Advanced Models - FULLY COMPLETE
 - ✅ GLM (Generalized Linear Models) - `/api/models/glm`
   - Gaussian, Binomial, Poisson, Gamma, Inverse Gaussian, Negative Binomial families
-  - Customizable link functions
-  - Offset/exposure support
+  - Customizable link functions (Identity, Log, Logit, Probit, Inverse, Sqrt)
+  - Frontend UI in AdvancedStatsPanel
 - ✅ Mixed Models (LMM) - `/api/models/mixed`
   - Random intercepts and slopes
   - ICC calculation
   - REML estimation
+  - Frontend UI in AdvancedStatsPanel
 - ✅ Margins/Predicted Probabilities - `/api/models/margins`
 - ✅ Predictions endpoint - `/api/models/predict`
 - 🔲 Frontend UI for GLM/Mixed Models (next)
