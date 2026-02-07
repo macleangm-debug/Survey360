@@ -113,7 +113,7 @@ async def analyze_with_ai(
     analysis_id = f"analysis_{int(datetime.now(timezone.utc).timestamp())}_{hashlib.md5(req.query.encode()).hexdigest()[:8]}"
     
     try:
-        from emergentintegrations.llm.chat import chat, UserMessage, SystemMessage
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
         
         system_prompt = """You are a statistical analysis assistant for survey data. Your role is to:
 1. Understand the user's analysis request
@@ -144,7 +144,7 @@ Respond in JSON format:
     "api_params": {"param1": "value1"}
 }"""
 
-        user_message = f"""User query: {req.query}
+        user_content = f"""User query: {req.query}
 
 {data_summary}
 
@@ -152,15 +152,15 @@ Respond in JSON format:
 
 Based on the available data and variables, provide an analysis plan."""
 
-        response = await chat(
+        # Initialize chat with system message
+        chat = LlmChat(
             api_key=api_key,
-            model="gpt-5.2",
-            messages=[
-                SystemMessage(content=system_prompt),
-                UserMessage(content=user_message)
-            ],
-            temperature=0.3
-        )
+            session_id=analysis_id,
+            system_message=system_prompt
+        ).with_model("openai", "gpt-5.2")
+        
+        # Send user message
+        response = await chat.send_message(UserMessage(text=user_content))
         
         # Parse AI response
         try:
