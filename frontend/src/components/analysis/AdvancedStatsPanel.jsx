@@ -85,6 +85,13 @@ export function AdvancedStatsPanel({
     groupVar: ''
   });
 
+  // Factor Analysis state
+  const [faConfig, setFaConfig] = useState({
+    variables: [],
+    nFactors: '',
+    rotation: 'varimax'
+  });
+
   const numericFields = fields.filter(f => f.type === 'number' || f.type === 'integer' || f.type === 'decimal');
   const categoricalFields = fields.filter(f => f.type === 'select' || f.type === 'radio' || f.type === 'text');
 
