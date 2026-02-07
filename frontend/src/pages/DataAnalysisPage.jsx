@@ -48,7 +48,7 @@ import {
   Scale
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuthStore, useOrgStore } from '../store';
+import { useAuthStore, useOrgStore, useAnalysisStore } from '../store';
 import { AdvancedStatsPanel } from '../components/analysis/AdvancedStatsPanel';
 import { ChartStudio } from '../components/analysis/ChartStudio';
 import { EnhancedAICopilot } from '../components/analysis/EnhancedAICopilot';
