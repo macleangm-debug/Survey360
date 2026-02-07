@@ -724,6 +724,28 @@ export function DataAnalysisPage() {
             </div>
           </TabsContent>
 
+          {/* Advanced Statistics Tab */}
+          <TabsContent value="advanced" className="space-y-4">
+            {selectedForm ? (
+              <AdvancedStatsPanel
+                formId={selectedForm}
+                snapshotId={selectedSnapshot}
+                orgId={currentOrg?.id}
+                fields={formFields}
+                getToken={getToken}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="text-center text-slate-500">
+                    <Calculator className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Select a form to access advanced statistics</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
           {/* Charts Tab */}
           <TabsContent value="charts" className="space-y-4">
             <Card>
