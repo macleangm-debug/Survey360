@@ -642,13 +642,7 @@ export function DataAnalysisPage() {
                           <Checkbox
                             id={field.id}
                             checked={selectedVariables.includes(field.id)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setSelectedVariables([...selectedVariables, field.id]);
-                              } else {
-                                setSelectedVariables(selectedVariables.filter(v => v !== field.id));
-                              }
-                            }}
+                            onCheckedChange={() => toggleVariable(field.id)}
                           />
                           <Label htmlFor={field.id} className="text-sm cursor-pointer">
                             {field.label || field.id}
