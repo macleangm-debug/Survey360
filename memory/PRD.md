@@ -449,18 +449,18 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 
 ## UPCOMING PHASES (Backlog)
 
-### Phase 2: Advanced Analytics Engine
-- Variable Management View
-- Data Transformations (Recode, Compute, Reshape)
-- Advanced Statistics (T-tests, ANOVA, Regression)
-- Complex Survey Design Features (weighting, strata)
-
-### Phase 3: AI Copilot & Graphics
-- Enhanced "Ask your data" interface
+### Phase 3: AI Copilot Enhancements & Graphics
+- Enhanced "Ask your data" with auto-execute
 - Publication-quality Chart Studio
-- Interactive Dashboards
+- Interactive Dashboards with drag-and-drop
 
 ### Phase 4: Reporting & Interoperability
-- Report Builder
+- Report Builder with templates
 - One-click Reproducibility Pack
-- Enhanced metadata preservation
+- Enhanced metadata preservation for SPSS/Stata round-trip
+
+### Phase 5: Complex Survey Design
+- Survey weights support
+- Stratified sampling analysis
+- Cluster-robust standard errors
+- Design effects reporting
