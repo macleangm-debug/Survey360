@@ -680,7 +680,7 @@ async def run_regression(
                 "std_error": round(float(row['std_error']), 4),
                 "test_statistic": round(float(row['t_statistic' if req.model_type == "ols" else 'z_statistic']), 4),
                 "p_value": round(float(row['p_value']), 4),
-                "significant": row['p_value'] < 0.05,
+                "significant": bool(row['p_value'] < 0.05),
                 "ci_95": [round(float(row['ci_lower']), 4), round(float(row['ci_upper']), 4)]
             })
         
