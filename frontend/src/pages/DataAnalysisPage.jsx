@@ -199,7 +199,7 @@ export function DataAnalysisPage() {
   };
 
   const createSnapshot = async () => {
-    if (!selectedForm) {
+    if (!selectedFormId) {
       toast.error('Please select a form');
       return;
     }
@@ -216,7 +216,7 @@ export function DataAnalysisPage() {
           'Authorization': `Bearer ${getToken()}`
         },
         body: JSON.stringify({
-          form_id: selectedForm,
+          form_id: selectedFormId,
           org_id: currentOrg.id,
           name: name,
           include_statuses: ['approved'],
