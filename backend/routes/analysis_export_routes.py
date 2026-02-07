@@ -235,8 +235,8 @@ def export_excel(df: pd.DataFrame, labels: Dict, schema: List, include_labels: b
 def export_spss(df: pd.DataFrame, labels: Dict) -> StreamingResponse:
     """Export as SPSS .sav file"""
     import pyreadstat
-    
-    buffer = io.BytesIO()
+    import tempfile
+    import os
     
     # Prepare labels
     column_labels = {col: labels.get(col, {}).get("variable_label", col) for col in df.columns}
@@ -248,18 +248,28 @@ def export_spss(df: pd.DataFrame, labels: Dict) -> StreamingResponse:
             # Convert to proper format
             value_labels[col] = {str(k): v for k, v in col_val_labels.items()}
     
-    # Write to SPSS format
-    pyreadstat.write_sav(
-        df,
-        buffer,
-        column_labels=column_labels,
-        variable_value_labels=value_labels
-    )
+    # Write to temp file (pyreadstat doesn't support BytesIO)
+    with tempfile.NamedTemporaryFile(suffix='.sav', delete=False) as tmp:
+        tmp_path = tmp.name
     
-    buffer.seek(0)
+    try:
+        pyreadstat.write_sav(
+            df,
+            tmp_path,
+            column_labels=column_labels,
+            variable_value_labels=value_labels
+        )
+        
+        # Read the file content
+        with open(tmp_path, 'rb') as f:
+            content = f.read()
+    finally:
+        # Clean up temp file
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
     
     return StreamingResponse(
-        buffer,
+        iter([content]),
         media_type="application/octet-stream",
         headers={
             "Content-Disposition": f"attachment; filename=export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sav"
