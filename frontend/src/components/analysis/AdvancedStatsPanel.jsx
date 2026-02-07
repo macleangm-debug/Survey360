@@ -1492,4 +1492,154 @@ function MixedModelResults({ data }) {
   );
 }
 
+// Factor Analysis Results Component
+function FactorAnalysisResults({ data }) {
+  if (data.error) {
+    return (
+      <div className="p-4 bg-red-50 rounded-lg flex items-center gap-2">
+        <AlertCircle className="h-5 w-5 text-red-600" />
+        <span className="text-red-700">{data.error}</span>
+      </div>
+    );
+  }
+
+  const getLoadingColor = (loading) => {
+    const absLoading = Math.abs(loading);
+    if (absLoading >= 0.7) return loading > 0 ? '#10b981' : '#ef4444';
+    if (absLoading >= 0.4) return loading > 0 ? '#22d3ee' : '#f97316';
+    return '#94a3b8';
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        <Badge>Factor Analysis</Badge>
+        <Badge variant="outline">{data.n_factors} Factors</Badge>
+        <Badge variant="outline">{data.rotation} rotation</Badge>
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-4 gap-3">
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-xs text-slate-500">N</p>
+          <p className="text-lg font-semibold">{data.n_observations}</p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-xs text-slate-500">Variables</p>
+          <p className="text-lg font-semibold">{data.n_variables}</p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-xs text-slate-500">Factors</p>
+          <p className="text-lg font-semibold">{data.n_factors}</p>
+        </div>
+        <div className="p-3 bg-sky-50 rounded">
+          <p className="text-xs text-slate-500">Variance</p>
+          <p className="text-lg font-semibold text-sky-600">{data.variance_explained?.total}%</p>
+        </div>
+      </div>
+
+      {/* KMO & Bartlett */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className={`p-3 rounded-lg ${data.kmo?.value >= 0.6 ? 'bg-emerald-50' : 'bg-amber-50'}`}>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm font-medium">KMO</p>
+              <p className="text-xs text-slate-500">{data.kmo?.interpretation}</p>
+            </div>
+            <p className="text-xl font-bold">{data.kmo?.value}</p>
+          </div>
+        </div>
+        <div className={`p-3 rounded-lg ${data.bartlett_test?.significant ? 'bg-emerald-50' : 'bg-red-50'}`}>
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm font-medium">Bartlett's Test</p>
+              <p className="text-xs text-slate-500">χ² = {data.bartlett_test?.chi_square}</p>
+            </div>
+            <Badge className={data.bartlett_test?.significant ? 'bg-emerald-100 text-emerald-700' : ''}>
+              p {data.bartlett_test?.p_value < 0.001 ? '< .001' : `= ${data.bartlett_test?.p_value}`}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Loading Matrix */}
+      <h4 className="font-medium">Factor Loadings</h4>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-slate-50">
+              <th className="p-2 text-left">Variable</th>
+              {Array.from({ length: data.n_factors }, (_, i) => (
+                <th key={i} className="p-2 text-center">F{i + 1}</th>
+              ))}
+              <th className="p-2 text-center">h²</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(data.loading_matrix || {}).map(([varName, loadings]) => (
+              <tr key={varName} className="border-b hover:bg-slate-50">
+                <td className="p-2 font-medium text-xs">{varName}</td>
+                {Array.from({ length: data.n_factors }, (_, i) => {
+                  const loading = loadings[`Factor_${i + 1}`];
+                  return (
+                    <td key={i} className="p-2 text-center">
+                      <span 
+                        className="px-1 py-0.5 rounded text-xs font-mono"
+                        style={{ 
+                          backgroundColor: Math.abs(loading) >= 0.4 ? getLoadingColor(loading) + '20' : 'transparent',
+                          color: getLoadingColor(loading),
+                          fontWeight: Math.abs(loading) >= 0.4 ? 'bold' : 'normal'
+                        }}
+                      >
+                        {loading?.toFixed(2)}
+                      </span>
+                    </td>
+                  );
+                })}
+                <td className="p-2 text-center text-xs text-slate-500">{loadings.communality?.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Factor Interpretation */}
+      {data.factor_interpretation && data.factor_interpretation.length > 0 && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Factor Summary</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {data.factor_interpretation.map((factor, idx) => (
+              <div key={idx} className="p-2 border rounded text-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge className="text-xs">{factor.factor}</Badge>
+                  <span className="text-xs text-slate-500">
+                    {data.variance_explained?.by_factor[idx]}%
+                  </span>
+                </div>
+                {factor.high_loading_variables.length > 0 ? (
+                  <p className="text-xs text-slate-600">
+                    {factor.high_loading_variables.map(v => v.variable).join(', ')}
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-400">No loadings ≥ 0.4</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="p-3 bg-blue-50 rounded-lg flex items-start gap-2">
+        <Info className="h-4 w-4 text-blue-600 mt-0.5" />
+        <p className="text-sm text-blue-800">
+          h² = communality. Loadings ≥ 0.4 indicate meaningful relationship. KMO ≥ 0.6 suggests adequate sampling.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default AdvancedStatsPanel;
