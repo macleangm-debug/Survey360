@@ -344,7 +344,7 @@ export function AdvancedStatsPanel({
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/stats/factor-analysis`, {
+      const response = await fetch(`${API_URL}/api/statistics/factor-analysis`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
