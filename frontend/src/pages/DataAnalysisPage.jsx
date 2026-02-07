@@ -51,6 +51,8 @@ import { useAuthStore, useOrgStore } from '../store';
 import { AdvancedStatsPanel } from '../components/analysis/AdvancedStatsPanel';
 import { ChartStudio } from '../components/analysis/ChartStudio';
 import { EnhancedAICopilot } from '../components/analysis/EnhancedAICopilot';
+import { ReportBuilder } from '../components/analysis/ReportBuilder';
+import { SurveyStatsPanel } from '../components/analysis/SurveyStatsPanel';
 import {
   BarChart,
   Bar,
