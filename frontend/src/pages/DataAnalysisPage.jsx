@@ -45,7 +45,8 @@ import {
   Settings2,
   Columns,
   ArrowRightLeft,
-  Scale
+  Scale,
+  LayoutDashboard
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore, useOrgStore, useAnalysisStore } from '../store';
