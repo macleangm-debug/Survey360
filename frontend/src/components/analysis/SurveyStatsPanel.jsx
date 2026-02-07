@@ -156,30 +156,30 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
               <div className="space-y-3">
                 <div>
                   <Label className="text-xs">Strata Variable</Label>
-                  <Select value={design.strata_var} onValueChange={v => setDesign({...design, strata_var: v})}>
+                  <Select value={design.strata_var || "none"} onValueChange={v => setDesign({...design, strata_var: v === "none" ? "" : v})}>
                     <SelectTrigger className="text-sm"><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {categoricalFields.map(f => <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label className="text-xs">Cluster/PSU Variable</Label>
-                  <Select value={design.cluster_var} onValueChange={v => setDesign({...design, cluster_var: v})}>
+                  <Select value={design.cluster_var || "none"} onValueChange={v => setDesign({...design, cluster_var: v === "none" ? "" : v})}>
                     <SelectTrigger className="text-sm"><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {fields.map(f => <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label className="text-xs">Weight Variable</Label>
-                  <Select value={design.weight_var} onValueChange={v => setDesign({...design, weight_var: v})}>
+                  <Select value={design.weight_var || "none"} onValueChange={v => setDesign({...design, weight_var: v === "none" ? "" : v})}>
                     <SelectTrigger className="text-sm"><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {numericFields.map(f => <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>)}
                     </SelectContent>
                   </Select>
