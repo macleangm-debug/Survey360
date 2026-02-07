@@ -748,15 +748,6 @@ export function DataAnalysisPage() {
             )}
           </TabsContent>
 
-          {/* Charts Tab */}
-          <TabsContent value="charts" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Charts</CardTitle>
-                <CardDescription>Visualize your data</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {statsResults ? (
           {/* Charts Tab - Chart Studio */}
           <TabsContent value="charts" className="space-y-4">
             {selectedForm ? (
