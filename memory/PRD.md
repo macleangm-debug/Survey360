@@ -620,7 +620,21 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
   - Reports: Builder with export buttons
   - Reproducibility: Pack list + creation form
 
-### Phase 9: Future Enhancements (Backlog)
+### Phase 9: Factor Analysis - COMPLETE (Feb 7, 2026)
+- ✅ Backend endpoint `/api/statistics/factor-analysis`
+  - KMO sampling adequacy with interpretation
+  - Bartlett's sphericity test
+  - Eigenvalue decomposition (scree plot data)
+  - Factor loadings with varimax rotation option
+  - Communalities calculation
+  - Factor interpretation (high loading variables)
+- ✅ Frontend UI in Advanced Stats panel (7th tab: EFA)
+  - Variable selection (min 3 required)
+  - Number of factors input (auto or custom)
+  - Rotation method dropdown
+  - Results display: summary stats, KMO/Bartlett, loading matrix, factor summary
+
+### Phase 10: Future Enhancements (Backlog)
 - Factor Analysis visualization
 - Missing data imputation UI
 - Violin plots, coefficient plots, heatmaps
