@@ -348,7 +348,7 @@ export function DataAnalysisPage() {
   };
 
   // Get current form schema
-  const currentForm = forms.find(f => f.id === selectedForm);
+  const currentForm = forms.find(f => f.id === selectedFormId);
   const formFields = currentForm?.fields || [];
 
   return (
