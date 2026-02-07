@@ -619,6 +619,177 @@ async def run_reliability(
     }
 
 
+# ============ Factor Analysis ============
+
+@router.post("/factor-analysis")
+async def run_factor_analysis(
+    request: Request,
+    req: FactorAnalysisRequest
+):
+    """Run exploratory factor analysis (EFA) with visualization data"""
+    db = request.app.state.db
+    
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df.empty:
+        return {"error": "No data available"}
+    
+    # Filter to requested variables
+    valid_vars = [v for v in req.variables if v in df.columns]
+    if len(valid_vars) < 3:
+        raise HTTPException(status_code=400, detail="Factor analysis requires at least 3 variables")
+    
+    df_numeric = df[valid_vars].apply(pd.to_numeric, errors='coerce').dropna()
+    
+    if len(df_numeric) < 50:
+        return {"error": "Factor analysis requires at least 50 complete cases"}
+    
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.decomposition import PCA
+    
+    # Standardize data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(df_numeric)
+    
+    # Determine number of factors using Kaiser criterion (eigenvalue > 1)
+    pca_full = PCA()
+    pca_full.fit(X_scaled)
+    eigenvalues = pca_full.explained_variance_
+    
+    if req.n_factors:
+        n_factors = min(req.n_factors, len(valid_vars))
+    else:
+        # Kaiser criterion: eigenvalues > 1
+        n_factors = max(1, sum(eigenvalues > 1))
+    
+    # Run PCA with determined factors
+    pca = PCA(n_components=n_factors)
+    factor_scores = pca.fit_transform(X_scaled)
+    loadings = pca.components_.T  # Variables x Factors
+    
+    # Calculate variance explained
+    explained_variance = pca.explained_variance_ratio_
+    cumulative_variance = np.cumsum(explained_variance)
+    
+    # Determine communalities
+    communalities = np.sum(loadings ** 2, axis=1)
+    
+    # Apply rotation if requested (simplified varimax)
+    if req.rotation == "varimax" and n_factors > 1:
+        # Simple varimax approximation
+        rotated_loadings = loadings.copy()
+        for _ in range(10):
+            for i in range(n_factors):
+                for j in range(i + 1, n_factors):
+                    # Calculate rotation angle
+                    u = rotated_loadings[:, i] ** 2 - rotated_loadings[:, j] ** 2
+                    v = 2 * rotated_loadings[:, i] * rotated_loadings[:, j]
+                    A = np.sum(u)
+                    B = np.sum(v)
+                    C = np.sum(u ** 2 - v ** 2)
+                    D = np.sum(2 * u * v)
+                    
+                    if C ** 2 + D ** 2 > 1e-10:
+                        phi = 0.25 * np.arctan2(D, C)
+                        cos_phi = np.cos(phi)
+                        sin_phi = np.sin(phi)
+                        
+                        temp_i = rotated_loadings[:, i] * cos_phi + rotated_loadings[:, j] * sin_phi
+                        temp_j = -rotated_loadings[:, i] * sin_phi + rotated_loadings[:, j] * cos_phi
+                        rotated_loadings[:, i] = temp_i
+                        rotated_loadings[:, j] = temp_j
+        loadings = rotated_loadings
+    
+    # Build loading matrix
+    loading_matrix = {}
+    for i, var in enumerate(valid_vars):
+        loading_matrix[var] = {
+            f"Factor_{j+1}": round(float(loadings[i, j]), 4) 
+            for j in range(n_factors)
+        }
+        loading_matrix[var]["communality"] = round(float(communalities[i]), 4)
+    
+    # Scree plot data
+    scree_data = [
+        {
+            "component": i + 1,
+            "eigenvalue": round(float(eigenvalues[i]), 4),
+            "variance_explained": round(float(pca_full.explained_variance_ratio_[i] * 100), 2),
+            "cumulative_variance": round(float(np.cumsum(pca_full.explained_variance_ratio_)[i] * 100), 2)
+        }
+        for i in range(min(len(eigenvalues), 10))
+    ]
+    
+    # KMO and Bartlett test approximation
+    corr_matrix = np.corrcoef(df_numeric.values.T)
+    det_corr = np.linalg.det(corr_matrix) if np.abs(np.linalg.det(corr_matrix)) > 1e-10 else 1e-10
+    n_vars = len(valid_vars)
+    n_obs = len(df_numeric)
+    
+    # Chi-square for Bartlett's test
+    bartlett_chi2 = -((n_obs - 1) - (2 * n_vars + 5) / 6) * np.log(det_corr)
+    bartlett_df = n_vars * (n_vars - 1) / 2
+    bartlett_p = 1 - scipy_stats.chi2.cdf(bartlett_chi2, bartlett_df) if bartlett_chi2 > 0 else 1.0
+    
+    # Simplified KMO
+    inv_corr = np.linalg.pinv(corr_matrix)
+    partial_corr = -inv_corr / np.sqrt(np.outer(np.diag(inv_corr), np.diag(inv_corr)))
+    np.fill_diagonal(partial_corr, 0)
+    
+    r_sq_sum = np.sum(corr_matrix ** 2) - n_vars
+    q_sq_sum = np.sum(partial_corr ** 2)
+    kmo = r_sq_sum / (r_sq_sum + q_sq_sum) if (r_sq_sum + q_sq_sum) > 0 else 0
+    
+    # KMO interpretation
+    if kmo >= 0.9:
+        kmo_interp = "Marvelous"
+    elif kmo >= 0.8:
+        kmo_interp = "Meritorious"
+    elif kmo >= 0.7:
+        kmo_interp = "Middling"
+    elif kmo >= 0.6:
+        kmo_interp = "Mediocre"
+    elif kmo >= 0.5:
+        kmo_interp = "Miserable"
+    else:
+        kmo_interp = "Unacceptable"
+    
+    return {
+        "n_observations": len(df_numeric),
+        "n_variables": len(valid_vars),
+        "n_factors": n_factors,
+        "rotation": req.rotation,
+        "kmo": {
+            "value": round(float(kmo), 4),
+            "interpretation": kmo_interp
+        },
+        "bartlett_test": {
+            "chi_square": round(float(bartlett_chi2), 2),
+            "df": int(bartlett_df),
+            "p_value": round(float(bartlett_p), 4),
+            "significant": bartlett_p < 0.05
+        },
+        "variance_explained": {
+            "by_factor": [round(float(v * 100), 2) for v in explained_variance],
+            "cumulative": [round(float(v * 100), 2) for v in cumulative_variance],
+            "total": round(float(cumulative_variance[-1] * 100), 2)
+        },
+        "loading_matrix": loading_matrix,
+        "scree_plot": scree_data,
+        "factor_interpretation": [
+            {
+                "factor": f"Factor_{i+1}",
+                "high_loading_variables": [
+                    {"variable": var, "loading": round(float(loadings[j, i]), 4)}
+                    for j, var in enumerate(valid_vars)
+                    if abs(loadings[j, i]) >= 0.4
+                ]
+            }
+            for i in range(n_factors)
+        ]
+    }
+
+
 # ============ Regression ============
 
 @router.post("/regression")
