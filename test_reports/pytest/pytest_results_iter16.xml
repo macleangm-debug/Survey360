@@ -1,55 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="18" failures="0" skipped="0" tests="18" time="5.055" timestamp="2026-02-07T10:21:54.274445+00:00" hostname="agent-env-e8a1c69a-cb31-46da-bfc0-b859a1ea1dea"><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_browse_responses_success" time="0.352"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_browse_responses_with_status_filter" time="0.259"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_browse_responses_pagination" time="0.264"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_quick_stats_success" time="0.259"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_quick_stats_numeric_variable" time="0.260"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_quick_stats_categorical_variable" time="0.261"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_crosstab_success" time="0.260"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_descriptives_with_normality" time="0.296"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_list_snapshots" time="0.260"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_create_snapshot" time="0.258"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_csv" time="0.254"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_excel" time="0.260"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_parquet" time="0.258"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_spss" time="0.262"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_stata" time="0.259"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_ai_copilot_analyze" time="0.257"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_ai_copilot_history" time="0.256"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_forms_list_with_org_query_param" time="0.300"><error message="failed on setup with &quot;AssertionError: No token in login response&#10;assert None&quot;">tests/test_data_analysis_iter16.py:35: in setup
-    assert token, "No token in login response"
-E   AssertionError: No token in login response
-E   assert None</error></testcase></testsuite></testsuites>
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="18" time="7.924" timestamp="2026-02-07T10:22:13.825673+00:00" hostname="agent-env-e8a1c69a-cb31-46da-bfc0-b859a1ea1dea"><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_browse_responses_success" time="0.320" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_browse_responses_with_status_filter" time="0.270" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_browse_responses_pagination" time="0.266" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_quick_stats_success" time="0.266" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_quick_stats_numeric_variable" time="0.269" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_quick_stats_categorical_variable" time="0.270" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_crosstab_success" time="0.358" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_descriptives_with_normality" time="0.274" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_list_snapshots" time="0.269" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_create_snapshot" time="0.281" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_csv" time="0.275" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_excel" time="0.481" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_parquet" time="0.273"><failure message="AssertionError: Export Parquet unexpected status: 520&#10;assert 520 in [200, 404]&#10; +  where 520 = &lt;Response [520]&gt;.status_code">tests/test_data_analysis_iter16.py:291: in test_export_parquet
+    assert response.status_code in [200, 404], f"Export Parquet unexpected status: {response.status_code}"
+E   AssertionError: Export Parquet unexpected status: 520
+E   assert 520 in [200, 404]
+E    +  where 520 = &lt;Response [520]&gt;.status_code</failure></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_spss" time="0.348"><failure message="AssertionError: Export SPSS unexpected status: 520&#10;assert 520 in [200, 404, 500]&#10; +  where 520 = &lt;Response [520]&gt;.status_code">tests/test_data_analysis_iter16.py:305: in test_export_spss
+    assert response.status_code in [200, 404, 500], f"Export SPSS unexpected status: {response.status_code}"
+E   AssertionError: Export SPSS unexpected status: 520
+E   assert 520 in [200, 404, 500]
+E    +  where 520 = &lt;Response [520]&gt;.status_code</failure></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_export_stata" time="0.274"><failure message="AssertionError: Export Stata unexpected status: 520&#10;assert 520 in [200, 404, 500]&#10; +  where 520 = &lt;Response [520]&gt;.status_code">tests/test_data_analysis_iter16.py:320: in test_export_stata
+    assert response.status_code in [200, 404, 500], f"Export Stata unexpected status: {response.status_code}"
+E   AssertionError: Export Stata unexpected status: 520
+E   assert 520 in [200, 404, 500]
+E    +  where 520 = &lt;Response [520]&gt;.status_code</failure></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_ai_copilot_analyze" time="2.767"><failure message="AssertionError: AI analyze unexpected status: 520&#10;assert 520 in [200, 500]&#10; +  where 520 = &lt;Response [520]&gt;.status_code">tests/test_data_analysis_iter16.py:336: in test_ai_copilot_analyze
+    assert response.status_code in [200, 500], f"AI analyze unexpected status: {response.status_code}"
+E   AssertionError: AI analyze unexpected status: 520
+E   assert 520 in [200, 500]
+E    +  where 520 = &lt;Response [520]&gt;.status_code</failure></testcase><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_ai_copilot_history" time="0.284" /><testcase classname="tests.test_data_analysis_iter16.TestDataAnalysisModule" name="test_forms_list_with_org_query_param" time="0.268" /></testsuite></testsuites>
