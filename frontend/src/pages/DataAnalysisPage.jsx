@@ -790,6 +790,17 @@ export function DataAnalysisPage() {
             )}
           </TabsContent>
 
+          {/* Dashboards Tab */}
+          <TabsContent value="dashboards" className="space-y-4">
+            <DashboardBuilder
+              formId={selectedFormId}
+              snapshotId={selectedSnapshotId}
+              orgId={currentOrg?.id}
+              fields={formFields}
+              getToken={getToken}
+            />
+          </TabsContent>
+
           {/* AI Copilot Tab - Enhanced */}
           <TabsContent value="ai" className="space-y-4">
             {selectedFormId ? (
