@@ -111,6 +111,9 @@ api_router.include_router(analysis_router)
 api_router.include_router(stats_router)
 api_router.include_router(ai_copilot_router)
 api_router.include_router(analysis_export_router)
+api_router.include_router(report_router)
+api_router.include_router(reproducibility_router)
+api_router.include_router(survey_stats_router)
 
 
 # Health check endpoint
