@@ -210,10 +210,10 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
                 </div>
                 <div>
                   <Label>Group By (optional)</Label>
-                  <Select value={meanConfig.by_group} onValueChange={v => setMeanConfig({...meanConfig, by_group: v})}>
+                  <Select value={meanConfig.by_group || "none"} onValueChange={v => setMeanConfig({...meanConfig, by_group: v === "none" ? "" : v})}>
                     <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {categoricalFields.map(f => <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>)}
                     </SelectContent>
                   </Select>
