@@ -603,7 +603,7 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
   - Frontend UI in AdvancedStatsPanel
 - ✅ Margins/Predicted Probabilities - `/api/models/margins`
 - ✅ Predictions endpoint - `/api/models/predict`
-- 🔲 Frontend UI for GLM/Mixed Models (next)
+- ✅ Frontend UI for GLM/Mixed Models in AdvancedStatsPanel
 
 ### Phase 8: Future Enhancements (Backlog)
 - Factor Analysis visualization
@@ -612,6 +612,7 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 - Dashboard sharing and permissions UI
 - Full audit trail implementation
 - Role-gating for sensitive analysis features
+- Drill-down capability for dashboards
 
 ---
 
@@ -627,6 +628,11 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 - Created new Zustand store with persist middleware
 - Persists: selectedFormId, selectedSnapshotId, activeTab, selectedVariables
 - Form selection now maintained when switching between analysis tabs
+
+### Issue #3: GLM Link Function Empty Value Bug ✅
+- **File**: `/app/frontend/src/components/analysis/AdvancedStatsPanel.jsx` (Line 658)
+- Changed SelectItem value from empty string to "default"
+- Updated API call to handle "default" value properly
 
 ---
 
