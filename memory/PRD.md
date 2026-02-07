@@ -579,16 +579,55 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 
 ## UPCOMING PHASES (Backlog)
 
-### Phase 6: Interactive Dashboards
-- Drag-and-drop dashboard builder
-- Filter controls (region, wave, gender)
-- Drill-down capability
-- Share permissions (viewer vs analyst)
-- Dashboard refresh against snapshots
+### Phase 6: Interactive Dashboards (BACKEND COMPLETE - Feb 7, 2026)
+- ✅ Dashboard CRUD endpoints (`/api/dashboards/*`)
+- ✅ Widget system (stat, chart, table, text types)
+- ✅ Filter controls with options retrieval
+- ✅ Dashboard data computation with applied filters
+- ✅ Share permissions (viewer, editor, public with password)
+- 🔲 Frontend Dashboard Builder UI (next)
+- 🔲 Drag-and-drop widget placement
+- 🔲 Drill-down capability
 
-### Phase 7: Advanced Features
-- Mixed models / Multilevel regression
-- Poisson / Negative Binomial / GLM
-- Margins and predicted probabilities plots
+### Phase 7: Advanced Models (BACKEND COMPLETE - Feb 7, 2026)
+- ✅ GLM (Generalized Linear Models) - `/api/models/glm`
+  - Gaussian, Binomial, Poisson, Gamma, Inverse Gaussian, Negative Binomial families
+  - Customizable link functions
+  - Offset/exposure support
+- ✅ Mixed Models (LMM) - `/api/models/mixed`
+  - Random intercepts and slopes
+  - ICC calculation
+  - REML estimation
+- ✅ Margins/Predicted Probabilities - `/api/models/margins`
+- ✅ Predictions endpoint - `/api/models/predict`
+- 🔲 Frontend UI for GLM/Mixed Models (next)
+
+### Phase 8: Future Enhancements (Backlog)
 - Factor Analysis visualization
-- Missing data imputation
+- Missing data imputation UI
+- Violin plots, coefficient plots, heatmaps
+- Dashboard sharing and permissions UI
+- Full audit trail implementation
+- Role-gating for sensitive analysis features
+
+---
+
+## BUG FIXES (Feb 7, 2026)
+
+### Issue #1: T-Test Validation for >2 Groups ✅
+- **File**: `/app/backend/routes/stats_routes.py` (Lines 293-304)
+- Added validation for independent samples t-test
+- Returns user-friendly error: "Independent samples t-test requires exactly 2 groups... Please use ANOVA for 3+ groups"
+
+### Issue #2: Form Selection State Persistence ✅
+- **Store**: `/app/frontend/src/store/index.js` (useAnalysisStore)
+- Created new Zustand store with persist middleware
+- Persists: selectedFormId, selectedSnapshotId, activeTab, selectedVariables
+- Form selection now maintained when switching between analysis tabs
+
+---
+
+## Test Credentials
+- **Email**: demo@datapulse.io
+- **Password**: Test123!
+- **Org**: ACME Research (a07e901a-bd5f-450d-8533-ed4f7ec629a5)
