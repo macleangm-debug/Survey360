@@ -599,7 +599,7 @@ async def compute_design_effects_report(request: Request, req: DesignEffectsRequ
     design_info = apply_survey_design(df, design)
     
     effects = []
-    for var in variables:
+    for var in req.variables:
         if var not in df.columns:
             continue
         
