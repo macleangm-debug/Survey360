@@ -336,6 +336,49 @@ export function AdvancedStatsPanel({
     }
   };
 
+  const runFactorAnalysis = async () => {
+    if (faConfig.variables.length < 3) {
+      toast.error('Please select at least 3 variables');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/stats/factor-analysis`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          snapshot_id: snapshotId || null,
+          form_id: snapshotId ? null : formId,
+          org_id: orgId,
+          variables: faConfig.variables,
+          n_factors: faConfig.nFactors ? parseInt(faConfig.nFactors) : null,
+          rotation: faConfig.rotation
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.error) {
+          toast.error(data.error);
+        } else {
+          setResults({ type: 'factor', data });
+          toast.success('Factor analysis completed');
+        }
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Factor analysis failed');
+      }
+    } catch (error) {
+      toast.error('Factor analysis failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderResults = () => {
     if (!results) return null;
 
@@ -352,6 +395,8 @@ export function AdvancedStatsPanel({
         return <GLMResults data={results.data} />;
       case 'mixed':
         return <MixedModelResults data={results.data} />;
+      case 'factor':
+        return <FactorAnalysisResults data={results.data} />;
       default:
         return null;
     }
@@ -370,13 +415,14 @@ export function AdvancedStatsPanel({
         </CardHeader>
         <CardContent>
           <Tabs value={activeTest} onValueChange={setActiveTest}>
-            <TabsList className="grid grid-cols-6 w-full">
+            <TabsList className="grid grid-cols-7 w-full">
               <TabsTrigger value="ttest">T-Test</TabsTrigger>
               <TabsTrigger value="anova">ANOVA</TabsTrigger>
-              <TabsTrigger value="correlation">Correlation</TabsTrigger>
-              <TabsTrigger value="regression">Regression</TabsTrigger>
+              <TabsTrigger value="correlation">Corr</TabsTrigger>
+              <TabsTrigger value="regression">Reg</TabsTrigger>
               <TabsTrigger value="glm">GLM</TabsTrigger>
               <TabsTrigger value="mixed">Mixed</TabsTrigger>
+              <TabsTrigger value="factor">EFA</TabsTrigger>
             </TabsList>
 
             {/* T-Test Configuration */}
