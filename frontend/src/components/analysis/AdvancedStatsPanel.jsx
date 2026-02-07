@@ -621,6 +621,167 @@ export function AdvancedStatsPanel({
                 </Button>
               </div>
             </TabsContent>
+
+            {/* GLM Configuration */}
+            <TabsContent value="glm" className="space-y-4 mt-4">
+              <div className="space-y-3">
+                <div>
+                  <Label>Family (Distribution)</Label>
+                  <Select 
+                    value={glmConfig.family} 
+                    onValueChange={(v) => setGlmConfig({...glmConfig, family: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gaussian">Gaussian (Normal)</SelectItem>
+                      <SelectItem value="binomial">Binomial (Logistic)</SelectItem>
+                      <SelectItem value="poisson">Poisson (Count)</SelectItem>
+                      <SelectItem value="gamma">Gamma</SelectItem>
+                      <SelectItem value="inverse_gaussian">Inverse Gaussian</SelectItem>
+                      <SelectItem value="negative_binomial">Negative Binomial</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Link Function (Optional)</Label>
+                  <Select 
+                    value={glmConfig.link} 
+                    onValueChange={(v) => setGlmConfig({...glmConfig, link: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Default for family" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Default</SelectItem>
+                      <SelectItem value="identity">Identity</SelectItem>
+                      <SelectItem value="log">Log</SelectItem>
+                      <SelectItem value="logit">Logit</SelectItem>
+                      <SelectItem value="probit">Probit</SelectItem>
+                      <SelectItem value="inverse">Inverse</SelectItem>
+                      <SelectItem value="sqrt">Square Root</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Dependent Variable (Y)</Label>
+                  <Select 
+                    value={glmConfig.dependentVar} 
+                    onValueChange={(v) => setGlmConfig({...glmConfig, dependentVar: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select outcome..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {numericFields.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Independent Variables (X)</Label>
+                  <ScrollArea className="h-[120px] border rounded-md p-2">
+                    {fields.filter(f => f.id !== glmConfig.dependentVar).map(f => (
+                      <div key={f.id} className="flex items-center space-x-2 py-1">
+                        <Checkbox 
+                          id={`glm-${f.id}`}
+                          checked={glmConfig.independentVars.includes(f.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setGlmConfig({...glmConfig, independentVars: [...glmConfig.independentVars, f.id]});
+                            } else {
+                              setGlmConfig({...glmConfig, independentVars: glmConfig.independentVars.filter(v => v !== f.id)});
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`glm-${f.id}`} className="text-sm">{f.label || f.id}</Label>
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+
+                <Button onClick={runGLM} disabled={loading} className="w-full">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Run GLM
+                </Button>
+              </div>
+            </TabsContent>
+
+            {/* Mixed Models Configuration */}
+            <TabsContent value="mixed" className="space-y-4 mt-4">
+              <div className="space-y-3">
+                <div>
+                  <Label>Dependent Variable (Y)</Label>
+                  <Select 
+                    value={mixedConfig.dependentVar} 
+                    onValueChange={(v) => setMixedConfig({...mixedConfig, dependentVar: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select outcome..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {numericFields.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Grouping Variable (Clusters)</Label>
+                  <Select 
+                    value={mixedConfig.groupVar} 
+                    onValueChange={(v) => setMixedConfig({...mixedConfig, groupVar: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select cluster variable..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoricalFields.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Fixed Effects</Label>
+                  <ScrollArea className="h-[100px] border rounded-md p-2">
+                    {fields.filter(f => f.id !== mixedConfig.dependentVar && f.id !== mixedConfig.groupVar).map(f => (
+                      <div key={f.id} className="flex items-center space-x-2 py-1">
+                        <Checkbox 
+                          id={`fixed-${f.id}`}
+                          checked={mixedConfig.fixedEffects.includes(f.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setMixedConfig({...mixedConfig, fixedEffects: [...mixedConfig.fixedEffects, f.id]});
+                            } else {
+                              setMixedConfig({...mixedConfig, fixedEffects: mixedConfig.fixedEffects.filter(v => v !== f.id)});
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`fixed-${f.id}`} className="text-sm">{f.label || f.id}</Label>
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+
+                <div className="bg-slate-50 p-2 rounded text-xs text-slate-600">
+                  <Info className="h-3 w-3 inline mr-1" />
+                  Mixed models estimate random intercepts for each group. The ICC (Intraclass Correlation) shows variance attributed to grouping.
+                </div>
+
+                <Button onClick={runMixedModel} disabled={loading} className="w-full">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Run Mixed Model
+                </Button>
+              </div>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
