@@ -41,10 +41,14 @@ import {
   AlertCircle,
   Clock,
   HelpCircle,
-  Send
+  Send,
+  Settings2,
+  Columns,
+  ArrowRightLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore, useOrgStore } from '../store';
+import { AdvancedStatsPanel } from '../components/analysis/AdvancedStatsPanel';
 import {
   BarChart,
   Bar,
