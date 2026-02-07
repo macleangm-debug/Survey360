@@ -270,7 +270,7 @@ export function AdvancedStatsPanel({
           dependent_var: glmConfig.dependentVar,
           independent_vars: glmConfig.independentVars,
           family: glmConfig.family,
-          link: glmConfig.link || null
+          link: glmConfig.link && glmConfig.link !== 'default' ? glmConfig.link : null
         })
       });
 
