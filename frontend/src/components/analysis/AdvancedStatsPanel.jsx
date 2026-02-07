@@ -835,6 +835,69 @@ export function AdvancedStatsPanel({
                 </Button>
               </div>
             </TabsContent>
+
+            {/* Factor Analysis Configuration */}
+            <TabsContent value="factor" className="space-y-4 mt-4">
+              <div className="space-y-3">
+                <div>
+                  <Label>Variables ({faConfig.variables.length} selected)</Label>
+                  <ScrollArea className="h-[150px] border rounded-md p-2 mt-1">
+                    {numericFields.map(f => (
+                      <div key={f.id} className="flex items-center space-x-2 py-1">
+                        <Checkbox 
+                          id={`fa-${f.id}`}
+                          checked={faConfig.variables.includes(f.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFaConfig({...faConfig, variables: [...faConfig.variables, f.id]});
+                            } else {
+                              setFaConfig({...faConfig, variables: faConfig.variables.filter(v => v !== f.id)});
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`fa-${f.id}`} className="text-sm">{f.label || f.id}</Label>
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+
+                <div>
+                  <Label>Number of Factors</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max={faConfig.variables.length}
+                    value={faConfig.nFactors}
+                    onChange={e => setFaConfig({...faConfig, nFactors: e.target.value})}
+                    placeholder="Auto (Kaiser criterion)"
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label>Rotation Method</Label>
+                  <Select value={faConfig.rotation} onValueChange={v => setFaConfig({...faConfig, rotation: v})}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="varimax">Varimax (orthogonal)</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="bg-slate-50 p-2 rounded text-xs text-slate-600">
+                  <Info className="h-3 w-3 inline mr-1" />
+                  Factor analysis identifies latent constructs underlying your variables. Requires at least 3 numeric variables and 50+ observations.
+                </div>
+
+                <Button onClick={runFactorAnalysis} disabled={loading || faConfig.variables.length < 3} className="w-full">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Run Factor Analysis
+                </Button>
+              </div>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
