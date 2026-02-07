@@ -79,11 +79,21 @@ export function DataAnalysisPage() {
   const { user } = useAuthStore();
   const { currentOrg } = useOrgStore();
   
-  const [activeTab, setActiveTab] = useState('browse');
+  // Use analysis store for persisted state
+  const {
+    selectedFormId,
+    selectedSnapshotId,
+    activeTab,
+    selectedVariables,
+    setSelectedForm,
+    setSelectedSnapshot,
+    setActiveTab,
+    setSelectedVariables,
+    toggleVariable
+  } = useAnalysisStore();
+  
   const [forms, setForms] = useState([]);
-  const [selectedForm, setSelectedForm] = useState('');
   const [snapshots, setSnapshots] = useState([]);
-  const [selectedSnapshot, setSelectedSnapshot] = useState('');
   const [loading, setLoading] = useState(false);
   
   // Browse state
@@ -92,8 +102,7 @@ export function DataAnalysisPage() {
   const [totalResponses, setTotalResponses] = useState(0);
   const [filters, setFilters] = useState({});
   
-  // Stats state
-  const [selectedVariables, setSelectedVariables] = useState([]);
+  // Stats state (selectedVariables now comes from store)
   const [statsResults, setStatsResults] = useState(null);
   
   // AI Copilot state
