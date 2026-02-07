@@ -68,6 +68,9 @@ from routes.analysis_routes import router as analysis_router
 from routes.stats_routes import router as stats_router
 from routes.ai_copilot_routes import router as ai_copilot_router
 from routes.analysis_export_routes import router as analysis_export_router
+from routes.report_routes import router as report_router
+from routes.reproducibility_routes import router as reproducibility_router
+from routes.survey_stats_routes import router as survey_stats_router
 
 # Include all route modules
 api_router.include_router(auth_router)
