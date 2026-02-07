@@ -664,7 +664,7 @@ async def run_factor_analysis(
     
     # Run PCA with determined factors
     pca = PCA(n_components=n_factors)
-    factor_scores = pca.fit_transform(X_scaled)
+    pca.fit_transform(X_scaled)  # Fit the model
     loadings = pca.components_.T  # Variables x Factors
     
     # Calculate variance explained
@@ -684,8 +684,6 @@ async def run_factor_analysis(
                     # Calculate rotation angle
                     u = rotated_loadings[:, i] ** 2 - rotated_loadings[:, j] ** 2
                     v = 2 * rotated_loadings[:, i] * rotated_loadings[:, j]
-                    A = np.sum(u)
-                    B = np.sum(v)
                     C = np.sum(u ** 2 - v ** 2)
                     D = np.sum(2 * u * v)
                     
