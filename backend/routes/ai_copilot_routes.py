@@ -450,7 +450,7 @@ async def generate_narrative(
         return {"error": "Analysis has no results to narrate"}
     
     try:
-        from emergentintegrations.llm.chat import chat, UserMessage, SystemMessage
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
         
         style_instructions = {
             "executive": "Write a brief executive summary (2-3 paragraphs) highlighting key findings and implications.",
@@ -479,7 +479,7 @@ Format your response as:
     ]
 }}"""
 
-        user_message = f"""Analysis Query: {analysis.get('query')}
+        user_content = f"""Analysis Query: {analysis.get('query')}
 
 Analysis Method: {analysis.get('analysis_plan', {}).get('statistical_method', 'Unknown')}
 
@@ -488,15 +488,16 @@ Results:
 
 Generate a {req.style} narrative for these results."""
 
-        response = await chat(
+        # Initialize chat with system message
+        narrative_id = f"narrative_{req.analysis_id}_{int(datetime.now(timezone.utc).timestamp())}"
+        chat = LlmChat(
             api_key=api_key,
-            model="gpt-5.2",
-            messages=[
-                SystemMessage(content=system_prompt),
-                UserMessage(content=user_message)
-            ],
-            temperature=0.3
-        )
+            session_id=narrative_id,
+            system_message=system_prompt
+        ).with_model("openai", "gpt-5.2")
+        
+        # Send user message
+        response = await chat.send_message(UserMessage(text=user_content))
         
         # Parse response
         try:
