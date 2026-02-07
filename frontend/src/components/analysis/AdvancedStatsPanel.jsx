@@ -1163,4 +1163,217 @@ function RegressionResults({ data }) {
   );
 }
 
+// GLM Results Component
+function GLMResults({ data }) {
+  if (data.error) {
+    return (
+      <div className="p-4 bg-red-50 rounded-lg flex items-center gap-2">
+        <AlertCircle className="h-5 w-5 text-red-600" />
+        <span className="text-red-700">{data.error}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        <Badge>{data.model_type}</Badge>
+        <Badge variant="outline">Family: {data.family}</Badge>
+        <Badge variant="outline">Link: {data.link}</Badge>
+      </div>
+
+      <Separator />
+
+      {/* Model Fit */}
+      <h4 className="font-medium">Model Fit</h4>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">N</p>
+          <p className="text-lg font-semibold">{data.model_fit?.n}</p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">Deviance</p>
+          <p className="text-lg font-semibold">{data.model_fit?.deviance?.toFixed(2)}</p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">AIC</p>
+          <p className="text-lg font-semibold">{data.model_fit?.aic?.toFixed(2)}</p>
+        </div>
+        {data.model_fit?.pseudo_r_squared !== undefined && (
+          <div className="p-3 bg-sky-50 rounded">
+            <p className="text-sm text-slate-500">Pseudo R²</p>
+            <p className="text-lg font-semibold">{data.model_fit.pseudo_r_squared?.toFixed(4)}</p>
+          </div>
+        )}
+      </div>
+
+      <Separator />
+
+      {/* Coefficients */}
+      <h4 className="font-medium">Coefficients</h4>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-slate-50">
+              <th className="p-2 text-left">Variable</th>
+              <th className="p-2 text-right">Coef</th>
+              <th className="p-2 text-right">SE</th>
+              <th className="p-2 text-right">z</th>
+              <th className="p-2 text-right">p-value</th>
+              <th className="p-2 text-center">95% CI</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.coefficients && Object.entries(data.coefficients).map(([varName, coef]) => (
+              <tr key={varName} className={`border-b ${coef.significant ? 'bg-sky-50/50' : ''}`}>
+                <td className="p-2 font-medium">{varName}</td>
+                <td className="p-2 text-right">{coef.coefficient?.toFixed(4)}</td>
+                <td className="p-2 text-right">{coef.std_error?.toFixed(4)}</td>
+                <td className="p-2 text-right">{coef.z_value?.toFixed(3)}</td>
+                <td className="p-2 text-right">
+                  {coef.p_value < 0.001 ? '< .001' : coef.p_value?.toFixed(4)}
+                </td>
+                <td className="p-2 text-center text-xs">
+                  [{coef.conf_int?.lower?.toFixed(3)}, {coef.conf_int?.upper?.toFixed(3)}]
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="p-3 bg-blue-50 rounded-lg flex items-start gap-2">
+        <Info className="h-4 w-4 text-blue-600 mt-0.5" />
+        <p className="text-sm text-blue-800">
+          GLM extends linear regression to non-normal distributions. Highlighted rows are significant at p &lt; 0.05.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Mixed Model Results Component
+function MixedModelResults({ data }) {
+  if (data.error) {
+    return (
+      <div className="p-4 bg-red-50 rounded-lg flex items-center gap-2">
+        <AlertCircle className="h-5 w-5 text-red-600" />
+        <span className="text-red-700">{data.error}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Badge>{data.model_type}</Badge>
+        <Badge variant="outline">Groups: {data.random_effects?.n_groups}</Badge>
+        {data.model_fit?.converged && (
+          <Badge className="bg-emerald-100 text-emerald-700">Converged</Badge>
+        )}
+      </div>
+
+      <Separator />
+
+      {/* Model Fit */}
+      <h4 className="font-medium">Model Fit</h4>
+      <div className="grid grid-cols-4 gap-3">
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">N</p>
+          <p className="text-lg font-semibold">{data.model_fit?.n}</p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">Groups</p>
+          <p className="text-lg font-semibold">{data.model_fit?.n_groups}</p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">AIC</p>
+          <p className="text-lg font-semibold">{data.model_fit?.aic?.toFixed(2)}</p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">BIC</p>
+          <p className="text-lg font-semibold">{data.model_fit?.bic?.toFixed(2)}</p>
+        </div>
+      </div>
+
+      {/* ICC */}
+      {data.random_effects?.icc !== null && (
+        <div className="p-4 bg-sky-50 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-sky-900">Intraclass Correlation (ICC)</p>
+              <p className="text-sm text-sky-700">Variance explained by grouping</p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-sky-600">{(data.random_effects.icc * 100).toFixed(1)}%</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Separator />
+
+      {/* Fixed Effects */}
+      <h4 className="font-medium">Fixed Effects</h4>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-slate-50">
+              <th className="p-2 text-left">Variable</th>
+              <th className="p-2 text-right">Coef</th>
+              <th className="p-2 text-right">SE</th>
+              <th className="p-2 text-right">z</th>
+              <th className="p-2 text-right">p-value</th>
+              <th className="p-2 text-center">Sig</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.fixed_effects && Object.entries(data.fixed_effects).map(([varName, coef]) => (
+              <tr key={varName} className={`border-b ${coef.significant ? 'bg-sky-50/50' : ''}`}>
+                <td className="p-2 font-medium">{varName}</td>
+                <td className="p-2 text-right">{coef.coefficient?.toFixed(4)}</td>
+                <td className="p-2 text-right">{coef.std_error?.toFixed(4)}</td>
+                <td className="p-2 text-right">{coef.z_value?.toFixed(3)}</td>
+                <td className="p-2 text-right">
+                  {coef.p_value < 0.001 ? '< .001' : coef.p_value?.toFixed(4)}
+                </td>
+                <td className="p-2 text-center">
+                  {coef.significant ? (
+                    <CheckCircle className="h-4 w-4 text-emerald-600 mx-auto" />
+                  ) : (
+                    <span className="text-slate-400">-</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Random Effects Variance */}
+      {data.random_effects?.variance_components && Object.keys(data.random_effects.variance_components).length > 0 && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Random Effects Variance</h4>
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries(data.random_effects.variance_components).map(([name, value]) => (
+              <div key={name} className="p-3 bg-slate-50 rounded">
+                <p className="text-sm text-slate-500">{name}</p>
+                <p className="font-semibold">{value?.toFixed(4)}</p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="p-3 bg-purple-50 rounded-lg flex items-start gap-2">
+        <Info className="h-4 w-4 text-purple-600 mt-0.5" />
+        <p className="text-sm text-purple-800">
+          Mixed models account for clustering/nesting in data. ICC indicates what proportion of variance is between groups vs within groups.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default AdvancedStatsPanel;
