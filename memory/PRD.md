@@ -482,15 +482,91 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 
 ---
 
+## DATA ANALYSIS MODULE - PHASE 4 (COMPLETE - Feb 7, 2026)
+
+### Features Implemented
+
+#### 1. Report Builder ✅
+- **Backend**: `/app/backend/routes/report_routes.py`
+- **Frontend**: `/app/frontend/src/components/analysis/ReportBuilder.jsx`
+- Create reports with multiple sections (Text, Table, Chart, Page Break)
+- Report templates (Summary, Detailed Analysis)
+- Export formats: PDF (WeasyPrint), Word (python-docx), HTML
+- Auto-include methodology and appendix
+- Report metadata: title, subtitle, author
+
+#### 2. Reproducibility Pack ✅
+- **Backend**: `/app/backend/routes/reproducibility_routes.py`
+- One-click export of complete analysis bundle
+- ZIP contains:
+  - README.md with instructions
+  - data/dataset.csv and dataset.json
+  - documentation/codebook.md and schema.json
+  - analyses/*.json (AI analyses)
+  - scripts/analysis.py (reproducible Python script)
+  - metadata/pack_info.json and run_log.txt
+- Data anonymization option (strips PII fields)
+- SHA-256 hash for integrity verification
+- Software version logging
+
+### APIs
+- `POST /api/reports` - Create report
+- `GET /api/reports/templates/{org_id}` - List templates
+- `POST /api/reports/generate` - Generate PDF/Word/HTML
+- `POST /api/reproducibility/pack` - Create pack
+- `GET /api/reproducibility/pack/{id}/download` - Download ZIP
+
+---
+
+## DATA ANALYSIS MODULE - PHASE 5 (COMPLETE - Feb 7, 2026)
+
+### Complex Survey Statistics
+
+#### 1. Survey Design Specification ✅
+- Strata variable support
+- PSU/Cluster variable support
+- Sampling weight variable
+- Finite Population Correction (FPC)
+- Nested design support
+
+#### 2. Survey-Weighted Estimates ✅
+- **API**: `/api/survey/mean` - Weighted mean with design-based SE
+- **API**: `/api/survey/proportion` - Weighted proportions with CI
+- **API**: `/api/survey/total` - Population totals with SE
+
+#### 3. Design Effects Reporting ✅
+- **API**: `/api/survey/design-effects`
+- DEFF calculation per variable
+- Effective sample size computation
+- Interpretation (No effect / Low / Moderate / High / Very High)
+
+#### 4. Survey Regression ✅
+- **API**: `/api/survey/regression`
+- Weighted OLS with cluster-robust SE
+- Weighted logistic regression
+- Model fit statistics (R², AIC, BIC)
+- Coefficient table with CI
+
+### Implementation
+- Uses `statsmodels` for weighted regression
+- Cluster-robust SE via `cov_type='cluster'`
+- Stratified SE computation
+- Taylor linearization for variance estimation
+
+---
+
 ## UPCOMING PHASES (Backlog)
 
-### Phase 4: Reporting & Interoperability
-- Report Builder with templates
-- One-click Reproducibility Pack
-- Enhanced metadata preservation for SPSS/Stata round-trip
+### Phase 6: Interactive Dashboards
+- Drag-and-drop dashboard builder
+- Filter controls (region, wave, gender)
+- Drill-down capability
+- Share permissions (viewer vs analyst)
+- Dashboard refresh against snapshots
 
-### Phase 5: Complex Survey Design
-- Survey weights support
-- Stratified sampling analysis
-- Cluster-robust standard errors
-- Design effects reporting
+### Phase 7: Advanced Features
+- Mixed models / Multilevel regression
+- Poisson / Negative Binomial / GLM
+- Margins and predicted probabilities plots
+- Factor Analysis visualization
+- Missing data imputation
