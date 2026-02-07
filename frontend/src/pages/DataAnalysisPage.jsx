@@ -118,10 +118,10 @@ export function DataAnalysisPage() {
   }, [currentOrg?.id]);
 
   useEffect(() => {
-    if (selectedForm) {
+    if (selectedFormId) {
       fetchResponses();
     }
-  }, [selectedForm, responsePage, filters]);
+  }, [selectedFormId, responsePage, filters]);
 
   const getToken = () => {
     // Get token from auth store (persisted in localStorage under 'auth-storage')
