@@ -742,10 +742,10 @@ export function DataAnalysisPage() {
 
           {/* Advanced Statistics Tab */}
           <TabsContent value="advanced" className="space-y-4">
-            {selectedForm ? (
+            {selectedFormId ? (
               <AdvancedStatsPanel
-                formId={selectedForm}
-                snapshotId={selectedSnapshot}
+                formId={selectedFormId}
+                snapshotId={selectedSnapshotId}
                 orgId={currentOrg?.id}
                 fields={formFields}
                 getToken={getToken}
@@ -764,9 +764,9 @@ export function DataAnalysisPage() {
 
           {/* Charts Tab - Chart Studio */}
           <TabsContent value="charts" className="space-y-4">
-            {selectedForm ? (
+            {selectedFormId ? (
               <ChartStudio
-                formId={selectedForm}
+                formId={selectedFormId}
                 orgId={currentOrg?.id}
                 fields={formFields}
                 stats={statsResults}
@@ -786,10 +786,10 @@ export function DataAnalysisPage() {
 
           {/* AI Copilot Tab - Enhanced */}
           <TabsContent value="ai" className="space-y-4">
-            {selectedForm ? (
+            {selectedFormId ? (
               <EnhancedAICopilot
-                formId={selectedForm}
-                snapshotId={selectedSnapshot}
+                formId={selectedFormId}
+                snapshotId={selectedSnapshotId}
                 orgId={currentOrg?.id}
                 fields={formFields}
                 getToken={getToken}
@@ -808,10 +808,10 @@ export function DataAnalysisPage() {
 
           {/* Survey Stats Tab */}
           <TabsContent value="survey" className="space-y-4">
-            {selectedForm ? (
+            {selectedFormId ? (
               <SurveyStatsPanel
-                formId={selectedForm}
-                snapshotId={selectedSnapshot}
+                formId={selectedFormId}
+                snapshotId={selectedSnapshotId}
                 orgId={currentOrg?.id}
                 fields={formFields}
                 getToken={getToken}
@@ -830,10 +830,10 @@ export function DataAnalysisPage() {
 
           {/* Reports Tab */}
           <TabsContent value="reports" className="space-y-4">
-            {selectedForm ? (
+            {selectedFormId ? (
               <ReportBuilder
-                formId={selectedForm}
-                snapshotId={selectedSnapshot}
+                formId={selectedFormId}
+                snapshotId={selectedSnapshotId}
                 orgId={currentOrg?.id}
                 getToken={getToken}
               />
