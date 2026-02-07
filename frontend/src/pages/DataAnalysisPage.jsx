@@ -757,57 +757,49 @@ export function DataAnalysisPage() {
               </CardHeader>
               <CardContent>
                 {statsResults ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {statsResults.variables?.map(varStats => (
-                      <div key={varStats.variable} className="border rounded-lg p-4">
-                        <h4 className="font-medium mb-4">{varStats.label}</h4>
-                        {varStats.type === 'categorical' && varStats.frequencies ? (
-                          <ResponsiveContainer width="100%" height={250}>
-                            <BarChart data={varStats.frequencies.slice(0, 10)}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                              <XAxis dataKey="value" tick={{ fontSize: 12 }} />
-                              <YAxis tick={{ fontSize: 12 }} />
-                              <Tooltip />
-                              <Bar dataKey="count" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        ) : varStats.type === 'numeric' ? (
-                          <div className="flex items-center justify-center h-[250px]">
-                            <div className="text-center">
-                              <p className="text-4xl font-bold text-sky-600">{varStats.mean?.toFixed(1)}</p>
-                              <p className="text-slate-500">Mean</p>
-                              <p className="text-sm text-slate-400 mt-2">
-                                Range: {varStats.min} - {varStats.max}
-                              </p>
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-slate-500">
+          {/* Charts Tab - Chart Studio */}
+          <TabsContent value="charts" className="space-y-4">
+            {selectedForm ? (
+              <ChartStudio
+                formId={selectedForm}
+                orgId={currentOrg?.id}
+                fields={formFields}
+                stats={statsResults}
+                getToken={getToken}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="text-center text-slate-500">
                     <PieChart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Run statistics first to generate charts</p>
+                    <p>Select a form to create charts</p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
-          {/* AI Copilot Tab */}
+          {/* AI Copilot Tab - Enhanced */}
           <TabsContent value="ai" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-sky-500" />
-                  AI Analysis Copilot
-                </CardTitle>
-                <CardDescription>
-                  Ask questions about your data in natural language
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            {selectedForm ? (
+              <EnhancedAICopilot
+                formId={selectedForm}
+                snapshotId={selectedSnapshot}
+                orgId={currentOrg?.id}
+                fields={formFields}
+                getToken={getToken}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="text-center text-slate-500">
+                    <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Select a form to use AI Copilot</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
                 <div className="flex gap-2">
                   <Textarea
                     value={aiQuery}
