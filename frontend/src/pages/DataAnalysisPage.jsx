@@ -380,7 +380,7 @@ export function DataAnalysisPage() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="browse" className="flex items-center gap-2 text-xs">
               <Database className="h-4 w-4" />
               Browse
@@ -404,6 +404,10 @@ export function DataAnalysisPage() {
             <TabsTrigger value="charts" className="flex items-center gap-2 text-xs">
               <PieChart className="h-4 w-4" />
               Charts
+            </TabsTrigger>
+            <TabsTrigger value="dashboards" className="flex items-center gap-2 text-xs">
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboards
             </TabsTrigger>
             <TabsTrigger value="ai" className="flex items-center gap-2 text-xs">
               <Sparkles className="h-4 w-4" />
