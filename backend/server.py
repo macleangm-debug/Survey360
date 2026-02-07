@@ -71,6 +71,8 @@ from routes.analysis_export_routes import router as analysis_export_router
 from routes.report_routes import router as report_router
 from routes.reproducibility_routes import router as reproducibility_router
 from routes.survey_stats_routes import router as survey_stats_router
+from routes.advanced_models_routes import router as advanced_models_router
+from routes.dashboard_builder_routes import router as dashboard_builder_router
 
 # Include all route modules
 api_router.include_router(auth_router)
