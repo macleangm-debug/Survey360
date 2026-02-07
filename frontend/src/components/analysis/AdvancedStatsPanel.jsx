@@ -249,6 +249,86 @@ export function AdvancedStatsPanel({
     }
   };
 
+  const runGLM = async () => {
+    if (!glmConfig.dependentVar || glmConfig.independentVars.length === 0) {
+      toast.error('Please select dependent and independent variables');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/models/glm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          snapshot_id: snapshotId || null,
+          form_id: snapshotId ? null : formId,
+          org_id: orgId,
+          dependent_var: glmConfig.dependentVar,
+          independent_vars: glmConfig.independentVars,
+          family: glmConfig.family,
+          link: glmConfig.link || null
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setResults({ type: 'glm', data });
+        toast.success('GLM completed');
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'GLM failed');
+      }
+    } catch (error) {
+      toast.error('GLM failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const runMixedModel = async () => {
+    if (!mixedConfig.dependentVar || mixedConfig.fixedEffects.length === 0 || !mixedConfig.groupVar) {
+      toast.error('Please select dependent variable, fixed effects, and grouping variable');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/models/mixed`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          snapshot_id: snapshotId || null,
+          form_id: snapshotId ? null : formId,
+          org_id: orgId,
+          dependent_var: mixedConfig.dependentVar,
+          fixed_effects: mixedConfig.fixedEffects,
+          random_effects: mixedConfig.randomEffects.length > 0 ? mixedConfig.randomEffects : ['1'],
+          group_var: mixedConfig.groupVar
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setResults({ type: 'mixed', data });
+        toast.success('Mixed Model completed');
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Mixed Model failed');
+      }
+    } catch (error) {
+      toast.error('Mixed Model failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderResults = () => {
     if (!results) return null;
 
@@ -261,6 +341,10 @@ export function AdvancedStatsPanel({
         return <CorrelationResults data={results.data} />;
       case 'regression':
         return <RegressionResults data={results.data} />;
+      case 'glm':
+        return <GLMResults data={results.data} />;
+      case 'mixed':
+        return <MixedModelResults data={results.data} />;
       default:
         return null;
     }
