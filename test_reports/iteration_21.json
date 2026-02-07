@@ -1,0 +1,84 @@
+{
+  "summary": "Iteration 21 - Report Builder and Reproducibility Pack testing completed successfully. All 16 backend tests passed (100%). Frontend UI verified working with Reports tab containing Reports and Reproducibility sub-tabs.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_reports_repro_iter21.py",
+    "/app/test_reports/pytest/pytest_results_iter21.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Report Builder (report_routes.py) properly uses reportlab for PDF generation instead of WeasyPrint",
+    "PDF generation returns valid %PDF header bytes",
+    "Word (docx) generation returns valid PK (ZIP) header bytes",
+    "HTML generation returns proper text/html content type",
+    "Reproducibility Pack download returns valid ZIP file with README, dataset, metadata folders",
+    "ReportBuilder.jsx correctly implements two sub-tabs: Reports and Reproducibility",
+    "All interactive elements have proper data-testid attributes (create-pack-btn, pack-name-input)",
+    "Pack creation with anonymization option works correctly"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_reports_repro_iter21.py"
+  ],
+  "success_rate": {
+    "backend": "100% (16/16 tests passed)",
+    "frontend": "100% - All UI features verified working"
+  },
+  "test_credentials": {
+    "email": "demo@datapulse.io",
+    "password": "Test123!",
+    "org_id": "a07e901a-bd5f-450d-8533-ed4f7ec629a5"
+  },
+  "seed_data_creation": "Created TEST_UI_Pack_Iter21 reproducibility pack during UI testing",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Report Builder and Reproducibility Pack features are fully functional. Reports tab in Data Analysis page has two sub-tabs. Report export supports PDF (reportlab), Word (python-docx), HTML formats. Reproducibility packs can be created with anonymization option and downloaded as valid ZIP files containing README.md, dataset (CSV/JSON), schema, codebook, scripts, and metadata.",
+  "features_verified": {
+    "report_builder": {
+      "pdf_generation": "PASS - Returns valid PDF with %PDF header, tested via API",
+      "word_generation": "PASS - Returns valid DOCX (ZIP) with PK header, tested via API",
+      "html_generation": "PASS - Returns valid HTML with proper content type, tested via API",
+      "invalid_format_handling": "PASS - Returns 400 for invalid format",
+      "nonexistent_report_handling": "PASS - Returns 404 for non-existent report"
+    },
+    "reproducibility_pack": {
+      "pack_creation": "PASS - Creates pack with hash for integrity verification",
+      "pack_listing": "PASS - Lists packs for organization",
+      "pack_download": "PASS - Downloads valid ZIP with README, data, metadata folders",
+      "anonymization": "PASS - Creates anonymized packs with PII redaction",
+      "nonexistent_pack_handling": "PASS - Returns 404 for non-existent pack"
+    },
+    "frontend_ui": {
+      "reports_tab": "PASS - Reports tab visible in Data Analysis page (10 tabs)",
+      "reports_subtab": "PASS - Reports sub-tab shows Report Builder with Title, Author, Text/Table/Break buttons",
+      "reproducibility_subtab": "PASS - Reproducibility sub-tab shows pack list and Create New Pack form",
+      "export_buttons": "PASS - PDF, Word, HTML export buttons visible",
+      "create_pack_form": "PASS - Pack Name, Description, Include Raw Data, Include Scripts, Anonymize PII options present",
+      "create_pack_button": "PASS - data-testid='create-pack-btn' present and functional",
+      "pack_name_input": "PASS - data-testid='pack-name-input' present and functional",
+      "download_buttons": "PASS - Download buttons appear for existing packs"
+    }
+  },
+  "api_endpoints_tested": {
+    "reports": [
+      "GET /api/reports/templates/{org_id} - List templates",
+      "POST /api/reports - Create report",
+      "GET /api/reports/{org_id} - List reports",
+      "POST /api/reports/generate - Generate PDF/Word/HTML"
+    ],
+    "reproducibility": [
+      "POST /api/reproducibility/pack - Create pack",
+      "GET /api/reproducibility/packs/{org_id} - List packs",
+      "GET /api/reproducibility/pack/{pack_id} - Get pack details",
+      "GET /api/reproducibility/pack/{pack_id}/download - Download ZIP",
+      "DELETE /api/reproducibility/pack/{pack_id} - Delete pack"
+    ]
+  }
+}
