@@ -110,3 +110,41 @@ export const useUIStore = create((set) => ({
   
   setLanguage: (language) => set({ language }),
 }));
+
+// Analysis Store - Persists analysis page state across tabs
+export const useAnalysisStore = create(
+  persist(
+    (set, get) => ({
+      selectedFormId: '',
+      selectedSnapshotId: '',
+      activeTab: 'browse',
+      selectedVariables: [],
+      
+      setSelectedForm: (formId) => set({ selectedFormId: formId }),
+      setSelectedSnapshot: (snapshotId) => set({ selectedSnapshotId: snapshotId }),
+      setActiveTab: (tab) => set({ activeTab: tab }),
+      setSelectedVariables: (variables) => set({ selectedVariables: variables }),
+      
+      // Toggle variable selection
+      toggleVariable: (varId) => {
+        const current = get().selectedVariables;
+        if (current.includes(varId)) {
+          set({ selectedVariables: current.filter(v => v !== varId) });
+        } else {
+          set({ selectedVariables: [...current, varId] });
+        }
+      },
+      
+      // Clear all state
+      clearAnalysisState: () => set({ 
+        selectedFormId: '', 
+        selectedSnapshotId: '', 
+        activeTab: 'browse',
+        selectedVariables: []
+      }),
+    }),
+    {
+      name: 'analysis-storage',
+    }
+  )
+);
