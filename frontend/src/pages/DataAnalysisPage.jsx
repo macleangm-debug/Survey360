@@ -803,6 +803,49 @@ export function DataAnalysisPage() {
             )}
           </TabsContent>
 
+          {/* Survey Stats Tab */}
+          <TabsContent value="survey" className="space-y-4">
+            {selectedForm ? (
+              <SurveyStatsPanel
+                formId={selectedForm}
+                snapshotId={selectedSnapshot}
+                orgId={currentOrg?.id}
+                fields={formFields}
+                getToken={getToken}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="text-center text-slate-500">
+                    <Scale className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Select a form to use Survey Statistics</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Reports Tab */}
+          <TabsContent value="reports" className="space-y-4">
+            {selectedForm ? (
+              <ReportBuilder
+                formId={selectedForm}
+                snapshotId={selectedSnapshot}
+                orgId={currentOrg?.id}
+                getToken={getToken}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="text-center text-slate-500">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Select a form to create reports</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
           {/* Export Tab */}
           <TabsContent value="export" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
