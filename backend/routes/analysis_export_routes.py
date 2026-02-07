@@ -237,16 +237,30 @@ def export_spss(df: pd.DataFrame, labels: Dict) -> StreamingResponse:
     import pyreadstat
     import tempfile
     import os
+    import re
     
-    # Prepare labels
-    column_labels = {col: labels.get(col, {}).get("variable_label", col) for col in df.columns}
+    # Clean column names for SPSS compatibility (must start with letter, only letters/numbers/underscore)
+    df_copy = df.copy()
+    col_mapping = {}
+    for col in df_copy.columns:
+        clean_col = re.sub(r'^[^a-zA-Z]+', '', col)  # Remove leading non-letter chars
+        clean_col = re.sub(r'[^a-zA-Z0-9_]', '_', clean_col)  # Replace invalid chars
+        if not clean_col:
+            clean_col = f"var_{col[:8]}"
+        col_mapping[col] = clean_col
+    
+    df_copy.columns = [col_mapping[c] for c in df_copy.columns]
+    
+    # Prepare labels using cleaned column names
+    column_labels = {}
     value_labels = {}
-    
-    for col in df.columns:
-        col_val_labels = labels.get(col, {}).get("value_labels", {})
+    for orig_col, new_col in col_mapping.items():
+        orig_label = labels.get(orig_col, {}).get("variable_label", orig_col)
+        column_labels[new_col] = orig_label
+        
+        col_val_labels = labels.get(orig_col, {}).get("value_labels", {})
         if col_val_labels:
-            # Convert to proper format
-            value_labels[col] = {str(k): v for k, v in col_val_labels.items()}
+            value_labels[new_col] = {str(k): v for k, v in col_val_labels.items()}
     
     # Write to temp file (pyreadstat doesn't support BytesIO)
     with tempfile.NamedTemporaryFile(suffix='.sav', delete=False) as tmp:
@@ -254,7 +268,7 @@ def export_spss(df: pd.DataFrame, labels: Dict) -> StreamingResponse:
     
     try:
         pyreadstat.write_sav(
-            df,
+            df_copy,
             tmp_path,
             column_labels=column_labels,
             variable_value_labels=value_labels
