@@ -655,7 +655,7 @@ export function AdvancedStatsPanel({
                       <SelectValue placeholder="Default for family" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Default</SelectItem>
+                      <SelectItem value="default">Default</SelectItem>
                       <SelectItem value="identity">Identity</SelectItem>
                       <SelectItem value="log">Log</SelectItem>
                       <SelectItem value="logit">Logit</SelectItem>
