@@ -69,6 +69,22 @@ export function AdvancedStatsPanel({
     robustSE: false
   });
 
+  // GLM state
+  const [glmConfig, setGlmConfig] = useState({
+    dependentVar: '',
+    independentVars: [],
+    family: 'gaussian',
+    link: ''
+  });
+
+  // Mixed Models state
+  const [mixedConfig, setMixedConfig] = useState({
+    dependentVar: '',
+    fixedEffects: [],
+    randomEffects: [],
+    groupVar: ''
+  });
+
   const numericFields = fields.filter(f => f.type === 'number' || f.type === 'integer' || f.type === 'decimal');
   const categoricalFields = fields.filter(f => f.type === 'select' || f.type === 'radio' || f.type === 'text');
 
