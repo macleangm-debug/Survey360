@@ -320,8 +320,8 @@ export function DataAnalysisPage() {
           'Authorization': `Bearer ${getToken()}`
         },
         body: JSON.stringify({
-          snapshot_id: selectedSnapshot || null,
-          form_id: selectedSnapshot ? null : selectedForm,
+          snapshot_id: selectedSnapshotId || null,
+          form_id: selectedSnapshotId ? null : selectedFormId,
           org_id: currentOrg.id,
           format: format,
           include_labels: true,
