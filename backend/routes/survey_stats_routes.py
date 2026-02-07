@@ -576,22 +576,22 @@ def compute_cluster_se_mean(df: pd.DataFrame, var: str, design: SurveyDesign) ->
 
 # ============ Design Effects Report ============
 
+class DesignEffectsRequest(BaseModel):
+    form_id: Optional[str] = None
+    snapshot_id: Optional[str] = None
+    org_id: str
+    variables: List[str]
+    design: Optional[SurveyDesign] = None
+
+
 @router.post("/design-effects")
-async def compute_design_effects_report(
-    request: Request,
-    form_id: Optional[str] = None,
-    snapshot_id: Optional[str] = None,
-    org_id: str = Query(...),
-    variables: List[str] = Query(...),
-    design: SurveyDesign = None
-):
+async def compute_design_effects_report(request: Request, req: DesignEffectsRequest):
     """Compute design effects for multiple variables"""
     db = request.app.state.db
     
-    if design is None:
-        design = SurveyDesign()
+    design = req.design if req.design else SurveyDesign()
     
-    df, schema = await get_survey_data(db, snapshot_id, form_id)
+    df, schema = await get_survey_data(db, req.snapshot_id, req.form_id)
     
     if df.empty:
         return {"error": "No data available"}
