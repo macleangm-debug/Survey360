@@ -14,7 +14,8 @@ import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Separator } from '../ui/separator';
-import { Scale, Layers, Users, TrendingUp, Calculator, Loader2, Info, AlertCircle, CheckCircle } from 'lucide-react';
+import { Slider } from '../ui/slider';
+import { Scale, Layers, Users, TrendingUp, Calculator, Loader2, Info, AlertCircle, CheckCircle, Repeat, Shuffle, Settings2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
