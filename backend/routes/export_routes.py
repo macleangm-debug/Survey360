@@ -457,7 +457,7 @@ input str20 id str30 submitted_by str25 submitted_at str10 status quality_score 
                 row += f'{val if val else 0} '
         do_file += row + "\n"
     
-    do_file += f"""end
+    do_file += """end
 
 * Variable labels
 label variable id "Submission ID"
