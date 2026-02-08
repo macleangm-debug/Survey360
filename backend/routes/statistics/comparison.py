@@ -240,7 +240,6 @@ async def run_ancova(request: Request, req: ANCOVARequest):
             ss_group += (model.params[col] ** 2) * (X[col].var() * len(X))
     
     ss_total = ((y - y.mean()) ** 2).sum()
-    ss_residual = model.ssr
     partial_eta_sq = ss_group / (ss_group + ss_residual) if (ss_group + ss_residual) > 0 else 0
     
     # Group adjusted means
