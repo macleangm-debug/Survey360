@@ -147,6 +147,9 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
     
     setLoading(true);
     try {
+      // Combine regular filters with drill-down filters
+      const combinedFilters = { ...appliedFilters, ...drillDownFilters };
+      
       const response = await fetch(`${API_URL}/api/dashboards/data`, {
         method: 'POST',
         headers: {
@@ -155,7 +158,7 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
         },
         body: JSON.stringify({
           dashboard_id: currentDashboard.id,
-          filters: appliedFilters
+          filters: combinedFilters
         })
       });
       
@@ -168,6 +171,27 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle drill-down click on chart elements
+  const handleDrillDown = (widget, dataPoint) => {
+    if (!dataPoint || !widget.config?.variable) return;
+    
+    const variable = widget.config.variable;
+    const value = dataPoint.name || dataPoint.payload?.name;
+    
+    if (value) {
+      setDrillDownFilters({ [variable]: value });
+      setDrillDownSource({ widgetId: widget.id, variable, value });
+      toast.info(`Filtered by ${variable}: ${value}`);
+    }
+  };
+
+  // Clear drill-down filters
+  const clearDrillDown = () => {
+    setDrillDownFilters({});
+    setDrillDownSource(null);
+    toast.info('Drill-down filter cleared');
   };
 
   const fetchFilterOptions = async () => {
