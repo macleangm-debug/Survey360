@@ -553,6 +553,8 @@ export function AdvancedStatsPanel({
         return <TTestResults data={results.data} />;
       case 'anova':
         return <ANOVAResults data={results.data} />;
+      case 'ancova':
+        return <ANCOVAResults data={results.data} />;
       case 'correlation':
         return <CorrelationResults data={results.data} />;
       case 'regression':
