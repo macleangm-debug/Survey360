@@ -272,6 +272,79 @@ async def export_to_xlsx(
     )
 
 
+@router.post("/parquet")
+@log_action("export_parquet", target_type="form")
+async def export_to_parquet(
+    request: Request,
+    data: ExportRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Export data as Parquet format (efficient columnar storage)"""
+    db = request.app.state.db
+    
+    form = await db.forms.find_one({"id": data.form_id}, {"_id": 0})
+    if not form:
+        raise HTTPException(status_code=404, detail="Form not found")
+    
+    # Build query
+    query = {"form_id": data.form_id, "is_deleted": {"$ne": True}}
+    if data.filters:
+        for f in data.filters:
+            query[f"data.{f.field}"] = f.value
+    
+    submissions = await db.responses.find(query, {"_id": 0}).to_list(None)
+    
+    if not submissions:
+        raise HTTPException(status_code=404, detail="No data to export")
+    
+    # Create DataFrame
+    rows = []
+    for sub in submissions:
+        row = {"response_id": sub.get("id", "")}
+        row.update(sub.get("data", {}))
+        row["submitted_at"] = sub.get("created_at", "")
+        rows.append(row)
+    
+    df = pd.DataFrame(rows)
+    
+    # Add metadata as schema
+    metadata = {
+        "form_id": data.form_id,
+        "form_name": form.get("name", ""),
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "row_count": str(len(df)),
+        "columns": ",".join(df.columns.tolist())
+    }
+    
+    # Export to Parquet
+    output = io.BytesIO()
+    df.to_parquet(output, engine='pyarrow', index=False)
+    output.seek(0)
+    
+    # Log export
+    export_log = ExportJob(
+        org_id=form["org_id"],
+        user_id=current_user["user_id"],
+        form_id=data.form_id,
+        format="parquet",
+        status="completed",
+        row_count=len(submissions),
+        completed_at=datetime.now(timezone.utc)
+    )
+    log_dict = export_log.model_dump()
+    log_dict["created_at"] = log_dict["created_at"].isoformat()
+    log_dict["completed_at"] = log_dict["completed_at"].isoformat()
+    await db.export_jobs.insert_one(log_dict)
+    
+    return StreamingResponse(
+        output,
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f"attachment; filename={form['name'].replace(' ', '_')}_export.parquet"
+        }
+    )
+
+
 @router.get("/history")
 async def get_export_history(
     request: Request,
