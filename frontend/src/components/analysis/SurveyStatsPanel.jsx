@@ -239,11 +239,12 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
 
             {/* Analysis Type */}
             <Tabs value={activeTest} onValueChange={setActiveTest}>
-              <TabsList className="grid grid-cols-4 w-full">
+              <TabsList className="grid grid-cols-5 w-full">
                 <TabsTrigger value="mean">Mean</TabsTrigger>
                 <TabsTrigger value="prop">Prop</TabsTrigger>
                 <TabsTrigger value="reg">Reg</TabsTrigger>
                 <TabsTrigger value="deff">DEFF</TabsTrigger>
+                <TabsTrigger value="rep">Rep Wt</TabsTrigger>
               </TabsList>
 
               <TabsContent value="mean" className="space-y-3 mt-4">
