@@ -79,6 +79,16 @@ class FactorAnalysisRequest(BaseModel):
     rotation: str = "varimax"  # varimax, promax, oblimin
 
 
+class ClusteringRequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    variables: List[str]
+    method: str = "kmeans"  # kmeans, hierarchical
+    n_clusters: Optional[int] = None  # Auto-detect if None (elbow method)
+    linkage: str = "ward"  # For hierarchical: ward, complete, average, single
+
+
 class RegressionRequest(BaseModel):
     snapshot_id: Optional[str] = None
     form_id: Optional[str] = None
