@@ -944,34 +944,186 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
         )}
       </div>
 
-      {/* Share Dialog */}
+      {/* Share Dialog - Enhanced */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Share Dashboard</DialogTitle>
-            <DialogDescription>Configure sharing settings</DialogDescription>
+            <DialogDescription>Configure sharing and permission settings</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">Public Access</p>
-                <p className="text-sm text-slate-500">Anyone with the link can view</p>
+          <Tabs defaultValue="link" className="w-full">
+            <TabsList className="grid grid-cols-3 w-full">
+              <TabsTrigger value="link">Link Sharing</TabsTrigger>
+              <TabsTrigger value="users">User Access</TabsTrigger>
+              <TabsTrigger value="embed">Embed</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="link" className="space-y-4 pt-4">
+              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div>
+                  <p className="font-medium">Public Access</p>
+                  <p className="text-sm text-slate-500">Anyone with the link can view</p>
+                </div>
+                <Switch 
+                  checked={shareSettings.public}
+                  onCheckedChange={(checked) => setShareSettings({...shareSettings, public: checked})}
+                />
               </div>
-              <Switch />
-            </div>
-            <Separator />
-            <div className="space-y-2">
-              <Label>Share Link</Label>
-              <div className="flex gap-2">
-                <Input value={`${window.location.origin}/dashboard/${currentDashboard?.id}`} readOnly />
-                <Button variant="outline" size="icon">
-                  <Copy className="h-4 w-4" />
+              
+              {shareSettings.public && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                    <div>
+                      <p className="font-medium">Password Protection</p>
+                      <p className="text-sm text-amber-600">Require password to view</p>
+                    </div>
+                    <Switch 
+                      checked={shareSettings.passwordProtected}
+                      onCheckedChange={(checked) => setShareSettings({...shareSettings, passwordProtected: checked})}
+                    />
+                  </div>
+                  
+                  {shareSettings.passwordProtected && (
+                    <div>
+                      <Label>Password</Label>
+                      <Input 
+                        type="password" 
+                        value={shareSettings.password}
+                        onChange={(e) => setShareSettings({...shareSettings, password: e.target.value})}
+                        placeholder="Enter password"
+                        className="mt-1"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              <Separator />
+              
+              <div className="space-y-2">
+                <Label>Share Link</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    value={`${window.location.origin}/dashboard/view/${currentDashboard?.id}`} 
+                    readOnly 
+                    className="font-mono text-sm"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/dashboard/view/${currentDashboard?.id}`);
+                      toast.success('Link copied!');
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="users" className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label>Add Users</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    value={newShareEmail}
+                    onChange={(e) => setNewShareEmail(e.target.value)}
+                    placeholder="Enter email address"
+                    className="flex-1"
+                  />
+                  <Select value={newShareRole} onValueChange={setNewShareRole}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="viewer">Viewer</SelectItem>
+                      <SelectItem value="editor">Editor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      if (newShareEmail) {
+                        setShareSettings({
+                          ...shareSettings,
+                          users: [...shareSettings.users, { email: newShareEmail, role: newShareRole }]
+                        });
+                        setNewShareEmail('');
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Shared With ({shareSettings.users.length})</Label>
+                <ScrollArea className="h-[150px] border rounded-lg p-2">
+                  {shareSettings.users.length === 0 ? (
+                    <p className="text-sm text-slate-500 text-center py-4">No users added yet</p>
+                  ) : (
+                    shareSettings.users.map((user, idx) => (
+                      <div key={idx} className="flex items-center justify-between py-2 border-b last:border-0">
+                        <div>
+                          <p className="font-medium text-sm">{user.email}</p>
+                          <Badge variant="outline" className="text-xs">{user.role}</Badge>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setShareSettings({
+                              ...shareSettings,
+                              users: shareSettings.users.filter((_, i) => i !== idx)
+                            });
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </ScrollArea>
+              </div>
+              
+              <div className="p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
+                <p><strong>Viewer:</strong> Can view dashboard and apply filters</p>
+                <p><strong>Editor:</strong> Can modify widgets and settings</p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="embed" className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label>Embed Code</Label>
+                <textarea
+                  className="w-full h-24 p-2 font-mono text-xs border rounded-lg bg-slate-50"
+                  readOnly
+                  value={`<iframe src="${window.location.origin}/embed/dashboard/${currentDashboard?.id}" width="100%" height="600" frameborder="0"></iframe>`}
+                />
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`<iframe src="${window.location.origin}/embed/dashboard/${currentDashboard?.id}" width="100%" height="600" frameborder="0"></iframe>`);
+                    toast.success('Embed code copied!');
+                  }}
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Embed Code
                 </Button>
               </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowShareDialog(false)}>Close</Button>
+              
+              <div className="p-3 bg-slate-50 rounded-lg text-sm text-slate-600">
+                Embed this dashboard in your website or application. The embedded view will respect the sharing permissions set above.
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowShareDialog(false)}>Cancel</Button>
+            <Button onClick={saveShareSettings}>Save Settings</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
