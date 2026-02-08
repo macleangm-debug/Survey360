@@ -7,6 +7,8 @@ import numpy as np
 from scipy import stats as scipy_stats
 
 from .utils import BaseStatsRequest, get_analysis_data, safe_float, safe_int
+from utils.rate_limiter import limiter
+from config.scalability import RATE_LIMIT_STATS
 
 router = APIRouter(prefix="/statistics", tags=["statistics"])
 
@@ -17,15 +19,23 @@ class DescriptiveRequest(BaseStatsRequest):
 
 
 @router.post("/descriptives")
+@limiter.limit(RATE_LIMIT_STATS)
 async def get_descriptive_stats(request: Request, req: DescriptiveRequest):
     """Calculate descriptive statistics for specified variables"""
     db = request.app.state.db
-    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    df, schema, metadata = await get_analysis_data(
+        db, req.snapshot_id, req.form_id,
+        sample=req.sample, sample_size=req.sample_size
+    )
     
     if df.empty:
         raise HTTPException(status_code=404, detail="No data found")
     
-    results = {"variables": {}, "total_n": len(df)}
+    results = {
+        "variables": {},
+        "total_n": len(df),
+        "data_info": metadata  # Include sampling info
+    }
     
     for var in req.variables:
         if var not in df.columns:
