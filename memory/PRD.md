@@ -22,6 +22,20 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 
 ## FINAL STATUS: DATA ANALYSIS MODULE - ONGOING (Last Update: Feb 8, 2026)
 
+### UI Dark Mode Fix (Feb 8, 2026) - COMPLETE
+- **Issue**: Cards across the application had poor contrast and visibility in dark mode
+- **Root Cause**: DashboardLayout used hardcoded light theme colors (bg-slate-50, bg-white) while cards used CSS variables that correctly adapted to dark mode
+- **Fix Applied**:
+  - Updated DashboardLayout.jsx to use CSS variable-based classes (bg-background, bg-card, text-foreground, etc.)
+  - Updated index.css dark mode CSS variables with better contrast ratios
+  - Removed shadow from Card component that was affecting visual appearance
+  - Updated ProjectsPage.jsx text colors to use semantic classes
+- **Files Modified**:
+  - `/app/frontend/src/layouts/DashboardLayout.jsx`
+  - `/app/frontend/src/index.css`
+  - `/app/frontend/src/components/ui/card.jsx`
+  - `/app/frontend/src/pages/ProjectsPage.jsx`
+
 ### Data Analysis Module - Complete Implementation
 - **Statistical Tests**: T-tests, ANOVA, Correlation, Regression (OLS/Logistic), GLM, Mixed Models, Factor Analysis, Nonparametric Tests, Proportions Tests, Clustering
 - **Survey Statistics**: Complex survey design, weighted estimates, design-based regression
