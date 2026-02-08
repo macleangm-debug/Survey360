@@ -1099,7 +1099,7 @@ async def run_nonparametric_test(
                                 "U_statistic": round(float(u_stat), 4),
                                 "p_value": round(float(u_p), 4),
                                 "adj_p_value": round(float(adj_p), 4),
-                                "significant": adj_p < 0.05
+                                "significant": bool(adj_p < 0.05)
                             })
         
         result.update({
