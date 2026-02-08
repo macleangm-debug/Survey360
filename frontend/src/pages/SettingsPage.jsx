@@ -74,7 +74,7 @@ import { useAuthStore, useOrgStore, useUIStore } from '../store';
 import { toast } from 'sonner';
 
 export function SettingsPage() {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const { currentOrg } = useOrgStore();
   const { theme, setTheme, language, setLanguage } = useUIStore();
   
@@ -88,6 +88,7 @@ export function SettingsPage() {
     emailReviews: true,
     emailDigest: false,
     pushEnabled: false,
+    soundEnabled: true,
   });
 
   const [orgSettings, setOrgSettings] = useState({
@@ -106,6 +107,31 @@ export function SettingsPage() {
     timezone: 'UTC',
   });
 
+  const [privacySettings, setPrivacySettings] = useState({
+    shareUsageData: true,
+    allowAnalytics: true,
+    showOnlineStatus: true,
+  });
+
+  const [securitySettings, setSecuritySettings] = useState({
+    sessionTimeout: '30',
+    loginAlerts: true,
+  });
+
+  // Mock connected devices
+  const [connectedDevices, setConnectedDevices] = useState([
+    { id: '1', name: 'MacBook Pro', type: 'laptop', location: 'Nairobi, Kenya', lastActive: new Date(), current: true },
+    { id: '2', name: 'iPhone 14', type: 'mobile', location: 'Nairobi, Kenya', lastActive: new Date(Date.now() - 86400000), current: false },
+    { id: '3', name: 'Windows PC', type: 'desktop', location: 'Mombasa, Kenya', lastActive: new Date(Date.now() - 172800000), current: false },
+  ]);
+
+  // Storage info mock
+  const [storageInfo, setStorageInfo] = useState({
+    used: 256,
+    total: 1024,
+    unit: 'MB'
+  });
+
   const [apiKey, setApiKey] = useState('dp_sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx');
   const [showApiKey, setShowApiKey] = useState(false);
   
@@ -115,6 +141,11 @@ export function SettingsPage() {
   const [newWebhook, setNewWebhook] = useState({ url: '', events: [] });
   
   const [saving, setSaving] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    current: '',
+    new: '',
+    confirm: ''
+  });
 
   const handleSaveProfile = async () => {
     setSaving(true);
