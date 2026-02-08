@@ -35,6 +35,14 @@ import { DeviceManagementPage } from './pages/DeviceManagementPage';
 import { DataAnalysisPage } from './pages/DataAnalysisPage';
 import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
+// Survey360 Solution Pages
+import { Survey360LandingPage } from './pages/solutions/Survey360LandingPage';
+import { Survey360LoginPage, Survey360RegisterPage } from './pages/solutions/Survey360AuthPages';
+import { Survey360AppLayout } from './pages/solutions/Survey360AppLayout';
+import { Survey360DashboardPage } from './pages/solutions/Survey360DashboardPage';
+import { Survey360SurveysPage } from './pages/solutions/Survey360SurveysPage';
+import { Survey360ResponsesPage } from './pages/solutions/Survey360ResponsesPage';
+import { Survey360SettingsPage } from './pages/solutions/Survey360SettingsPage';
 import '@/App.css';
 
 // Register service worker
