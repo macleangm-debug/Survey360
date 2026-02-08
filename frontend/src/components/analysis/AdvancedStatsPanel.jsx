@@ -632,6 +632,8 @@ export function AdvancedStatsPanel({
         return <NonparametricResults data={results.data} />;
       case 'clustering':
         return <ClusteringResults data={results.data} />;
+      case 'proportions':
+        return <ProportionsResults data={results.data} />;
       default:
         return null;
     }
