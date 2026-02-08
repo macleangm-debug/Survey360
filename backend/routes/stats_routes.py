@@ -1674,14 +1674,15 @@ async def run_regression(
         if req.include_diagnostics and req.model_type == "ols":
             try:
                 residuals = results.resid
+                jb_stat, jb_pvalue = scipy_stats.jarque_bera(residuals)[:2]
                 diagnostics = {
                     "residual_mean": round(float(np.mean(residuals)), 6),
                     "residual_std": round(float(np.std(residuals)), 4),
                     "durbin_watson": round(float(sm.stats.stattools.durbin_watson(residuals)), 4),
                     "jarque_bera": {
-                        "statistic": round(float(stats.jarque_bera(residuals)[0]), 4),
-                        "p_value": round(float(stats.jarque_bera(residuals)[1]), 4),
-                        "normal": bool(stats.jarque_bera(residuals)[1] > 0.05)
+                        "statistic": round(float(jb_stat), 4),
+                        "p_value": round(float(jb_pvalue), 4),
+                        "normal": bool(jb_pvalue > 0.05)
                     },
                     "condition_number": round(float(np.linalg.cond(X)), 2)
                 }
