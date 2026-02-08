@@ -325,6 +325,11 @@ async def startup_db_client():
         await db.device_activity_logs.create_index([("org_id", 1), ("timestamp", -1)])
         
         logger.info("Database indexes created successfully")
+        
+        # Create Survey360 demo user
+        from routes.survey360_routes import create_survey360_demo_user
+        await create_survey360_demo_user(db)
+        
     except Exception as e:
         logger.error(f"Error creating indexes: {e}")
 
