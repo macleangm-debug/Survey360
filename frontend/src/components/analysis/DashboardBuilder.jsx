@@ -96,6 +96,10 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [editingWidget, setEditingWidget] = useState(null);
   const [previewMode, setPreviewMode] = useState(false);
+  
+  // Drill-down state
+  const [drillDownFilters, setDrillDownFilters] = useState({});
+  const [drillDownSource, setDrillDownSource] = useState(null);
 
   // New dashboard form
   const [newDashboard, setNewDashboard] = useState({
@@ -122,7 +126,7 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
       fetchDashboardData();
       fetchFilterOptions();
     }
-  }, [currentDashboard?.id, appliedFilters]);
+  }, [currentDashboard?.id, appliedFilters, drillDownFilters]);
 
   const fetchDashboards = async () => {
     try {
