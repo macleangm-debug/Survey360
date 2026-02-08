@@ -221,6 +221,7 @@ async def delete_report(request: Request, org_id: str, report_id: str):
 # ============ Report Generation ============
 
 @router.post("/generate")
+@log_action("generate_report", target_type="report")
 async def generate_report(request: Request, req: GenerateReportRequest):
     """Generate a report in the specified format"""
     db = request.app.state.db
