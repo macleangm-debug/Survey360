@@ -1492,6 +1492,200 @@ async def run_proportions_test(
     return result
 
 
+# ============ Proportions Tests ============
+
+class ProportionsRequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    test_type: str  # one_sample, two_sample, chi_square_gof
+    variable: str
+    # For one-sample test
+    hypothesized_proportion: Optional[float] = None
+    success_value: Optional[str] = None
+    # For two-sample test
+    group_var: Optional[str] = None
+    # For chi-square goodness of fit
+    expected_proportions: Optional[List[float]] = None
+
+
+@router.post("/proportions")
+@log_action("run_proportions_test", target_type="analysis")
+async def run_proportions_test(
+    request: Request,
+    req: ProportionsRequest
+):
+    """Run proportions tests (one-sample, two-sample, chi-square goodness of fit)"""
+    db = request.app.state.db
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df is None or df.empty:
+        raise HTTPException(status_code=404, detail="No data found")
+    
+    if req.variable not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Variable '{req.variable}' not found")
+    
+    series = df[req.variable].dropna()
+    
+    if len(series) < 10:
+        raise HTTPException(status_code=400, detail="Insufficient data (need at least 10 observations)")
+    
+    result = {
+        "test_type": req.test_type,
+        "variable": req.variable,
+        "n": len(series)
+    }
+    
+    if req.test_type == "one_sample":
+        # One-sample proportions test (binomial test)
+        if req.hypothesized_proportion is None:
+            raise HTTPException(status_code=400, detail="Hypothesized proportion required")
+        if req.success_value is None:
+            raise HTTPException(status_code=400, detail="Success value required")
+        
+        p0 = req.hypothesized_proportion
+        if not 0 < p0 < 1:
+            raise HTTPException(status_code=400, detail="Hypothesized proportion must be between 0 and 1")
+        
+        # Count successes
+        successes = (series.astype(str) == str(req.success_value)).sum()
+        n = len(series)
+        p_hat = successes / n
+        
+        # Z-test for proportions
+        se = np.sqrt(p0 * (1 - p0) / n)
+        z_stat = (p_hat - p0) / se
+        p_value = 2 * (1 - scipy_stats.norm.cdf(abs(z_stat)))
+        
+        # Confidence interval for observed proportion
+        se_hat = np.sqrt(p_hat * (1 - p_hat) / n)
+        ci_lower = max(0, p_hat - 1.96 * se_hat)
+        ci_upper = min(1, p_hat + 1.96 * se_hat)
+        
+        result.update({
+            "success_value": req.success_value,
+            "successes": int(successes),
+            "observed_proportion": round(float(p_hat), 4),
+            "hypothesized_proportion": p0,
+            "z_statistic": round(float(z_stat), 4),
+            "p_value": round(float(p_value), 4),
+            "ci_95": [round(ci_lower, 4), round(ci_upper, 4)],
+            "significant": bool(p_value < 0.05),
+            "interpretation": f"The observed proportion ({p_hat:.1%}) is {'significantly' if p_value < 0.05 else 'not significantly'} different from the hypothesized proportion ({p0:.1%})."
+        })
+    
+    elif req.test_type == "two_sample":
+        # Two-sample proportions test (comparing proportions between groups)
+        if req.group_var is None:
+            raise HTTPException(status_code=400, detail="Group variable required")
+        if req.success_value is None:
+            raise HTTPException(status_code=400, detail="Success value required")
+        if req.group_var not in df.columns:
+            raise HTTPException(status_code=400, detail=f"Group variable '{req.group_var}' not found")
+        
+        # Get groups
+        df_valid = df[[req.variable, req.group_var]].dropna()
+        groups = df_valid[req.group_var].unique()
+        
+        if len(groups) != 2:
+            raise HTTPException(status_code=400, detail=f"Two-sample test requires exactly 2 groups, found {len(groups)}")
+        
+        group_data = {}
+        for grp in groups:
+            grp_series = df_valid[df_valid[req.group_var] == grp][req.variable]
+            successes = (grp_series.astype(str) == str(req.success_value)).sum()
+            n = len(grp_series)
+            group_data[str(grp)] = {"successes": int(successes), "n": int(n), "proportion": successes / n if n > 0 else 0}
+        
+        grp_names = list(group_data.keys())
+        n1, x1 = group_data[grp_names[0]]["n"], group_data[grp_names[0]]["successes"]
+        n2, x2 = group_data[grp_names[1]]["n"], group_data[grp_names[1]]["successes"]
+        p1, p2 = x1 / n1, x2 / n2
+        
+        # Pooled proportion
+        p_pooled = (x1 + x2) / (n1 + n2)
+        
+        # Z-test for difference in proportions
+        se = np.sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2))
+        z_stat = (p1 - p2) / se if se > 0 else 0
+        p_value = 2 * (1 - scipy_stats.norm.cdf(abs(z_stat)))
+        
+        # CI for difference
+        se_diff = np.sqrt(p1*(1-p1)/n1 + p2*(1-p2)/n2)
+        diff = p1 - p2
+        ci_lower = diff - 1.96 * se_diff
+        ci_upper = diff + 1.96 * se_diff
+        
+        # Effect size (Cohen's h)
+        cohens_h = 2 * (np.arcsin(np.sqrt(p1)) - np.arcsin(np.sqrt(p2)))
+        
+        result.update({
+            "group_var": req.group_var,
+            "success_value": req.success_value,
+            "groups": [
+                {"name": grp_names[0], **group_data[grp_names[0]], "proportion": round(p1, 4)},
+                {"name": grp_names[1], **group_data[grp_names[1]], "proportion": round(p2, 4)}
+            ],
+            "difference": round(float(diff), 4),
+            "z_statistic": round(float(z_stat), 4),
+            "p_value": round(float(p_value), 4),
+            "ci_95_difference": [round(ci_lower, 4), round(ci_upper, 4)],
+            "cohens_h": round(float(cohens_h), 4),
+            "significant": bool(p_value < 0.05),
+            "interpretation": f"The difference in proportions ({diff:.1%}) between {grp_names[0]} and {grp_names[1]} is {'statistically significant' if p_value < 0.05 else 'not statistically significant'}."
+        })
+    
+    elif req.test_type == "chi_square_gof":
+        # Chi-square goodness of fit test
+        value_counts = series.value_counts()
+        categories = value_counts.index.tolist()
+        observed = value_counts.values
+        n = len(series)
+        
+        # Expected frequencies
+        if req.expected_proportions:
+            if len(req.expected_proportions) != len(categories):
+                raise HTTPException(status_code=400, detail=f"Expected proportions must have {len(categories)} values")
+            if abs(sum(req.expected_proportions) - 1.0) > 0.01:
+                raise HTTPException(status_code=400, detail="Expected proportions must sum to 1")
+            expected = np.array(req.expected_proportions) * n
+        else:
+            # Default: equal proportions
+            expected = np.array([n / len(categories)] * len(categories))
+        
+        # Chi-square test
+        chi2_stat, p_value = scipy_stats.chisquare(observed, expected)
+        df_chi = len(categories) - 1
+        
+        # Effect size (Cramér's V approximation for 1-way)
+        cramers_v = np.sqrt(chi2_stat / (n * df_chi)) if df_chi > 0 else 0
+        
+        result.update({
+            "categories": [
+                {
+                    "value": str(cat),
+                    "observed": int(obs),
+                    "expected": round(float(exp), 2),
+                    "observed_pct": round(float(obs / n * 100), 1),
+                    "expected_pct": round(float(exp / n * 100), 1),
+                    "residual": round(float((obs - exp) / np.sqrt(exp)), 2) if exp > 0 else 0
+                }
+                for cat, obs, exp in zip(categories, observed, expected)
+            ],
+            "chi_square": round(float(chi2_stat), 4),
+            "df": df_chi,
+            "p_value": round(float(p_value), 4),
+            "cramers_v": round(float(cramers_v), 4),
+            "significant": bool(p_value < 0.05),
+            "interpretation": f"The observed distribution {'significantly differs from' if p_value < 0.05 else 'does not significantly differ from'} the expected distribution (χ² = {chi2_stat:.2f}, df = {df_chi}, p = {p_value:.4f})."
+        })
+    
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown test type: {req.test_type}")
+    
+    return result
+
+
 # ============ Regression ============
 
 @router.post("/regression")
