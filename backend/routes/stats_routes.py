@@ -1110,7 +1110,7 @@ async def run_nonparametric_test(
             "df": len(group_data) - 1,
             "p_value": round(float(p_value), 4),
             "eta_squared": round(float(eta_sq), 4),
-            "significant": p_value < 0.05,
+            "significant": bool(p_value < 0.05),
             "posthoc": posthoc_results if posthoc_results else None,
             "interpretation": "Significant difference among groups" if p_value < 0.05 else "No significant difference among groups"
         })
