@@ -629,3 +629,370 @@ async def get_submission_trends(
         })
     
     return {"trends": trends, "period_days": days}
+
+
+# ============ Missing Data Imputation ============
+
+class ImputationMethod(str, Enum):
+    MEAN = "mean"
+    MEDIAN = "median"
+    MODE = "mode"
+    CONSTANT = "constant"
+    FORWARD_FILL = "ffill"
+    BACKWARD_FILL = "bfill"
+    INTERPOLATE = "interpolate"
+    DROP = "drop"
+
+
+class ImputationRequest(BaseModel):
+    org_id: str
+    form_id: Optional[str] = None
+    snapshot_id: Optional[str] = None
+    variables: List[str]
+    method: ImputationMethod = ImputationMethod.MEAN
+    constant_value: Optional[Any] = None
+    group_by: Optional[str] = None  # For group-wise imputation
+    create_snapshot: bool = False  # Create new snapshot with imputed data
+
+
+@router.post("/imputation/preview")
+async def preview_imputation(
+    request: Request,
+    req: ImputationRequest
+):
+    """Preview missing data imputation without applying changes"""
+    db = request.app.state.db
+    
+    # Get data
+    if req.snapshot_id:
+        snapshot_data = await db.snapshot_data.find_one({"snapshot_id": req.snapshot_id})
+        if not snapshot_data:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        data = snapshot_data.get("data", [])
+    else:
+        submissions = await db.submissions.find({
+            "form_id": req.form_id,
+            "status": {"$in": ["approved", "submitted"]}
+        }).to_list(None)
+        data = [s.get("data", {}) for s in submissions]
+    
+    if not data:
+        return {"error": "No data available"}
+    
+    df = pd.DataFrame(data)
+    
+    # Filter to requested variables
+    valid_vars = [v for v in req.variables if v in df.columns]
+    if not valid_vars:
+        return {"error": "No valid variables found"}
+    
+    # Calculate missing data statistics before imputation
+    missing_before = {}
+    for var in valid_vars:
+        missing_count = df[var].isna().sum() + (df[var] == '').sum()
+        missing_before[var] = {
+            "count": int(missing_count),
+            "percent": round(float(missing_count / len(df) * 100), 2)
+        }
+    
+    # Apply imputation to copy of data
+    df_imputed = df.copy()
+    imputation_details = {}
+    
+    for var in valid_vars:
+        # Convert to numeric if possible for numeric methods
+        series = df_imputed[var].replace('', np.nan)
+        try:
+            numeric_series = pd.to_numeric(series, errors='coerce')
+            is_numeric = numeric_series.notna().sum() > 0
+        except:
+            is_numeric = False
+            numeric_series = series
+        
+        imputed_value = None
+        
+        if req.method == ImputationMethod.MEAN:
+            if is_numeric:
+                if req.group_by and req.group_by in df_imputed.columns:
+                    df_imputed[var] = df_imputed.groupby(req.group_by)[var].transform(
+                        lambda x: pd.to_numeric(x, errors='coerce').fillna(pd.to_numeric(x, errors='coerce').mean())
+                    )
+                    imputed_value = "Group means"
+                else:
+                    imputed_value = float(numeric_series.mean())
+                    df_imputed[var] = numeric_series.fillna(imputed_value)
+            else:
+                imputed_value = "N/A (not numeric)"
+                
+        elif req.method == ImputationMethod.MEDIAN:
+            if is_numeric:
+                if req.group_by and req.group_by in df_imputed.columns:
+                    df_imputed[var] = df_imputed.groupby(req.group_by)[var].transform(
+                        lambda x: pd.to_numeric(x, errors='coerce').fillna(pd.to_numeric(x, errors='coerce').median())
+                    )
+                    imputed_value = "Group medians"
+                else:
+                    imputed_value = float(numeric_series.median())
+                    df_imputed[var] = numeric_series.fillna(imputed_value)
+            else:
+                imputed_value = "N/A (not numeric)"
+                
+        elif req.method == ImputationMethod.MODE:
+            mode_val = series.mode()
+            if len(mode_val) > 0:
+                imputed_value = str(mode_val.iloc[0])
+                df_imputed[var] = series.fillna(mode_val.iloc[0])
+            else:
+                imputed_value = "N/A (no mode)"
+                
+        elif req.method == ImputationMethod.CONSTANT:
+            imputed_value = req.constant_value
+            df_imputed[var] = series.fillna(req.constant_value)
+            
+        elif req.method == ImputationMethod.FORWARD_FILL:
+            df_imputed[var] = series.ffill()
+            imputed_value = "Forward fill"
+            
+        elif req.method == ImputationMethod.BACKWARD_FILL:
+            df_imputed[var] = series.bfill()
+            imputed_value = "Backward fill"
+            
+        elif req.method == ImputationMethod.INTERPOLATE:
+            if is_numeric:
+                df_imputed[var] = numeric_series.interpolate(method='linear')
+                imputed_value = "Linear interpolation"
+            else:
+                imputed_value = "N/A (not numeric)"
+                
+        elif req.method == ImputationMethod.DROP:
+            imputed_value = "Rows dropped"
+        
+        imputation_details[var] = {
+            "method": req.method.value,
+            "imputed_value": imputed_value,
+            "is_numeric": is_numeric
+        }
+    
+    # Handle drop method
+    if req.method == ImputationMethod.DROP:
+        original_count = len(df_imputed)
+        df_imputed = df_imputed.dropna(subset=valid_vars)
+        rows_dropped = original_count - len(df_imputed)
+    else:
+        rows_dropped = 0
+    
+    # Calculate missing data statistics after imputation
+    missing_after = {}
+    for var in valid_vars:
+        if var in df_imputed.columns:
+            missing_count = df_imputed[var].isna().sum()
+            missing_after[var] = {
+                "count": int(missing_count),
+                "percent": round(float(missing_count / len(df_imputed) * 100), 2) if len(df_imputed) > 0 else 0
+            }
+    
+    # Preview sample of changes
+    sample_changes = []
+    for idx in df.index[:20]:
+        if idx in df_imputed.index:
+            for var in valid_vars:
+                original = df.loc[idx, var] if var in df.columns else None
+                imputed = df_imputed.loc[idx, var] if var in df_imputed.columns else None
+                if pd.isna(original) or original == '':
+                    sample_changes.append({
+                        "row": int(idx),
+                        "variable": var,
+                        "original": None,
+                        "imputed": imputed if not pd.isna(imputed) else None
+                    })
+    
+    return {
+        "n_original": len(df),
+        "n_after": len(df_imputed),
+        "rows_dropped": rows_dropped,
+        "variables": valid_vars,
+        "method": req.method.value,
+        "missing_before": missing_before,
+        "missing_after": missing_after,
+        "imputation_details": imputation_details,
+        "sample_changes": sample_changes[:10]
+    }
+
+
+@router.post("/imputation/apply")
+async def apply_imputation(
+    request: Request,
+    req: ImputationRequest
+):
+    """Apply imputation and create a new snapshot with imputed data"""
+    if not req.create_snapshot:
+        raise HTTPException(status_code=400, detail="create_snapshot must be true to apply imputation")
+    
+    db = request.app.state.db
+    
+    # Get data
+    if req.snapshot_id:
+        snapshot_data = await db.snapshot_data.find_one({"snapshot_id": req.snapshot_id})
+        if not snapshot_data:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        data = snapshot_data.get("data", [])
+        schema = snapshot_data.get("schema", [])
+        source_name = f"Snapshot {req.snapshot_id[:8]}"
+    else:
+        submissions = await db.submissions.find({
+            "form_id": req.form_id,
+            "status": {"$in": ["approved", "submitted"]}
+        }).to_list(None)
+        data = [s.get("data", {}) for s in submissions]
+        form = await db.forms.find_one({"id": req.form_id})
+        schema = form.get("fields", []) if form else []
+        source_name = f"Form {req.form_id[:8]}"
+    
+    if not data:
+        return {"error": "No data available"}
+    
+    df = pd.DataFrame(data)
+    valid_vars = [v for v in req.variables if v in df.columns]
+    
+    # Apply imputation (same logic as preview)
+    for var in valid_vars:
+        series = df[var].replace('', np.nan)
+        try:
+            numeric_series = pd.to_numeric(series, errors='coerce')
+            is_numeric = numeric_series.notna().sum() > 0
+        except:
+            is_numeric = False
+            numeric_series = series
+        
+        if req.method == ImputationMethod.MEAN and is_numeric:
+            df[var] = numeric_series.fillna(numeric_series.mean())
+        elif req.method == ImputationMethod.MEDIAN and is_numeric:
+            df[var] = numeric_series.fillna(numeric_series.median())
+        elif req.method == ImputationMethod.MODE:
+            mode_val = series.mode()
+            if len(mode_val) > 0:
+                df[var] = series.fillna(mode_val.iloc[0])
+        elif req.method == ImputationMethod.CONSTANT:
+            df[var] = series.fillna(req.constant_value)
+        elif req.method == ImputationMethod.FORWARD_FILL:
+            df[var] = series.ffill()
+        elif req.method == ImputationMethod.BACKWARD_FILL:
+            df[var] = series.bfill()
+        elif req.method == ImputationMethod.INTERPOLATE and is_numeric:
+            df[var] = numeric_series.interpolate(method='linear')
+    
+    if req.method == ImputationMethod.DROP:
+        df = df.dropna(subset=valid_vars)
+    
+    # Create new snapshot
+    import uuid
+    snapshot_id = str(uuid.uuid4())
+    
+    snapshot = {
+        "id": snapshot_id,
+        "org_id": req.org_id,
+        "form_id": req.form_id,
+        "name": f"Imputed ({req.method.value}) - {source_name}",
+        "description": f"Data with {req.method.value} imputation applied to: {', '.join(valid_vars)}",
+        "status": "ready",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "record_count": len(df),
+        "transformation": {
+            "type": "imputation",
+            "method": req.method.value,
+            "variables": valid_vars,
+            "source_snapshot_id": req.snapshot_id
+        }
+    }
+    
+    snapshot_data_record = {
+        "snapshot_id": snapshot_id,
+        "schema": schema,
+        "data": df.to_dict('records')
+    }
+    
+    await db.snapshots.insert_one(snapshot)
+    await db.snapshot_data.insert_one(snapshot_data_record)
+    
+    return {
+        "snapshot_id": snapshot_id,
+        "name": snapshot["name"],
+        "record_count": len(df),
+        "variables_imputed": valid_vars,
+        "method": req.method.value
+    }
+
+
+@router.get("/imputation/missing-summary/{form_id}")
+async def get_missing_summary(
+    request: Request,
+    form_id: str,
+    snapshot_id: Optional[str] = None
+):
+    """Get summary of missing data across all variables"""
+    db = request.app.state.db
+    
+    # Get data
+    if snapshot_id:
+        snapshot_data = await db.snapshot_data.find_one({"snapshot_id": snapshot_id})
+        if not snapshot_data:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        data = snapshot_data.get("data", [])
+        schema = snapshot_data.get("schema", [])
+    else:
+        submissions = await db.submissions.find({
+            "form_id": form_id,
+            "status": {"$in": ["approved", "submitted"]}
+        }).to_list(None)
+        data = [s.get("data", {}) for s in submissions]
+        form = await db.forms.find_one({"id": form_id})
+        schema = form.get("fields", []) if form else []
+    
+    if not data:
+        return {"total_rows": 0, "variables": [], "overall_missing_percent": 0}
+    
+    df = pd.DataFrame(data)
+    
+    variables_summary = []
+    total_missing = 0
+    total_cells = 0
+    
+    for col in df.columns:
+        field_info = next((f for f in schema if f.get("id") == col), {})
+        missing_count = df[col].isna().sum() + (df[col] == '').sum()
+        total_missing += missing_count
+        total_cells += len(df)
+        
+        # Determine if numeric
+        try:
+            pd.to_numeric(df[col], errors='raise')
+            is_numeric = True
+        except:
+            is_numeric = False
+        
+        variables_summary.append({
+            "variable": col,
+            "label": field_info.get("label", col),
+            "type": field_info.get("type", "unknown"),
+            "is_numeric": is_numeric,
+            "total": len(df),
+            "missing_count": int(missing_count),
+            "missing_percent": round(float(missing_count / len(df) * 100), 2),
+            "complete_count": int(len(df) - missing_count),
+            "complete_percent": round(float((len(df) - missing_count) / len(df) * 100), 2)
+        })
+    
+    # Sort by missing percent descending
+    variables_summary.sort(key=lambda x: x["missing_percent"], reverse=True)
+    
+    return {
+        "total_rows": len(df),
+        "total_columns": len(df.columns),
+        "total_cells": total_cells,
+        "total_missing": int(total_missing),
+        "overall_missing_percent": round(float(total_missing / total_cells * 100), 2) if total_cells > 0 else 0,
+        "complete_cases": int((~df.isna().any(axis=1)).sum()),
+        "complete_cases_percent": round(float((~df.isna().any(axis=1)).sum() / len(df) * 100), 2) if len(df) > 0 else 0,
+        "variables": variables_summary
+    }
+
