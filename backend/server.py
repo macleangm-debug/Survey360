@@ -88,7 +88,6 @@ from routes.survey_stats_routes import router as survey_stats_router
 from routes.advanced_models_routes import router as advanced_models_router
 from routes.dashboard_builder_routes import router as dashboard_builder_router
 from routes.audit_routes import router as audit_router
-from routes.rbac_routes import router as rbac_router
 from routes.job_routes import router as job_router
 
 # Include all route modules
