@@ -1690,7 +1690,7 @@ async def generate_residual_plots(request: Request, req: ResidualPlotRequest):
         try:
             from statsmodels.stats.diagnostic import het_breuschpagan
             bp_stat, bp_p, _, _ = het_breuschpagan(residuals, X)
-        except:
+        except Exception:
             bp_stat, bp_p = None, None
         
         return {
