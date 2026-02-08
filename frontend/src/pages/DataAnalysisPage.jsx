@@ -906,7 +906,7 @@ export function DataAnalysisPage() {
             <DiagnosticPlots
               formId={selectedFormId}
               snapshotId={selectedSnapshotId}
-              orgId={selectedOrg?.id}
+              orgId={currentOrg?.id}
               fields={formFields}
             />
           </TabsContent>
