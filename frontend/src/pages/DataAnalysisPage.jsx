@@ -47,7 +47,8 @@ import {
   ArrowRightLeft,
   Scale,
   LayoutDashboard,
-  FileQuestion
+  FileQuestion,
+  Shield
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore, useOrgStore, useAnalysisStore } from '../store';
