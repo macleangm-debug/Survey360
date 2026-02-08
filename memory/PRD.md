@@ -708,12 +708,39 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
   - Cluster profiles with variable means
 
 ### Phase 14: Future Enhancements (Backlog)
-- ROC curves and residual/QQ plots visualization
-- Chart export (PNG/SVG/PDF)
 - AI-Assisted Data Preparation suggestions
 - Dashboard sharing and permissions UI
 - Role-gating for sensitive analysis features
 - ANCOVA and additional statistics tests
+- Export-to-PowerPoint for charts
+
+---
+
+## UPDATE: Feb 8, 2026 - Diagnostic Visualizations Implemented
+
+### Features Completed
+1. **ROC Curve Analysis**
+   - Binary classification evaluation
+   - AUC calculation with 95% CI (bootstrap)
+   - Optimal threshold detection (Youden's J)
+   - Visual curve with diagonal reference
+   - Interpretation text
+
+2. **Residual Diagnostics**
+   - Residuals vs Fitted plot
+   - Q-Q plot for normality assessment
+   - Scale-Location plot for heteroscedasticity
+   - Diagnostic tests: Shapiro-Wilk, Durbin-Watson, Breusch-Pagan
+   - Color-coded pass/fail indicators
+
+### Backend Endpoints Added
+- `POST /api/statistics/diagnostics/roc` - Generate ROC curve data
+- `POST /api/statistics/diagnostics/residuals` - Generate residual plot data
+
+### Files Created/Modified
+- `/app/frontend/src/components/analysis/DiagnosticPlots.jsx` (NEW)
+- `/app/frontend/src/pages/DataAnalysisPage.jsx` (MODIFIED - added Diag tab)
+- `/app/backend/routes/stats_routes.py` (MODIFIED - added diagnostic endpoints)
 
 ---
 
