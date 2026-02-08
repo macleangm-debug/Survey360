@@ -308,15 +308,6 @@ async def export_to_parquet(
     
     df = pd.DataFrame(rows)
     
-    # Add metadata as schema
-    metadata = {
-        "form_id": data.form_id,
-        "form_name": form.get("name", ""),
-        "exported_at": datetime.now(timezone.utc).isoformat(),
-        "row_count": str(len(df)),
-        "columns": ",".join(df.columns.tolist())
-    }
-    
     # Export to Parquet
     output = io.BytesIO()
     df.to_parquet(output, engine='pyarrow', index=False)
