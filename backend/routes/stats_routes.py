@@ -380,6 +380,7 @@ async def run_ttest(
 # ============ ANOVA ============
 
 @router.post("/anova")
+@log_action("run_anova", target_type="analysis")
 async def run_anova(
     request: Request,
     req: ANOVARequest
