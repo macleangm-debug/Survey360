@@ -523,6 +523,291 @@ export function SettingsPage() {
             </Card>
           </TabsContent>
 
+          {/* Security Tab */}
+          <TabsContent value="security" className="space-y-6">
+            {/* Password Change */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <Lock className="w-5 h-5" />
+                  Change Password
+                </CardTitle>
+                <CardDescription>Update your account password</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 max-w-md">
+                  <div className="grid gap-2">
+                    <Label htmlFor="current-password">Current Password</Label>
+                    <Input
+                      id="current-password"
+                      type="password"
+                      value={passwordForm.current}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, current: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      value={passwordForm.new}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, new: e.target.value })}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="confirm-password">Confirm New Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      value={passwordForm.confirm}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, confirm: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <Button onClick={handleChangePassword} disabled={saving}>
+                  <Lock className="w-4 h-4 mr-2" />
+                  Update Password
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Connected Devices */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <Smartphone className="w-5 h-5" />
+                  Connected Devices
+                </CardTitle>
+                <CardDescription>Manage devices with access to your account</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {connectedDevices.map((device) => {
+                    const DeviceIcon = getDeviceIcon(device.type);
+                    return (
+                      <div key={device.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                            <DeviceIcon className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{device.name}</p>
+                              {device.current && (
+                                <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-xs">
+                                  Current
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <MapPin className="w-3 h-3" />
+                              <span>{device.location}</span>
+                              <span>•</span>
+                              <Clock className="w-3 h-3" />
+                              <span>{formatLastActive(device.lastActive)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        {!device.current && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleRevokeDevice(device.id)}
+                          >
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Revoke
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <Separator />
+                <Button variant="outline" onClick={handleRevokeAllDevices}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out All Other Devices
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Session Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  Session Settings
+                </CardTitle>
+                <CardDescription>Configure session timeout and security</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Session Timeout</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically sign out after inactivity
+                    </p>
+                  </div>
+                  <Select 
+                    value={securitySettings.sessionTimeout} 
+                    onValueChange={(v) => setSecuritySettings({ ...securitySettings, sessionTimeout: v })}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="15">15 minutes</SelectItem>
+                      <SelectItem value="30">30 minutes</SelectItem>
+                      <SelectItem value="60">1 hour</SelectItem>
+                      <SelectItem value="120">2 hours</SelectItem>
+                      <SelectItem value="never">Never</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Login Alerts</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified of new sign-ins to your account
+                    </p>
+                  </div>
+                  <Switch 
+                    checked={securitySettings.loginAlerts}
+                    onCheckedChange={(checked) => setSecuritySettings({ ...securitySettings, loginAlerts: checked })}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Privacy Tab */}
+          <TabsContent value="privacy" className="space-y-6">
+            {/* Privacy Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  Privacy Settings
+                </CardTitle>
+                <CardDescription>Control your data and privacy preferences</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Share Usage Data</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Help improve DataPulse by sharing anonymous usage data
+                    </p>
+                  </div>
+                  <Switch 
+                    checked={privacySettings.shareUsageData}
+                    onCheckedChange={(checked) => setPrivacySettings({ ...privacySettings, shareUsageData: checked })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Analytics</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow analytics cookies to improve your experience
+                    </p>
+                  </div>
+                  <Switch 
+                    checked={privacySettings.allowAnalytics}
+                    onCheckedChange={(checked) => setPrivacySettings({ ...privacySettings, allowAnalytics: checked })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Show Online Status</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Let team members see when you&apos;re active
+                    </p>
+                  </div>
+                  <Switch 
+                    checked={privacySettings.showOnlineStatus}
+                    onCheckedChange={(checked) => setPrivacySettings({ ...privacySettings, showOnlineStatus: checked })}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Data & Storage */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2">
+                  <HardDrive className="w-5 h-5" />
+                  Data & Storage
+                </CardTitle>
+                <CardDescription>Manage your cached data and storage</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Storage Used</span>
+                    <span>{storageInfo.used} {storageInfo.unit} / {storageInfo.total} {storageInfo.unit}</span>
+                  </div>
+                  <Progress value={(storageInfo.used / storageInfo.total) * 100} />
+                  <p className="text-xs text-muted-foreground">
+                    {((storageInfo.used / storageInfo.total) * 100).toFixed(1)}% of available storage
+                  </p>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <p className="font-medium">Clear Cache</p>
+                    <p className="text-sm text-muted-foreground">
+                      Remove cached forms and temporary data
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={handleClearCache} disabled={saving}>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Clear
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Danger Zone */}
+            <Card className="border-destructive/50">
+              <CardHeader>
+                <CardTitle className="font-barlow flex items-center gap-2 text-destructive">
+                  <UserX className="w-5 h-5" />
+                  Danger Zone
+                </CardTitle>
+                <CardDescription>Irreversible actions for your account</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 border border-destructive/30 rounded-lg bg-destructive/5">
+                  <div>
+                    <p className="font-medium">Delete Account</p>
+                    <p className="text-sm text-muted-foreground">
+                      Permanently delete your account and all associated data
+                    </p>
+                  </div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">Delete Account</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete your
+                          account and remove all your data from our servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive hover:bg-destructive/90">
+                          Delete Account
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Organization Tab */}
           <TabsContent value="organization">
             <Card>
