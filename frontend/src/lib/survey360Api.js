@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// Survey360 uses a separate backend running on port 8002
-const SURVEY360_API_URL = 'http://localhost:8002/api';
+// Survey360 uses the main backend's /api/survey360 routes
+const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
+const SURVEY360_API_URL = `${API_BASE}/api/survey360`;
 
 const survey360Api = axios.create({
   baseURL: SURVEY360_API_URL,
