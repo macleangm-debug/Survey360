@@ -384,6 +384,106 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Calculate DEFF
                 </Button>
               </TabsContent>
+
+              <TabsContent value="rep" className="space-y-3 mt-4">
+                <div className="p-2 bg-muted/50 rounded-lg text-xs text-muted-foreground">
+                  <Info className="h-3 w-3 inline mr-1" />
+                  Replicate weights provide robust variance estimation for complex surveys
+                </div>
+                <div>
+                  <Label>Analysis Variable</Label>
+                  <Select value={repConfig.variable} onValueChange={v => setRepConfig({...repConfig, variable: v})}>
+                    <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                    <SelectContent>
+                      {numericFields.map(f => <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Method</Label>
+                  <Select value={repConfig.method} onValueChange={v => setRepConfig({...repConfig, method: v})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="brr">BRR (Balanced Repeated Replication)</SelectItem>
+                      <SelectItem value="jackknife">Jackknife</SelectItem>
+                      <SelectItem value="bootstrap">Bootstrap</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {repConfig.method === 'brr' && (
+                  <>
+                    <div>
+                      <Label>Replicate Weight Columns</Label>
+                      <div className="border rounded p-2 max-h-[100px] overflow-y-auto space-y-1">
+                        {numericFields.map(f => (
+                          <div key={f.id} className="flex items-center gap-2">
+                            <Checkbox
+                              checked={repConfig.replicate_vars.includes(f.id)}
+                              onCheckedChange={c => {
+                                if (c) setRepConfig({...repConfig, replicate_vars: [...repConfig.replicate_vars, f.id]});
+                                else setRepConfig({...repConfig, replicate_vars: repConfig.replicate_vars.filter(v => v !== f.id)});
+                              }}
+                            />
+                            <span className="text-xs">{f.label || f.id}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {repConfig.replicate_vars.length} replicate(s) selected
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Fay Coefficient: {repConfig.fay_coefficient}</Label>
+                      <Slider
+                        value={[repConfig.fay_coefficient]}
+                        onValueChange={([v]) => setRepConfig({...repConfig, fay_coefficient: v})}
+                        min={0}
+                        max={1}
+                        step={0.1}
+                        className="mt-2"
+                      />
+                      <p className="text-xs text-muted-foreground">0 = Standard BRR, 0.5 = Fay's method</p>
+                    </div>
+                  </>
+                )}
+
+                {repConfig.method === 'jackknife' && (
+                  <div>
+                    <Label>PSU/Cluster Variable</Label>
+                    <Select value={repConfig.psu_var || "none"} onValueChange={v => setRepConfig({...repConfig, psu_var: v === "none" ? "" : v})}>
+                      <SelectTrigger><SelectValue placeholder="None (delete-1)" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None (delete-1)</SelectItem>
+                        {fields.map(f => <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Leave empty for delete-1 jackknife, or select PSU for delete-a-group
+                    </p>
+                  </div>
+                )}
+
+                {repConfig.method === 'bootstrap' && (
+                  <div>
+                    <Label>Number of Replicates: {repConfig.n_replicates}</Label>
+                    <Slider
+                      value={[repConfig.n_replicates]}
+                      onValueChange={([v]) => setRepConfig({...repConfig, n_replicates: v})}
+                      min={50}
+                      max={500}
+                      step={50}
+                      className="mt-2"
+                    />
+                  </div>
+                )}
+
+                <Button onClick={runReplicateWeights} disabled={loading} className="w-full">
+                  {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  <Repeat className="h-4 w-4 mr-2" />
+                  Run Replicate Analysis
+                </Button>
+              </TabsContent>
             </Tabs>
           </ScrollArea>
         </CardContent>
