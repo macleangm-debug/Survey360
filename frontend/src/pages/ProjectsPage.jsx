@@ -124,9 +124,9 @@ const ProjectCard = ({ project, onStatusChange, onSelect }) => {
             {project.description || 'No description'}
           </p>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5" />
-              {project.form_count} forms
+              <span>{project.form_count} forms</span>
             </div>
             <div className="flex items-center gap-1">
               <Users className="w-3.5 h-3.5" />
