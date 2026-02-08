@@ -808,6 +808,7 @@ export function ChartStudio({ formId, orgId, fields, stats, getToken }) {
                     <SelectItem value="png">PNG</SelectItem>
                     <SelectItem value="svg">SVG</SelectItem>
                     <SelectItem value="pdf">PDF</SelectItem>
+                    <SelectItem value="pptx">PPTX</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button 
