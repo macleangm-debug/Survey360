@@ -214,6 +214,64 @@ export function SettingsPage() {
     setWebhooks(webhooks.map(w => w.id === id ? { ...w, active: !w.active } : w));
   };
 
+  const handleChangePassword = async () => {
+    if (passwordForm.new !== passwordForm.confirm) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    if (passwordForm.new.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+    setSaving(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    toast.success('Password changed successfully');
+    setPasswordForm({ current: '', new: '', confirm: '' });
+    setSaving(false);
+  };
+
+  const handleRevokeDevice = (deviceId) => {
+    setConnectedDevices(connectedDevices.filter(d => d.id !== deviceId));
+    toast.success('Device session revoked');
+  };
+
+  const handleRevokeAllDevices = () => {
+    setConnectedDevices(connectedDevices.filter(d => d.current));
+    toast.success('All other sessions revoked');
+  };
+
+  const handleClearCache = async () => {
+    setSaving(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setStorageInfo({ ...storageInfo, used: 12 });
+    toast.success('Cache cleared successfully');
+    setSaving(false);
+  };
+
+  const handleDeleteAccount = () => {
+    toast.error('Account deletion requires contacting support');
+  };
+
+  const getDeviceIcon = (type) => {
+    switch (type) {
+      case 'mobile': return Smartphone;
+      case 'laptop': return Laptop;
+      default: return Monitor;
+    }
+  };
+
+  const formatLastActive = (date) => {
+    const now = new Date();
+    const diff = now - new Date(date);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (hours < 1) return 'Active now';
+    if (hours < 24) return `${hours} hours ago`;
+    if (days === 1) return 'Yesterday';
+    return `${days} days ago`;
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6 max-w-4xl" data-testid="settings-page">
