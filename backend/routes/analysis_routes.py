@@ -996,3 +996,270 @@ async def get_missing_summary(
         "variables": variables_summary
     }
 
+
+# ============ Chart Data Endpoints ============
+
+class CorrelationHeatmapRequest(BaseModel):
+    org_id: str
+    form_id: Optional[str] = None
+    snapshot_id: Optional[str] = None
+    variables: List[str]
+
+
+@router.post("/charts/heatmap")
+async def get_correlation_heatmap(
+    request: Request,
+    req: CorrelationHeatmapRequest
+):
+    """Get correlation matrix data for heatmap visualization"""
+    db = request.app.state.db
+    
+    # Get data
+    if req.snapshot_id:
+        snapshot_data = await db.snapshot_data.find_one({"snapshot_id": req.snapshot_id})
+        if not snapshot_data:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        data = snapshot_data.get("data", [])
+    else:
+        submissions = await db.submissions.find({
+            "form_id": req.form_id,
+            "status": {"$in": ["approved", "submitted"]}
+        }).to_list(None)
+        data = [s.get("data", {}) for s in submissions]
+    
+    if not data:
+        return {"error": "No data available"}
+    
+    df = pd.DataFrame(data)
+    
+    # Filter to requested variables and convert to numeric
+    valid_vars = [v for v in req.variables if v in df.columns]
+    if len(valid_vars) < 2:
+        return {"error": "Need at least 2 variables for correlation heatmap"}
+    
+    df_numeric = df[valid_vars].apply(pd.to_numeric, errors='coerce').dropna()
+    
+    if len(df_numeric) < 5:
+        return {"error": "Not enough data for correlation analysis"}
+    
+    # Calculate correlation matrix
+    corr_matrix = df_numeric.corr()
+    
+    # Format for heatmap
+    heatmap_data = []
+    for i, var1 in enumerate(valid_vars):
+        for j, var2 in enumerate(valid_vars):
+            if var1 in corr_matrix.columns and var2 in corr_matrix.index:
+                corr_val = corr_matrix.loc[var2, var1]
+                heatmap_data.append({
+                    "x": var1,
+                    "y": var2,
+                    "value": round(float(corr_val), 3) if not pd.isna(corr_val) else 0
+                })
+    
+    return {
+        "variables": valid_vars,
+        "n_observations": len(df_numeric),
+        "data": heatmap_data,
+        "min_value": -1,
+        "max_value": 1
+    }
+
+
+class ViolinPlotRequest(BaseModel):
+    org_id: str
+    form_id: Optional[str] = None
+    snapshot_id: Optional[str] = None
+    numeric_var: str
+    group_var: Optional[str] = None
+
+
+@router.post("/charts/violin")
+async def get_violin_data(
+    request: Request,
+    req: ViolinPlotRequest
+):
+    """Get data for violin plot visualization (distribution by group)"""
+    db = request.app.state.db
+    
+    # Get data
+    if req.snapshot_id:
+        snapshot_data = await db.snapshot_data.find_one({"snapshot_id": req.snapshot_id})
+        if not snapshot_data:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        data = snapshot_data.get("data", [])
+    else:
+        submissions = await db.submissions.find({
+            "form_id": req.form_id,
+            "status": {"$in": ["approved", "submitted"]}
+        }).to_list(None)
+        data = [s.get("data", {}) for s in submissions]
+    
+    if not data:
+        return {"error": "No data available"}
+    
+    df = pd.DataFrame(data)
+    
+    if req.numeric_var not in df.columns:
+        return {"error": f"Variable {req.numeric_var} not found"}
+    
+    # Convert to numeric
+    df[req.numeric_var] = pd.to_numeric(df[req.numeric_var], errors='coerce')
+    df = df.dropna(subset=[req.numeric_var])
+    
+    if len(df) < 10:
+        return {"error": "Not enough data for violin plot"}
+    
+    # Calculate distribution data
+    result = {
+        "variable": req.numeric_var,
+        "n_total": len(df),
+        "groups": []
+    }
+    
+    if req.group_var and req.group_var in df.columns:
+        # Group-wise statistics
+        for group_name, group_df in df.groupby(req.group_var):
+            values = group_df[req.numeric_var].dropna()
+            if len(values) >= 5:
+                # Calculate percentiles for violin shape
+                percentiles = [5, 10, 25, 50, 75, 90, 95]
+                pcts = np.percentile(values, percentiles)
+                
+                result["groups"].append({
+                    "name": str(group_name),
+                    "n": len(values),
+                    "mean": round(float(values.mean()), 3),
+                    "median": round(float(values.median()), 3),
+                    "std": round(float(values.std()), 3),
+                    "min": round(float(values.min()), 3),
+                    "max": round(float(values.max()), 3),
+                    "q1": round(float(pcts[2]), 3),  # 25th percentile
+                    "q3": round(float(pcts[4]), 3),  # 75th percentile
+                    "p5": round(float(pcts[0]), 3),
+                    "p95": round(float(pcts[6]), 3),
+                    "distribution": [
+                        {"percentile": p, "value": round(float(v), 3)}
+                        for p, v in zip(percentiles, pcts)
+                    ]
+                })
+    else:
+        # Overall statistics
+        values = df[req.numeric_var].dropna()
+        percentiles = [5, 10, 25, 50, 75, 90, 95]
+        pcts = np.percentile(values, percentiles)
+        
+        result["groups"].append({
+            "name": "All",
+            "n": len(values),
+            "mean": round(float(values.mean()), 3),
+            "median": round(float(values.median()), 3),
+            "std": round(float(values.std()), 3),
+            "min": round(float(values.min()), 3),
+            "max": round(float(values.max()), 3),
+            "q1": round(float(pcts[2]), 3),
+            "q3": round(float(pcts[4]), 3),
+            "p5": round(float(pcts[0]), 3),
+            "p95": round(float(pcts[6]), 3),
+            "distribution": [
+                {"percentile": p, "value": round(float(v), 3)}
+                for p, v in zip(percentiles, pcts)
+            ]
+        })
+    
+    return result
+
+
+class CoefficientPlotRequest(BaseModel):
+    org_id: str
+    form_id: Optional[str] = None
+    snapshot_id: Optional[str] = None
+    dependent_var: str
+    independent_vars: List[str]
+
+
+@router.post("/charts/coefficient")
+async def get_coefficient_plot_data(
+    request: Request,
+    req: CoefficientPlotRequest
+):
+    """Get regression coefficients with confidence intervals for coefficient plot"""
+    db = request.app.state.db
+    
+    # Get data
+    if req.snapshot_id:
+        snapshot_data = await db.snapshot_data.find_one({"snapshot_id": req.snapshot_id})
+        if not snapshot_data:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        data = snapshot_data.get("data", [])
+    else:
+        submissions = await db.submissions.find({
+            "form_id": req.form_id,
+            "status": {"$in": ["approved", "submitted"]}
+        }).to_list(None)
+        data = [s.get("data", {}) for s in submissions]
+    
+    if not data:
+        return {"error": "No data available"}
+    
+    df = pd.DataFrame(data)
+    
+    # Prepare variables
+    all_vars = [req.dependent_var] + req.independent_vars
+    valid_vars = [v for v in all_vars if v in df.columns]
+    
+    if len(valid_vars) < 2:
+        return {"error": "Need at least dependent variable and one independent variable"}
+    
+    # Convert to numeric and drop missing
+    df_model = df[valid_vars].apply(pd.to_numeric, errors='coerce').dropna()
+    
+    if len(df_model) < len(req.independent_vars) + 10:
+        return {"error": "Not enough data for regression"}
+    
+    # Run OLS regression
+    import statsmodels.api as sm
+    
+    y = df_model[req.dependent_var]
+    X = df_model[[v for v in req.independent_vars if v in df_model.columns]]
+    X = sm.add_constant(X)
+    
+    try:
+        model = sm.OLS(y, X).fit()
+        
+        coefficients = []
+        for var in model.params.index:
+            if var != 'const':
+                coef = model.params[var]
+                se = model.bse[var]
+                conf_int = model.conf_int().loc[var]
+                p_val = model.pvalues[var]
+                
+                coefficients.append({
+                    "variable": var,
+                    "coefficient": round(float(coef), 4),
+                    "std_error": round(float(se), 4),
+                    "ci_lower": round(float(conf_int[0]), 4),
+                    "ci_upper": round(float(conf_int[1]), 4),
+                    "p_value": round(float(p_val), 4),
+                    "significant": p_val < 0.05
+                })
+        
+        # Sort by absolute coefficient size
+        coefficients.sort(key=lambda x: abs(x["coefficient"]), reverse=True)
+        
+        return {
+            "dependent_var": req.dependent_var,
+            "n_observations": len(df_model),
+            "r_squared": round(float(model.rsquared), 4),
+            "adj_r_squared": round(float(model.rsquared_adj), 4),
+            "coefficients": coefficients,
+            "intercept": {
+                "value": round(float(model.params.get('const', 0)), 4),
+                "ci_lower": round(float(model.conf_int().loc['const'][0]), 4) if 'const' in model.conf_int().index else None,
+                "ci_upper": round(float(model.conf_int().loc['const'][1]), 4) if 'const' in model.conf_int().index else None
+            }
+        }
+    except Exception as e:
+        return {"error": f"Regression failed: {str(e)}"}
+
