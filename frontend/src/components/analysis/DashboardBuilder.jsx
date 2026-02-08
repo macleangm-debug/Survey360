@@ -652,13 +652,13 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
             {dashboards.map(dashboard => (
               <Card 
                 key={dashboard.id} 
-                className="cursor-pointer hover:border-sky-300 transition-colors"
+                className="bg-card border border-border cursor-pointer hover:border-sky-400 hover:shadow-md transition-all"
                 onClick={() => selectDashboard(dashboard.id)}
                 data-testid={`dashboard-card-${dashboard.id}`}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{dashboard.name}</CardTitle>
+                    <CardTitle className="text-base text-foreground">{dashboard.name}</CardTitle>
                     <Badge variant="outline">{dashboard.theme}</Badge>
                   </div>
                   <CardDescription className="text-xs">
