@@ -201,6 +201,53 @@ export function AdvancedStatsPanel({
     }
   };
 
+  const runANCOVA = async () => {
+    if (!ancovaConfig.dependentVar || !ancovaConfig.groupVar) {
+      toast.error('Please select dependent and grouping variables');
+      return;
+    }
+    if (ancovaConfig.covariates.length === 0) {
+      toast.error('Please select at least one covariate');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/statistics/ancova`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          snapshot_id: snapshotId || null,
+          form_id: snapshotId ? null : formId,
+          org_id: orgId,
+          dependent_var: ancovaConfig.dependentVar,
+          group_var: ancovaConfig.groupVar,
+          covariates: ancovaConfig.covariates
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.error) {
+          toast.error(data.error);
+        } else {
+          setResults({ type: 'ancova', data });
+          toast.success('ANCOVA completed');
+        }
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'ANCOVA failed');
+      }
+    } catch (error) {
+      toast.error('ANCOVA failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const runCorrelation = async () => {
     if (corrConfig.variables.length < 2) {
       toast.error('Select at least 2 variables');
