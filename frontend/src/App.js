@@ -41,8 +41,10 @@ import { Survey360LoginPage, Survey360RegisterPage } from './pages/solutions/Sur
 import { Survey360AppLayout } from './pages/solutions/Survey360AppLayout';
 import { Survey360DashboardPage } from './pages/solutions/Survey360DashboardPage';
 import { Survey360SurveysPage } from './pages/solutions/Survey360SurveysPage';
+import { Survey360BuilderPage } from './pages/solutions/Survey360BuilderPage';
 import { Survey360ResponsesPage } from './pages/solutions/Survey360ResponsesPage';
 import { Survey360SettingsPage } from './pages/solutions/Survey360SettingsPage';
+import { PublicSurveyPage } from './pages/solutions/PublicSurveyPage';
 import '@/App.css';
 
 // Register service worker
