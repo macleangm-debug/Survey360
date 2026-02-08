@@ -466,6 +466,227 @@ async def run_anova(
     return result
 
 
+# ============ ANCOVA ============
+
+class ANCOVARequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    dependent_var: str
+    group_var: str  # Categorical grouping variable
+    covariates: List[str]  # Continuous covariates to control for
+
+
+@router.post("/ancova")
+@log_action("run_ancova", target_type="analysis")
+async def run_ancova(
+    request: Request,
+    req: ANCOVARequest
+):
+    """Run Analysis of Covariance (ANCOVA) - compare group means while controlling for covariates"""
+    db = request.app.state.db
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df is None or df.empty:
+        raise HTTPException(status_code=404, detail="No data found")
+    
+    # Validate variables exist
+    all_vars = [req.dependent_var, req.group_var] + req.covariates
+    missing = [v for v in all_vars if v not in df.columns]
+    if missing:
+        raise HTTPException(status_code=400, detail=f"Variables not found: {missing}")
+    
+    if not req.covariates:
+        raise HTTPException(status_code=400, detail="At least one covariate is required for ANCOVA")
+    
+    # Prepare data
+    df_model = df[all_vars].dropna()
+    
+    if len(df_model) < 10:
+        raise HTTPException(status_code=400, detail="Insufficient data (need at least 10 observations)")
+    
+    # Convert dependent and covariates to numeric
+    y = pd.to_numeric(df_model[req.dependent_var], errors='coerce')
+    covariates_data = df_model[req.covariates].apply(pd.to_numeric, errors='coerce')
+    
+    # Get groups
+    groups = df_model[req.group_var].astype(str)
+    unique_groups = groups.unique()
+    
+    if len(unique_groups) < 2:
+        raise HTTPException(status_code=400, detail="Need at least 2 groups for ANCOVA")
+    if len(unique_groups) > 20:
+        raise HTTPException(status_code=400, detail="Too many groups (max 20)")
+    
+    try:
+        import statsmodels.api as sm
+        from statsmodels.formula.api import ols
+        from statsmodels.stats.anova import anova_lm
+        
+        # Create a clean dataframe for formula
+        model_df = pd.DataFrame({
+            'y': y.values,
+            'group': groups.values
+        })
+        
+        # Add covariates
+        for i, cov in enumerate(req.covariates):
+            model_df[f'cov_{i}'] = covariates_data[cov].values
+        
+        # Build formula: y ~ C(group) + cov_0 + cov_1 + ...
+        cov_terms = ' + '.join([f'cov_{i}' for i in range(len(req.covariates))])
+        formula = f'y ~ C(group) + {cov_terms}'
+        
+        # Fit model
+        model = ols(formula, data=model_df).fit()
+        
+        # Get ANOVA table (Type II SS for ANCOVA)
+        anova_table = anova_lm(model, typ=2)
+        
+        # Extract group effect
+        group_row = anova_table.loc['C(group)']
+        group_ss = float(group_row['sum_sq'])
+        group_df = int(group_row['df'])
+        group_ms = group_ss / group_df
+        group_f = float(group_row['F'])
+        group_p = float(group_row['PR(>F)'])
+        
+        # Calculate effect size (partial eta squared)
+        residual_ss = float(anova_table.loc['Residual']['sum_sq'])
+        partial_eta_sq = group_ss / (group_ss + residual_ss)
+        
+        # Calculate adjusted means (least squares means)
+        # Get covariate means
+        cov_means = {f'cov_{i}': model_df[f'cov_{i}'].mean() for i in range(len(req.covariates))}
+        
+        adjusted_means = {}
+        raw_means = {}
+        group_ns = {}
+        
+        for grp in unique_groups:
+            grp_mask = model_df['group'] == grp
+            raw_means[str(grp)] = round(float(model_df.loc[grp_mask, 'y'].mean()), 4)
+            group_ns[str(grp)] = int(grp_mask.sum())
+            
+            # Calculate adjusted mean at covariate means
+            pred_data = pd.DataFrame({'group': [grp], **cov_means})
+            adjusted_means[str(grp)] = round(float(model.predict(pred_data)[0]), 4)
+        
+        # Covariate effects
+        covariate_effects = []
+        for i, cov in enumerate(req.covariates):
+            cov_key = f'cov_{i}'
+            if cov_key in anova_table.index:
+                cov_row = anova_table.loc[cov_key]
+                covariate_effects.append({
+                    "variable": cov,
+                    "coefficient": round(float(model.params.get(cov_key, 0)), 4),
+                    "std_error": round(float(model.bse.get(cov_key, 0)), 4),
+                    "t_value": round(float(model.tvalues.get(cov_key, 0)), 4),
+                    "p_value": round(float(model.pvalues.get(cov_key, 0)), 4),
+                    "F_value": round(float(cov_row['F']), 4),
+                    "significant": bool(cov_row['PR(>F)'] < 0.05)
+                })
+        
+        # Model fit statistics
+        result = {
+            "test": "ANCOVA",
+            "dependent_var": req.dependent_var,
+            "group_var": req.group_var,
+            "covariates": req.covariates,
+            "n_observations": len(model_df),
+            "n_groups": len(unique_groups),
+            "group_effect": {
+                "SS": round(group_ss, 4),
+                "df": group_df,
+                "MS": round(group_ms, 4),
+                "F": round(group_f, 4),
+                "p_value": round(group_p, 4),
+                "significant": bool(group_p < 0.05),
+                "partial_eta_squared": round(partial_eta_sq, 4)
+            },
+            "covariate_effects": covariate_effects,
+            "adjusted_means": [
+                {
+                    "group": grp,
+                    "n": group_ns[grp],
+                    "raw_mean": raw_means[grp],
+                    "adjusted_mean": adjusted_means[grp]
+                }
+                for grp in unique_groups
+            ],
+            "model_fit": {
+                "r_squared": round(float(model.rsquared), 4),
+                "adj_r_squared": round(float(model.rsquared_adj), 4),
+                "residual_ss": round(residual_ss, 4),
+                "residual_df": int(anova_table.loc['Residual']['df'])
+            },
+            "interpretation": get_ancova_interpretation(group_p, partial_eta_sq, len(unique_groups))
+        }
+        
+        # Post-hoc pairwise comparisons if significant
+        if group_p < 0.05 and len(unique_groups) > 2:
+            try:
+                from itertools import combinations
+                
+                pairwise = []
+                n_comparisons = len(list(combinations(unique_groups, 2)))
+                bonferroni_alpha = 0.05 / n_comparisons
+                
+                for g1, g2 in combinations(unique_groups, 2):
+                    diff = adjusted_means[str(g1)] - adjusted_means[str(g2)]
+                    
+                    # Simple approximation for SE of difference
+                    mse = residual_ss / int(anova_table.loc['Residual']['df'])
+                    n1, n2 = group_ns[str(g1)], group_ns[str(g2)]
+                    se_diff = np.sqrt(mse * (1/n1 + 1/n2))
+                    t_stat = diff / se_diff if se_diff > 0 else 0
+                    
+                    from scipy import stats as scipy_stats
+                    p_val = 2 * (1 - scipy_stats.t.cdf(abs(t_stat), int(anova_table.loc['Residual']['df'])))
+                    
+                    pairwise.append({
+                        "group1": str(g1),
+                        "group2": str(g2),
+                        "diff_adjusted": round(diff, 4),
+                        "t_statistic": round(t_stat, 4),
+                        "p_value": round(p_val, 4),
+                        "p_adjusted": round(min(p_val * n_comparisons, 1.0), 4),
+                        "significant": bool(p_val < bonferroni_alpha)
+                    })
+                
+                result["pairwise_comparisons"] = pairwise
+                result["pairwise_note"] = "Bonferroni-adjusted p-values"
+            except Exception as e:
+                result["pairwise_error"] = str(e)
+        
+        return result
+        
+    except ImportError:
+        raise HTTPException(status_code=500, detail="statsmodels required for ANCOVA")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ANCOVA failed: {str(e)}")
+
+
+def get_ancova_interpretation(p_value, eta_sq, n_groups):
+    """Generate interpretation text for ANCOVA results"""
+    effect_size = "small" if eta_sq < 0.06 else "medium" if eta_sq < 0.14 else "large"
+    
+    if p_value < 0.001:
+        sig_text = "highly significant (p < .001)"
+    elif p_value < 0.01:
+        sig_text = "significant (p < .01)"
+    elif p_value < 0.05:
+        sig_text = "significant (p < .05)"
+    else:
+        sig_text = "not significant"
+    
+    if p_value < 0.05:
+        return f"After controlling for covariates, the group effect is {sig_text} with a {effect_size} effect size (partial η² = {eta_sq:.3f}). The adjusted group means differ significantly."
+    else:
+        return f"After controlling for covariates, the group effect is {sig_text}. The differences between adjusted group means are not statistically significant."
+
+
 # ============ Correlation ============
 
 @router.post("/correlation")
