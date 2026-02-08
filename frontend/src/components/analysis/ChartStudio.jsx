@@ -77,7 +77,10 @@ const CHART_TYPES = [
   { id: 'donut', label: 'Donut Chart', icon: PieChart },
   { id: 'line', label: 'Line Chart', icon: LineChartIcon },
   { id: 'area', label: 'Area Chart', icon: TrendingUp },
-  { id: 'scatter', label: 'Scatter Plot', icon: ScatterChart }
+  { id: 'scatter', label: 'Scatter Plot', icon: ScatterChart },
+  { id: 'violin', label: 'Violin Plot', icon: BarChart3 },
+  { id: 'coef', label: 'Coefficient Plot', icon: TrendingUp },
+  { id: 'heatmap', label: 'Heatmap', icon: PieChart }
 ];
 
 export function ChartStudio({ formId, orgId, fields, stats, getToken }) {
