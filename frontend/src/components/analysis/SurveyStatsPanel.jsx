@@ -504,6 +504,7 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
               {results.type === 'proportion' && <ProportionResults data={results.data} />}
               {results.type === 'regression' && <RegressionResults data={results.data} />}
               {results.type === 'deff' && <DeffResults data={results.data} />}
+              {results.type === 'replicate' && <ReplicateResults data={results.data} />}
             </ScrollArea>
           ) : (
             <div className="text-center py-12 text-slate-500">
