@@ -748,6 +748,35 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 
 ---
 
+## UPDATE: Feb 8, 2026 - Security Decorators Applied
+
+### Features Completed
+1. **Security Utilities Created** (`/app/backend/utils/security.py`)
+   - `@requires_permission(permission)` - Checks user has specific permission
+   - `@requires_role([roles])` - Checks user role membership
+   - `check_permission()` - Inline permission checking
+   - `get_user_permissions()` - Fetches user permissions from DB
+
+2. **Audit Logging Utilities Created** (`/app/backend/utils/audit.py`)
+   - `@log_action(action, target_type)` - Decorator for automatic audit logging
+   - `log_audit_event()` - Inline audit logging function
+   - `get_audit_logs()` - Query audit logs with filters
+
+3. **Decorators Applied to Critical Endpoints**
+   - Export Routes: `export_csv`, `export_json`, `export_excel`
+   - Stats Routes: `descriptives`, `ttest`, `anova`, `factor_analysis`, `clustering`, `nonparametric`, `regression`
+   - Report Routes: `create_report`, `generate_report`
+
+### Files Created/Modified
+- `/app/backend/utils/__init__.py` (NEW)
+- `/app/backend/utils/security.py` (NEW)
+- `/app/backend/utils/audit.py` (NEW)
+- `/app/backend/routes/export_routes.py` (MODIFIED)
+- `/app/backend/routes/stats_routes.py` (MODIFIED)
+- `/app/backend/routes/report_routes.py` (MODIFIED)
+
+---
+
 ## BUG FIXES (Feb 7, 2026)
 
 ### Issue #1: T-Test Validation for >2 Groups ✅
