@@ -798,6 +798,152 @@ async def run_factor_analysis(
     }
 
 
+# ============ Clustering ============
+
+@router.post("/clustering")
+async def run_clustering(
+    request: Request,
+    req: ClusteringRequest
+):
+    """Run cluster analysis (k-means or hierarchical)"""
+    db = request.app.state.db
+    
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df.empty:
+        return {"error": "No data available"}
+    
+    # Filter to requested variables
+    valid_vars = [v for v in req.variables if v in df.columns]
+    if len(valid_vars) < 2:
+        raise HTTPException(status_code=400, detail="Clustering requires at least 2 variables")
+    
+    df_numeric = df[valid_vars].apply(pd.to_numeric, errors='coerce').dropna()
+    
+    if len(df_numeric) < 10:
+        return {"error": "Clustering requires at least 10 complete cases"}
+    
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.cluster import KMeans, AgglomerativeClustering
+    from sklearn.metrics import silhouette_score, calinski_harabasz_score
+    
+    # Standardize data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(df_numeric)
+    
+    # Determine optimal number of clusters if not specified
+    if req.n_clusters is None:
+        # Elbow method + silhouette
+        inertias = []
+        silhouettes = []
+        K_range = range(2, min(11, len(df_numeric) // 2))
+        
+        for k in K_range:
+            kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+            kmeans.fit(X_scaled)
+            inertias.append(kmeans.inertia_)
+            silhouettes.append(silhouette_score(X_scaled, kmeans.labels_))
+        
+        # Find elbow (maximum silhouette)
+        optimal_k = K_range[silhouettes.index(max(silhouettes))]
+        n_clusters = optimal_k
+        
+        elbow_data = [
+            {"k": k, "inertia": round(float(inertias[i]), 2), "silhouette": round(float(silhouettes[i]), 4)}
+            for i, k in enumerate(K_range)
+        ]
+    else:
+        n_clusters = req.n_clusters
+        elbow_data = None
+    
+    result = {
+        "method": req.method,
+        "n_clusters": n_clusters,
+        "n_observations": len(df_numeric),
+        "variables": valid_vars
+    }
+    
+    if req.method == "kmeans":
+        # K-means clustering
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+        labels = kmeans.fit_predict(X_scaled)
+        
+        # Cluster centers (back-transformed)
+        centers_scaled = kmeans.cluster_centers_
+        centers = scaler.inverse_transform(centers_scaled)
+        
+        # Metrics
+        silhouette = silhouette_score(X_scaled, labels)
+        calinski = calinski_harabasz_score(X_scaled, labels)
+        
+        # Cluster profiles
+        df_numeric['cluster'] = labels
+        cluster_profiles = []
+        for i in range(n_clusters):
+            cluster_data = df_numeric[df_numeric['cluster'] == i]
+            profile = {
+                "cluster": i,
+                "n": len(cluster_data),
+                "percent": round(float(len(cluster_data) / len(df_numeric) * 100), 1),
+                "center": {var: round(float(centers[i, j]), 4) for j, var in enumerate(valid_vars)},
+                "means": {var: round(float(cluster_data[var].mean()), 4) for var in valid_vars}
+            }
+            cluster_profiles.append(profile)
+        
+        result.update({
+            "silhouette_score": round(float(silhouette), 4),
+            "calinski_harabasz": round(float(calinski), 2),
+            "inertia": round(float(kmeans.inertia_), 2),
+            "cluster_profiles": cluster_profiles,
+            "elbow_data": elbow_data
+        })
+    
+    elif req.method == "hierarchical":
+        # Hierarchical clustering
+        from scipy.cluster.hierarchy import dendrogram, linkage as scipy_linkage
+        
+        # Compute linkage matrix
+        Z = scipy_linkage(X_scaled, method=req.linkage)
+        
+        # Cut tree at n_clusters
+        hc = AgglomerativeClustering(n_clusters=n_clusters, linkage=req.linkage)
+        labels = hc.fit_predict(X_scaled)
+        
+        # Metrics
+        silhouette = silhouette_score(X_scaled, labels)
+        
+        # Cluster profiles
+        df_numeric['cluster'] = labels
+        cluster_profiles = []
+        for i in range(n_clusters):
+            cluster_data = df_numeric[df_numeric['cluster'] == i]
+            profile = {
+                "cluster": i,
+                "n": len(cluster_data),
+                "percent": round(float(len(cluster_data) / len(df_numeric) * 100), 1),
+                "means": {var: round(float(cluster_data[var].mean()), 4) for var in valid_vars}
+            }
+            cluster_profiles.append(profile)
+        
+        # Dendrogram data (simplified for plotting)
+        dendro_data = {
+            "icoord": [[round(x, 2) for x in row] for row in dendrogram(Z, no_plot=True)['icoord'][:50]],
+            "dcoord": [[round(x, 2) for x in row] for row in dendrogram(Z, no_plot=True)['dcoord'][:50]]
+        }
+        
+        result.update({
+            "linkage": req.linkage,
+            "silhouette_score": round(float(silhouette), 4),
+            "cluster_profiles": cluster_profiles,
+            "dendrogram": dendro_data
+        })
+    
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown clustering method: {req.method}")
+    
+    return result
+
+
 # ============ Nonparametric Tests ============
 
 class NonparametricRequest(BaseModel):
