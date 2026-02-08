@@ -209,7 +209,7 @@ export function Survey360RegisterPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await api.post('/auth/register', { email, password, name });
+      const response = await survey360Api.post('/auth/register', { email, password, name });
       login(response.data.user, response.data.access_token);
       toast.success('Account created successfully!');
       navigate('/solutions/survey360/app/dashboard');
