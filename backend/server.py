@@ -1,8 +1,10 @@
 """DataPulse - Main FastAPI Application"""
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 import os
 import logging
 from pathlib import Path
@@ -11,9 +13,15 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
+# MongoDB connection with connection pooling
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(
+    mongo_url,
+    minPoolSize=5,
+    maxPoolSize=50,
+    maxIdleTimeMS=30000,
+    serverSelectionTimeoutMS=5000
+)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app
@@ -25,6 +33,11 @@ app = FastAPI(
 
 # Store db in app state for route access
 app.state.db = db
+
+# Setup rate limiting
+from utils.rate_limiter import limiter, rate_limit_exceeded_handler
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
