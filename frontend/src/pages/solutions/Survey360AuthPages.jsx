@@ -7,7 +7,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { useAuthStore, useOrgStore } from '../../store';
-import api from '../../lib/api';
+import survey360Api from '../../lib/survey360Api';
 import { toast } from 'sonner';
 
 export function Survey360LoginPage() {
@@ -23,12 +23,12 @@ export function Survey360LoginPage() {
     setLoading(true);
     try {
       // Use the Survey360 backend
-      const response = await api.post('/auth/login', { email, password });
+      const response = await survey360Api.post('/auth/login', { email, password });
       login(response.data.user, response.data.access_token);
       
       // Load organizations
       try {
-        const orgsRes = await api.get('/organizations');
+        const orgsRes = await survey360Api.get('/organizations');
         setOrganizations(orgsRes.data);
         if (orgsRes.data.length > 0) {
           setCurrentOrg(orgsRes.data[0]);
