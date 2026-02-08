@@ -103,6 +103,26 @@ export function LoginPage() {
               <CardDescription>Sign in to your account to continue</CardDescription>
             </CardHeader>
             <CardContent>
+              {/* Demo Credentials Box */}
+              <div className="mb-4 p-3 bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-5 h-5 rounded-full bg-sky-500 flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">i</span>
+                  </div>
+                  <span className="font-medium text-sky-800 text-sm">Demo Credentials</span>
+                </div>
+                <div className="space-y-1 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600">Email:</span>
+                    <code className="bg-white px-2 py-0.5 rounded text-sky-700 font-mono text-xs">demo@datapulse.io</code>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600">Password:</span>
+                    <code className="bg-white px-2 py-0.5 rounded text-sky-700 font-mono text-xs">Test123!</code>
+                  </div>
+                </div>
+              </div>
+
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
