@@ -1045,7 +1045,7 @@ async def run_nonparametric_test(
             "W_statistic": round(float(statistic), 4),
             "p_value": round(float(p_value), 4),
             "effect_size_r": round(float(r), 4),
-            "significant": p_value < 0.05,
+            "significant": bool(p_value < 0.05),
             "interpretation": "Significant difference between paired observations" if p_value < 0.05 else "No significant difference between paired observations"
         })
     
