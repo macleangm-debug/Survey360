@@ -558,10 +558,25 @@ export function DataAnalysisPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center text-slate-500 py-4">No snapshots yet</p>
+                  <p className="text-center text-muted-foreground py-4">No snapshots yet</p>
                 )}
               </CardContent>
             </Card>
+
+            {/* Quick Analysis Wizard */}
+            {selectedFormId && formSchema.length > 0 && (
+              <QuickAnalysis
+                formId={selectedFormId}
+                snapshotId={selectedSnapshotId}
+                orgId={currentOrg?.id}
+                fields={formSchema}
+                getToken={getToken}
+                onRunAnalysis={(testType, results) => {
+                  toast.success(`${testType} analysis complete`);
+                  // Could navigate to results or update state here
+                }}
+              />
+            )}
           </TabsContent>
 
           {/* Variables Tab - with sub-tabs */}
