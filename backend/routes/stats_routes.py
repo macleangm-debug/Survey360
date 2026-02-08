@@ -1669,7 +1669,26 @@ async def run_regression(
                 "bic": round(float(results.bic), 2)
             })
         
-        return {
+        # Add model diagnostics
+        diagnostics = None
+        if req.include_diagnostics and req.model_type == "ols":
+            try:
+                residuals = results.resid
+                diagnostics = {
+                    "residual_mean": round(float(np.mean(residuals)), 6),
+                    "residual_std": round(float(np.std(residuals)), 4),
+                    "durbin_watson": round(float(sm.stats.stattools.durbin_watson(residuals)), 4),
+                    "jarque_bera": {
+                        "statistic": round(float(stats.jarque_bera(residuals)[0]), 4),
+                        "p_value": round(float(stats.jarque_bera(residuals)[1]), 4),
+                        "normal": bool(stats.jarque_bera(residuals)[1] > 0.05)
+                    },
+                    "condition_number": round(float(np.linalg.cond(X)), 2)
+                }
+            except Exception:
+                diagnostics = None
+        
+        response = {
             "model_type": req.model_type,
             "dependent_variable": req.dependent_var,
             "independent_variables": req.independent_vars,
@@ -1677,6 +1696,14 @@ async def run_regression(
             "model_fit": model_fit,
             "coefficients": coefficients
         }
+        
+        if interaction_info:
+            response["interactions"] = interaction_info
+        
+        if diagnostics:
+            response["diagnostics"] = diagnostics
+        
+        return response
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Model estimation failed: {str(e)}")
