@@ -15,9 +15,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Switch } from '../ui/switch';
 import { 
   FileText, Plus, Trash2, MoveUp, MoveDown, Download, Save, FileType, Table, BarChart3, Type, Minus, Loader2, File, FileSpreadsheet,
-  Package, Archive, RefreshCw, CheckCircle, Clock, Hash, Database
+  Package, Archive, RefreshCw, CheckCircle, Clock, Hash, Database, Shield
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { AuditTrail } from './AuditTrail';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
