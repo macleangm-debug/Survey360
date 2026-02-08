@@ -304,12 +304,14 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
                     <SelectContent>
                       <SelectItem value="linear">Linear (OLS)</SelectItem>
                       <SelectItem value="logistic">Logistic</SelectItem>
+                      <SelectItem value="poisson">Poisson</SelectItem>
+                      <SelectItem value="negbin">Negative Binomial</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label>Independent Variables</Label>
-                  <div className="border rounded p-2 max-h-[120px] overflow-y-auto space-y-1">
+                  <div className="border rounded p-2 max-h-[100px] overflow-y-auto space-y-1">
                     {fields.filter(f => f.id !== regConfig.dependent_var).map(f => (
                       <div key={f.id} className="flex items-center gap-2">
                         <Checkbox
@@ -323,6 +325,37 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
                       </div>
                     ))}
                   </div>
+                </div>
+                {regConfig.independent_vars.length >= 2 && (
+                  <div>
+                    <Label>Interaction Terms</Label>
+                    <div className="border rounded p-2 max-h-[80px] overflow-y-auto space-y-1">
+                      {regConfig.independent_vars.slice(0, -1).map((v1, i) => 
+                        regConfig.independent_vars.slice(i + 1).map(v2 => {
+                          const interactionKey = `${v1}*${v2}`;
+                          return (
+                            <div key={interactionKey} className="flex items-center gap-2">
+                              <Checkbox
+                                checked={regConfig.interactions?.includes(interactionKey)}
+                                onCheckedChange={c => {
+                                  if (c) setRegConfig({...regConfig, interactions: [...(regConfig.interactions || []), interactionKey]});
+                                  else setRegConfig({...regConfig, interactions: (regConfig.interactions || []).filter(v => v !== interactionKey)});
+                                }}
+                              />
+                              <span className="text-xs">{v1} × {v2}</span>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={regConfig.include_diagnostics}
+                    onCheckedChange={c => setRegConfig({...regConfig, include_diagnostics: c})}
+                  />
+                  <Label className="text-sm">Include model diagnostics</Label>
                 </div>
                 <Button onClick={runSurveyRegression} disabled={loading} className="w-full">
                   {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}Run Regression
