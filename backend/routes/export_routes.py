@@ -121,6 +121,7 @@ async def export_to_csv(
 
 
 @router.post("/json")
+@log_action("export_json", target_type="form")
 async def export_to_json(
     request: Request,
     data: ExportRequest,
