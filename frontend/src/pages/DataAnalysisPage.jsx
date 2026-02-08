@@ -555,83 +555,108 @@ export function DataAnalysisPage() {
             </Card>
           </TabsContent>
 
-          {/* Variables Tab */}
+          {/* Variables Tab - with sub-tabs */}
           <TabsContent value="variables" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Columns className="h-5 w-5" />
-                      Variable View
-                    </CardTitle>
-                    <CardDescription>Manage variable metadata and properties</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {formFields.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b bg-slate-50">
-                          <th className="p-3 text-left font-medium">Variable ID</th>
-                          <th className="p-3 text-left font-medium">Label</th>
-                          <th className="p-3 text-left font-medium">Type</th>
-                          <th className="p-3 text-left font-medium">Values</th>
-                          <th className="p-3 text-center font-medium">Required</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {formFields.map((field, idx) => (
-                          <tr key={field.id} className={`border-b ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}`}>
-                            <td className="p-3 font-mono text-xs">{field.id}</td>
-                            <td className="p-3">{field.label || '-'}</td>
-                            <td className="p-3">
-                              <Badge variant="outline" className="text-xs">
-                                {field.type}
-                              </Badge>
-                            </td>
-                            <td className="p-3">
-                              {field.options ? (
-                                <div className="flex flex-wrap gap-1">
-                                  {field.options.slice(0, 3).map((opt, i) => (
-                                    <Badge key={i} variant="secondary" className="text-xs">
-                                      {opt.label || opt.value}
-                                    </Badge>
-                                  ))}
-                                  {field.options.length > 3 && (
-                                    <Badge variant="secondary" className="text-xs">
-                                      +{field.options.length - 3} more
-                                    </Badge>
+            <Tabs defaultValue="view" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="view" className="flex items-center gap-2">
+                  <Columns className="h-4 w-4" />
+                  Variable View
+                </TabsTrigger>
+                <TabsTrigger value="missing" className="flex items-center gap-2">
+                  <FileQuestion className="h-4 w-4" />
+                  Missing Data
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="view">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <Columns className="h-5 w-5" />
+                          Variable View
+                        </CardTitle>
+                        <CardDescription>Manage variable metadata and properties</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {formFields.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b bg-slate-50">
+                              <th className="p-3 text-left font-medium">Variable ID</th>
+                              <th className="p-3 text-left font-medium">Label</th>
+                              <th className="p-3 text-left font-medium">Type</th>
+                              <th className="p-3 text-left font-medium">Values</th>
+                              <th className="p-3 text-center font-medium">Required</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {formFields.map((field, idx) => (
+                              <tr key={field.id} className={`border-b ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}`}>
+                                <td className="p-3 font-mono text-xs">{field.id}</td>
+                                <td className="p-3">{field.label || '-'}</td>
+                                <td className="p-3">
+                                  <Badge variant="outline" className="text-xs">
+                                    {field.type}
+                                  </Badge>
+                                </td>
+                                <td className="p-3">
+                                  {field.options ? (
+                                    <div className="flex flex-wrap gap-1">
+                                      {field.options.slice(0, 3).map((opt, i) => (
+                                        <Badge key={i} variant="secondary" className="text-xs">
+                                          {opt.label || opt.value}
+                                        </Badge>
+                                      ))}
+                                      {field.options.length > 3 && (
+                                        <Badge variant="secondary" className="text-xs">
+                                          +{field.options.length - 3} more
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  ) : field.type === 'number' ? (
+                                    <span className="text-slate-500">Numeric</span>
+                                  ) : (
+                                    <span className="text-slate-400">-</span>
                                   )}
-                                </div>
-                              ) : field.type === 'number' ? (
-                                <span className="text-slate-500">Numeric</span>
-                              ) : (
-                                <span className="text-slate-400">-</span>
-                              )}
-                            </td>
-                            <td className="p-3 text-center">
-                              {field.required ? (
-                                <CheckCircle className="h-4 w-4 text-emerald-500 mx-auto" />
-                              ) : (
-                                <span className="text-slate-300">-</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-slate-500">
-                    <Columns className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Select a form to view variables</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                                </td>
+                                <td className="p-3 text-center">
+                                  {field.required ? (
+                                    <CheckCircle className="h-4 w-4 text-emerald-500 mx-auto" />
+                                  ) : (
+                                    <span className="text-slate-300">-</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-12 text-slate-500">
+                        <Columns className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Select a form to view variables</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="missing">
+                <MissingDataImputation
+                  formId={selectedFormId}
+                  snapshotId={selectedSnapshotId}
+                  orgId={currentOrg?.id}
+                  fields={formFields}
+                  getToken={getToken}
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           {/* Statistics Tab */}
