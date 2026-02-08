@@ -129,6 +129,7 @@ api_router.include_router(device_router)
 api_router.include_router(analysis_router)
 api_router.include_router(stats_router)
 api_router.include_router(statistics_modular_router)  # New modular statistics routes
+api_router.include_router(job_router)  # Background job management
 api_router.include_router(ai_copilot_router)
 api_router.include_router(analysis_export_router)
 api_router.include_router(report_router)
