@@ -827,7 +827,7 @@ export function FormBuilderPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Field Types Palette */}
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <Card className="bg-card border border-border">
             <CardHeader>
               <CardTitle className="font-barlow text-lg text-white">Add Fields</CardTitle>
             </CardHeader>
@@ -848,7 +848,7 @@ export function FormBuilderPage() {
 
           {/* Form Canvas */}
           <div className="lg:col-span-3">
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50 min-h-[60vh]">
+            <Card className="bg-card border border-border min-h-[60vh]">
               <CardHeader className="border-b border-border/50">
                 <div className="flex items-center justify-between">
                   <CardTitle className="font-barlow text-lg text-white">Form Fields</CardTitle>

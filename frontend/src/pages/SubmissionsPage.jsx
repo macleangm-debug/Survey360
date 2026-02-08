@@ -361,13 +361,13 @@ export function SubmissionsPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <Card className="bg-card border border-border">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Total</p>
               <p className="text-2xl font-barlow font-bold">{submissions.length}</p>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <Card className="bg-card border border-border">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Pending</p>
               <p className="text-2xl font-barlow font-bold text-yellow-500">
@@ -375,7 +375,7 @@ export function SubmissionsPage() {
               </p>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <Card className="bg-card border border-border">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Approved</p>
               <p className="text-2xl font-barlow font-bold text-green-500">
@@ -383,7 +383,7 @@ export function SubmissionsPage() {
               </p>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <Card className="bg-card border border-border">
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Rejected</p>
               <p className="text-2xl font-barlow font-bold text-red-500">
@@ -412,7 +412,7 @@ export function SubmissionsPage() {
         )}
 
         {/* Table */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <Card className="bg-card border border-border">
           <CardContent className="p-0">
             {loading ? (
               <div className="p-4 space-y-4">

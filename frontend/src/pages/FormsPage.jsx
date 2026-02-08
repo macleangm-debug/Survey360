@@ -61,7 +61,7 @@ const FormCard = ({ form, onPublish, onDuplicate, onArchive }) => {
       transition={{ duration: 0.2 }}
     >
       <Card 
-        className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all cursor-pointer group"
+        className="bg-card border border-border hover:border-primary/50 transition-all cursor-pointer group"
         onClick={() => navigate(`/forms/${form.id}`)}
         data-testid={`form-card-${form.id}`}
       >
@@ -429,7 +429,7 @@ export function FormsPage() {
             ))}
           </div>
         ) : (
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <Card className="bg-card border border-border">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <FileText className="w-8 h-8 text-primary" />

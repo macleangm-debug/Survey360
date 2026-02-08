@@ -344,7 +344,7 @@ export function ProjectsPage() {
             ))}
           </div>
         ) : (
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+          <Card className="bg-card border border-border">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <FolderKanban className="w-8 h-8 text-primary" />

@@ -277,7 +277,7 @@ export function TeamPage() {
           {['admin', 'manager', 'analyst', 'enumerator'].map((role) => {
             const count = members.filter(m => m.role === role).length;
             return (
-              <Card key={role} className="bg-card/50 backdrop-blur-sm border-border/50">
+              <Card key={role} className="bg-card border border-border">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -293,7 +293,7 @@ export function TeamPage() {
         </div>
 
         {/* Members List */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <Card className="bg-card border border-border">
           <CardHeader>
             <CardTitle className="font-barlow">Team Members</CardTitle>
             <CardDescription>{members.length} members in {currentOrg.name}</CardDescription>
@@ -370,7 +370,7 @@ export function CreateOrganizationPage() {
   return (
     <DashboardLayout>
       <div className="max-w-xl mx-auto" data-testid="create-org-page">
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <Card className="bg-card border border-border">
           <CardHeader>
             <div className="w-12 h-12 rounded-sm bg-primary/10 flex items-center justify-center mb-4">
               <Building2 className="w-6 h-6 text-primary" />
