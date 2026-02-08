@@ -708,13 +708,43 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
   - Cluster profiles with variable means
 
 ### Phase 14: Future Enhancements (Backlog)
-- Factor Analysis visualization
-- Missing data imputation UI
-- Violin plots, coefficient plots, heatmaps
+- ROC curves and residual/QQ plots visualization
+- Chart export (PNG/SVG/PDF)
+- AI-Assisted Data Preparation suggestions
 - Dashboard sharing and permissions UI
-- Full audit trail implementation
 - Role-gating for sensitive analysis features
-- Drill-down capability for dashboards
+- ANCOVA and additional statistics tests
+
+---
+
+## UPDATE: Feb 8, 2026 - Frontend UI for NonParametric Tests & Clustering
+
+### Features Completed
+1. **Nonparametric Tests UI** (NonP tab in Advanced Statistics)
+   - Mann-Whitney U test (2 independent groups)
+   - Wilcoxon Signed-Rank test (paired samples)
+   - Kruskal-Wallis H test (3+ groups with post-hoc)
+   - Contextual info text for each test type
+
+2. **Clustering UI** (Cluster tab in Advanced Statistics)
+   - K-Means clustering with auto-detection (elbow method)
+   - Hierarchical clustering with linkage options (Ward, Complete, Average, Single)
+   - Cluster profile visualization
+   - Silhouette score display
+
+### Components Updated
+- `/app/frontend/src/components/analysis/AdvancedStatsPanel.jsx`
+  - Now has 9 tabs: T-Test, ANOVA, Corr, Reg, GLM, Mixed, EFA, NonP, Cluster
+  - Added NonparametricResults and ClusteringResults components
+  - Added state management for nonparametric and clustering configurations
+
+### Bug Fixes
+- Fixed numpy.bool serialization in Wilcoxon test (stats_routes.py line 1048)
+- Fixed numpy.bool serialization in Kruskal-Wallis post-hoc (stats_routes.py line 1102)
+
+### Test Results (Iteration 26)
+- Backend: 100% (11/11 tests passed)
+- Frontend: 100% - All 9 tabs verified working
 
 ---
 
