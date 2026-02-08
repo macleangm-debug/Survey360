@@ -43,11 +43,23 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
   const [regConfig, setRegConfig] = useState({
     dependent_var: '',
     independent_vars: [],
-    model_type: 'linear'
+    model_type: 'linear',
+    interactions: [],
+    include_diagnostics: true
   });
 
   // Design effects config
   const [deffConfig, setDeffConfig] = useState({ variables: [] });
+
+  // Replicate weights config
+  const [repConfig, setRepConfig] = useState({
+    variable: '',
+    method: 'brr',
+    replicate_vars: [],
+    psu_var: '',
+    fay_coefficient: 0.5,
+    n_replicates: 100
+  });
 
   const numericFields = fields.filter(f => ['number', 'integer', 'decimal'].includes(f.type));
   const categoricalFields = fields.filter(f => ['select', 'radio', 'text'].includes(f.type));
