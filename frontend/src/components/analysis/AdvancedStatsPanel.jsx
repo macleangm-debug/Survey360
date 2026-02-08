@@ -1936,4 +1936,304 @@ function FactorAnalysisResults({ data }) {
   );
 }
 
+// Nonparametric Results Component
+function NonparametricResults({ data }) {
+  if (data.error) {
+    return (
+      <div className="p-4 bg-red-50 rounded-lg flex items-center gap-2">
+        <AlertCircle className="h-5 w-5 text-red-600" />
+        <span className="text-red-700">{data.error}</span>
+      </div>
+    );
+  }
+
+  const isSignificant = data.significant;
+  
+  const getTestName = (type) => {
+    switch(type) {
+      case 'mann_whitney': return 'Mann-Whitney U Test';
+      case 'wilcoxon': return 'Wilcoxon Signed-Rank Test';
+      case 'kruskal_wallis': return 'Kruskal-Wallis H Test';
+      default: return 'Nonparametric Test';
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        {isSignificant ? (
+          <Badge variant="destructive" className="flex items-center gap-1">
+            <AlertCircle className="h-3 w-3" />
+            Significant
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" />
+            Not Significant
+          </Badge>
+        )}
+        <Badge variant="outline">{getTestName(data.test_type)}</Badge>
+      </div>
+
+      <Separator />
+
+      {/* Test Statistics */}
+      <div className="grid grid-cols-3 gap-4">
+        {data.U_statistic !== undefined && (
+          <div className="p-3 bg-slate-50 rounded">
+            <p className="text-sm text-slate-500">U Statistic</p>
+            <p className="text-lg font-semibold">{data.U_statistic}</p>
+          </div>
+        )}
+        {data.W_statistic !== undefined && (
+          <div className="p-3 bg-slate-50 rounded">
+            <p className="text-sm text-slate-500">W Statistic</p>
+            <p className="text-lg font-semibold">{data.W_statistic}</p>
+          </div>
+        )}
+        {data.H_statistic !== undefined && (
+          <div className="p-3 bg-slate-50 rounded">
+            <p className="text-sm text-slate-500">H Statistic</p>
+            <p className="text-lg font-semibold">{data.H_statistic}</p>
+          </div>
+        )}
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">P-Value</p>
+          <p className={`text-lg font-semibold ${isSignificant ? 'text-red-600' : ''}`}>
+            {data.p_value < 0.001 ? '< 0.001' : data.p_value}
+          </p>
+        </div>
+        {data.effect_size_r !== undefined && (
+          <div className="p-3 bg-sky-50 rounded">
+            <p className="text-sm text-slate-500">Effect Size (r)</p>
+            <p className="text-lg font-semibold">{data.effect_size_r}</p>
+          </div>
+        )}
+        {data.eta_squared !== undefined && (
+          <div className="p-3 bg-sky-50 rounded">
+            <p className="text-sm text-slate-500">Effect Size (η²)</p>
+            <p className="text-lg font-semibold">{data.eta_squared}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Group Statistics */}
+      {data.groups && data.groups.length > 0 && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Group Statistics</h4>
+          <div className="space-y-2">
+            {data.groups.map((group, idx) => (
+              <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 rounded">
+                <span className="font-medium">{group.name}</span>
+                <span className="text-sm text-slate-600">
+                  N = {group.n}, Median = {group.median}
+                  {group.mean_rank && `, Mean Rank = ${group.mean_rank}`}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Paired Data Stats */}
+      {data.var1_median !== undefined && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Paired Data Statistics</h4>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">Variable 1 Median</p>
+              <p className="text-lg font-semibold">{data.var1_median}</p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">Variable 2 Median</p>
+              <p className="text-lg font-semibold">{data.var2_median}</p>
+            </div>
+            <div className="p-3 bg-sky-50 rounded">
+              <p className="text-sm text-slate-500">Median Difference</p>
+              <p className="text-lg font-semibold">{data.median_diff}</p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Post-hoc Comparisons */}
+      {data.posthoc && data.posthoc.length > 0 && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Post-hoc Pairwise Comparisons</h4>
+          <div className="space-y-2">
+            {data.posthoc.map((comp, idx) => (
+              <div 
+                key={idx} 
+                className={`flex justify-between items-center p-2 rounded ${
+                  comp.significant ? 'bg-red-50' : 'bg-slate-50'
+                }`}
+              >
+                <span className="text-sm">
+                  {comp.group1} vs {comp.group2}
+                </span>
+                <span className="text-sm">
+                  U = {comp.U_statistic}, p = {comp.p_value} (adj: {comp.adj_p_value})
+                  {comp.significant && <span className="text-red-600 ml-1">*</span>}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-500">* p-values adjusted using Bonferroni correction</p>
+        </>
+      )}
+
+      {/* Interpretation */}
+      {data.interpretation && (
+        <div className={`p-3 rounded-lg flex items-start gap-2 ${isSignificant ? 'bg-red-50' : 'bg-emerald-50'}`}>
+          <Info className={`h-4 w-4 mt-0.5 ${isSignificant ? 'text-red-600' : 'text-emerald-600'}`} />
+          <p className={`text-sm ${isSignificant ? 'text-red-800' : 'text-emerald-800'}`}>
+            {data.interpretation}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Clustering Results Component
+function ClusteringResults({ data }) {
+  if (data.error) {
+    return (
+      <div className="p-4 bg-red-50 rounded-lg flex items-center gap-2">
+        <AlertCircle className="h-5 w-5 text-red-600" />
+        <span className="text-red-700">{data.error}</span>
+      </div>
+    );
+  }
+
+  const CLUSTER_COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        <Badge>{data.method === 'kmeans' ? 'K-Means Clustering' : 'Hierarchical Clustering'}</Badge>
+        <Badge variant="outline">{data.n_clusters} Clusters</Badge>
+        <Badge variant="outline">N = {data.n_observations}</Badge>
+      </div>
+
+      <Separator />
+
+      {/* Model Quality Metrics */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="p-3 bg-sky-50 rounded">
+          <p className="text-sm text-slate-500">Silhouette Score</p>
+          <p className="text-lg font-semibold">{data.silhouette_score}</p>
+          <p className="text-xs text-slate-500">
+            {data.silhouette_score > 0.5 ? 'Good separation' : data.silhouette_score > 0.25 ? 'Moderate' : 'Weak'}
+          </p>
+        </div>
+        {data.calinski_harabasz && (
+          <div className="p-3 bg-slate-50 rounded">
+            <p className="text-sm text-slate-500">Calinski-Harabasz</p>
+            <p className="text-lg font-semibold">{data.calinski_harabasz}</p>
+          </div>
+        )}
+        {data.inertia && (
+          <div className="p-3 bg-slate-50 rounded">
+            <p className="text-sm text-slate-500">Inertia</p>
+            <p className="text-lg font-semibold">{data.inertia}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Elbow Data */}
+      {data.elbow_data && data.elbow_data.length > 0 && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Elbow Method Analysis</h4>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-slate-50">
+                  <th className="p-2 text-center">K</th>
+                  <th className="p-2 text-right">Inertia</th>
+                  <th className="p-2 text-right">Silhouette</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.elbow_data.map((row) => (
+                  <tr 
+                    key={row.k} 
+                    className={`border-b ${row.k === data.n_clusters ? 'bg-sky-50' : ''}`}
+                  >
+                    <td className="p-2 text-center font-medium">
+                      {row.k}
+                      {row.k === data.n_clusters && <span className="ml-1 text-sky-600">←</span>}
+                    </td>
+                    <td className="p-2 text-right">{row.inertia}</td>
+                    <td className="p-2 text-right">{row.silhouette}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      <Separator />
+
+      {/* Cluster Profiles */}
+      <h4 className="font-medium">Cluster Profiles</h4>
+      <div className="space-y-3">
+        {data.cluster_profiles && data.cluster_profiles.map((cluster, idx) => (
+          <div key={idx} className="p-3 border rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-4 h-4 rounded-full" 
+                  style={{ backgroundColor: CLUSTER_COLORS[idx % CLUSTER_COLORS.length] }}
+                />
+                <span className="font-medium">Cluster {cluster.cluster}</span>
+              </div>
+              <Badge variant="outline">
+                {cluster.n} observations ({cluster.percent}%)
+              </Badge>
+            </div>
+            
+            {/* Variable Means */}
+            <div className="mt-2">
+              <p className="text-xs text-slate-500 mb-1">Variable Means:</p>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(cluster.means || cluster.center || {}).map(([varName, value]) => (
+                  <div key={varName} className="text-xs bg-slate-100 px-2 py-1 rounded">
+                    <span className="text-slate-500">{varName}:</span> {value?.toFixed(2)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Variables Used */}
+      {data.variables && (
+        <div className="p-3 bg-slate-50 rounded-lg">
+          <p className="text-sm text-slate-500 mb-1">Variables used for clustering:</p>
+          <div className="flex flex-wrap gap-1">
+            {data.variables.map(v => (
+              <Badge key={v} variant="secondary" className="text-xs">{v}</Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="p-3 bg-blue-50 rounded-lg flex items-start gap-2">
+        <Info className="h-4 w-4 text-blue-600 mt-0.5" />
+        <p className="text-sm text-blue-800">
+          Silhouette Score ranges from -1 to 1. Higher values indicate better-defined clusters. 
+          Values above 0.5 suggest strong clustering structure.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default AdvancedStatsPanel;
