@@ -125,6 +125,7 @@ async def create_template(request: Request, template: ReportTemplate, org_id: st
 # ============ Report Management ============
 
 @router.post("")
+@log_action("create_report", target_type="report")
 async def create_report(request: Request, req: CreateReportRequest):
     """Create a new report definition"""
     db = request.app.state.db
