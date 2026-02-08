@@ -587,9 +587,10 @@ export function AdvancedStatsPanel({
         </CardHeader>
         <CardContent>
           <Tabs value={activeTest} onValueChange={setActiveTest}>
-            <TabsList className="grid grid-cols-9 w-full">
+            <TabsList className="grid grid-cols-10 w-full">
               <TabsTrigger value="ttest">T-Test</TabsTrigger>
               <TabsTrigger value="anova">ANOVA</TabsTrigger>
+              <TabsTrigger value="ancova">ANCOVA</TabsTrigger>
               <TabsTrigger value="correlation">Corr</TabsTrigger>
               <TabsTrigger value="regression">Reg</TabsTrigger>
               <TabsTrigger value="glm">GLM</TabsTrigger>
