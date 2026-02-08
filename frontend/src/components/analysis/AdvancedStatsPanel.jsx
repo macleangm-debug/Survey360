@@ -2682,4 +2682,176 @@ function ClusteringResults({ data }) {
   );
 }
 
+// Proportions Results Component
+function ProportionsResults({ data }) {
+  const isSignificant = data.significant;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        {isSignificant ? (
+          <Badge variant="destructive" className="flex items-center gap-1">
+            <AlertCircle className="h-3 w-3" />
+            Significant
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" />
+            Not Significant
+          </Badge>
+        )}
+        <Badge variant="outline">
+          {data.test_type === 'one_sample' ? 'One-Sample Z-Test' : 
+           data.test_type === 'two_sample' ? 'Two-Sample Z-Test' : 
+           'Chi-Square Goodness of Fit'}
+        </Badge>
+        <Badge variant="outline">N = {data.n}</Badge>
+      </div>
+
+      <Separator />
+
+      {/* One-Sample Results */}
+      {data.test_type === 'one_sample' && (
+        <>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="p-3 bg-sky-50 rounded">
+              <p className="text-sm text-slate-500">Observed Proportion</p>
+              <p className="text-lg font-semibold">{(data.observed_proportion * 100).toFixed(1)}%</p>
+              <p className="text-xs text-slate-500">{data.successes} successes</p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">Hypothesized</p>
+              <p className="text-lg font-semibold">{(data.hypothesized_proportion * 100).toFixed(1)}%</p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">Z-Statistic</p>
+              <p className="text-lg font-semibold">{data.z_statistic}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">P-Value</p>
+              <p className={`text-lg font-semibold ${isSignificant ? 'text-red-600' : ''}`}>
+                {data.p_value < 0.001 ? '< 0.001' : data.p_value}
+              </p>
+            </div>
+            <div className="p-3 bg-emerald-50 rounded">
+              <p className="text-sm text-slate-500">95% CI</p>
+              <p className="text-lg font-semibold">
+                [{(data.ci_95[0] * 100).toFixed(1)}%, {(data.ci_95[1] * 100).toFixed(1)}%]
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Two-Sample Results */}
+      {data.test_type === 'two_sample' && data.groups && (
+        <>
+          <h4 className="font-medium">Group Proportions</h4>
+          <div className="grid grid-cols-2 gap-4">
+            {data.groups.map((grp, idx) => (
+              <div key={idx} className="p-3 bg-slate-50 rounded">
+                <p className="font-medium">{grp.name}</p>
+                <p className="text-2xl font-bold text-sky-600">{(grp.proportion * 100).toFixed(1)}%</p>
+                <p className="text-xs text-slate-500">{grp.successes} / {grp.n}</p>
+              </div>
+            ))}
+          </div>
+          <Separator />
+          <div className="grid grid-cols-4 gap-4">
+            <div className="p-3 bg-sky-50 rounded">
+              <p className="text-sm text-slate-500">Difference</p>
+              <p className="text-lg font-semibold">{(data.difference * 100).toFixed(1)}%</p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">Z-Statistic</p>
+              <p className="text-lg font-semibold">{data.z_statistic}</p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">P-Value</p>
+              <p className={`text-lg font-semibold ${isSignificant ? 'text-red-600' : ''}`}>
+                {data.p_value < 0.001 ? '< 0.001' : data.p_value}
+              </p>
+            </div>
+            <div className="p-3 bg-amber-50 rounded">
+              <p className="text-sm text-slate-500">Cohen's h</p>
+              <p className="text-lg font-semibold">{data.cohens_h}</p>
+            </div>
+          </div>
+          <div className="p-3 bg-emerald-50 rounded">
+            <p className="text-sm text-slate-500">95% CI for Difference</p>
+            <p className="text-lg font-semibold">
+              [{(data.ci_95_difference[0] * 100).toFixed(1)}%, {(data.ci_95_difference[1] * 100).toFixed(1)}%]
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* Chi-Square Goodness of Fit Results */}
+      {data.test_type === 'chi_square_gof' && data.categories && (
+        <>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">Chi-Square</p>
+              <p className="text-lg font-semibold">{data.chi_square}</p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">df</p>
+              <p className="text-lg font-semibold">{data.df}</p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded">
+              <p className="text-sm text-slate-500">P-Value</p>
+              <p className={`text-lg font-semibold ${isSignificant ? 'text-red-600' : ''}`}>
+                {data.p_value < 0.001 ? '< 0.001' : data.p_value}
+              </p>
+            </div>
+          </div>
+          <Separator />
+          <h4 className="font-medium">Category Breakdown</h4>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-slate-50">
+                  <th className="p-2 text-left">Category</th>
+                  <th className="p-2 text-right">Observed</th>
+                  <th className="p-2 text-right">Expected</th>
+                  <th className="p-2 text-right">Obs %</th>
+                  <th className="p-2 text-right">Exp %</th>
+                  <th className="p-2 text-right">Std Residual</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.categories.map((cat, idx) => (
+                  <tr key={idx} className={`border-b ${Math.abs(cat.residual) > 2 ? 'bg-red-50' : ''}`}>
+                    <td className="p-2 font-medium">{cat.value}</td>
+                    <td className="p-2 text-right">{cat.observed}</td>
+                    <td className="p-2 text-right">{cat.expected}</td>
+                    <td className="p-2 text-right">{cat.observed_pct}%</td>
+                    <td className="p-2 text-right">{cat.expected_pct}%</td>
+                    <td className={`p-2 text-right ${Math.abs(cat.residual) > 2 ? 'text-red-600 font-medium' : ''}`}>
+                      {cat.residual}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-slate-500">Standardized residuals > |2| indicate categories contributing most to chi-square</p>
+        </>
+      )}
+
+      {/* Interpretation */}
+      {data.interpretation && (
+        <div className={`p-3 rounded-lg flex items-start gap-2 ${isSignificant ? 'bg-red-50' : 'bg-emerald-50'}`}>
+          <Info className={`h-4 w-4 mt-0.5 ${isSignificant ? 'text-red-600' : 'text-emerald-600'}`} />
+          <p className={`text-sm ${isSignificant ? 'text-red-800' : 'text-emerald-800'}`}>
+            {data.interpretation}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default AdvancedStatsPanel;
