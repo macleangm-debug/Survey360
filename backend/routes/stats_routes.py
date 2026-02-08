@@ -1488,3 +1488,241 @@ async def run_kruskal_wallis(
             "epsilon_squared": round(float(epsilon_sq), 4)
         }
     }
+
+
+
+# ============ Diagnostic Visualizations ============
+
+class ROCRequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    actual_var: str  # Binary outcome variable (0/1)
+    predicted_var: str  # Predicted probability or score
+
+
+class ResidualPlotRequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    dependent_var: str
+    independent_vars: List[str]
+
+
+@router.post("/diagnostics/roc")
+@log_action("generate_roc_curve", target_type="analysis")
+async def generate_roc_curve(request: Request, req: ROCRequest):
+    """Generate ROC curve data for binary classification evaluation"""
+    db = request.app.state.db
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df is None or df.empty:
+        raise HTTPException(status_code=404, detail="No data found")
+    
+    # Validate variables exist
+    if req.actual_var not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Variable '{req.actual_var}' not found")
+    if req.predicted_var not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Variable '{req.predicted_var}' not found")
+    
+    # Get data
+    actual = pd.to_numeric(df[req.actual_var], errors='coerce')
+    predicted = pd.to_numeric(df[req.predicted_var], errors='coerce')
+    
+    # Remove missing values
+    mask = ~(actual.isna() | predicted.isna())
+    actual = actual[mask]
+    predicted = predicted[mask]
+    
+    if len(actual) < 10:
+        raise HTTPException(status_code=400, detail="Insufficient data for ROC analysis")
+    
+    # Check if actual is binary
+    unique_vals = actual.unique()
+    if len(unique_vals) != 2:
+        raise HTTPException(status_code=400, detail="Actual variable must be binary (0/1)")
+    
+    try:
+        from sklearn.metrics import roc_curve, auc, roc_auc_score
+        
+        # Calculate ROC curve
+        fpr, tpr, thresholds = roc_curve(actual, predicted)
+        roc_auc = auc(fpr, tpr)
+        
+        # Find optimal threshold (Youden's J)
+        j_scores = tpr - fpr
+        optimal_idx = np.argmax(j_scores)
+        optimal_threshold = float(thresholds[optimal_idx])
+        
+        # Generate points for plotting (subsample if too many)
+        n_points = len(fpr)
+        if n_points > 100:
+            indices = np.linspace(0, n_points - 1, 100, dtype=int)
+            fpr_plot = fpr[indices]
+            tpr_plot = tpr[indices]
+        else:
+            fpr_plot = fpr
+            tpr_plot = tpr
+        
+        # Calculate confidence interval for AUC using bootstrapping
+        n_bootstrap = 100
+        auc_scores = []
+        for _ in range(n_bootstrap):
+            idx = np.random.choice(len(actual), size=len(actual), replace=True)
+            try:
+                auc_boot = roc_auc_score(actual.iloc[idx], predicted.iloc[idx])
+                auc_scores.append(auc_boot)
+            except:
+                pass
+        
+        ci_lower = np.percentile(auc_scores, 2.5) if auc_scores else roc_auc
+        ci_upper = np.percentile(auc_scores, 97.5) if auc_scores else roc_auc
+        
+        return {
+            "curve_points": [
+                {"fpr": round(float(f), 4), "tpr": round(float(t), 4)} 
+                for f, t in zip(fpr_plot, tpr_plot)
+            ],
+            "auc": round(float(roc_auc), 4),
+            "auc_ci_lower": round(float(ci_lower), 4),
+            "auc_ci_upper": round(float(ci_upper), 4),
+            "optimal_threshold": round(optimal_threshold, 4),
+            "optimal_fpr": round(float(fpr[optimal_idx]), 4),
+            "optimal_tpr": round(float(tpr[optimal_idx]), 4),
+            "n_observations": len(actual),
+            "interpretation": get_auc_interpretation(roc_auc)
+        }
+        
+    except ImportError:
+        raise HTTPException(status_code=500, detail="sklearn required for ROC analysis")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ROC analysis failed: {str(e)}")
+
+
+def get_auc_interpretation(auc):
+    """Interpret AUC value"""
+    if auc >= 0.9:
+        return "Excellent discrimination"
+    elif auc >= 0.8:
+        return "Good discrimination"
+    elif auc >= 0.7:
+        return "Fair discrimination"
+    elif auc >= 0.6:
+        return "Poor discrimination"
+    else:
+        return "No discrimination (random)"
+
+
+@router.post("/diagnostics/residuals")
+@log_action("generate_residual_plots", target_type="analysis")
+async def generate_residual_plots(request: Request, req: ResidualPlotRequest):
+    """Generate residual and Q-Q plot data for regression diagnostics"""
+    db = request.app.state.db
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df is None or df.empty:
+        raise HTTPException(status_code=404, detail="No data found")
+    
+    # Validate variables
+    all_vars = [req.dependent_var] + req.independent_vars
+    missing = [v for v in all_vars if v not in df.columns]
+    if missing:
+        raise HTTPException(status_code=400, detail=f"Variables not found: {missing}")
+    
+    # Prepare data
+    df_model = df[all_vars].dropna()
+    
+    if len(df_model) < len(req.independent_vars) + 5:
+        raise HTTPException(status_code=400, detail="Insufficient data for regression")
+    
+    try:
+        import statsmodels.api as sm
+        
+        y = df_model[req.dependent_var]
+        X = df_model[req.independent_vars]
+        X = sm.add_constant(X)
+        
+        model = sm.OLS(y, X).fit()
+        
+        # Get residuals and fitted values
+        residuals = model.resid
+        fitted = model.fittedvalues
+        standardized_resid = (residuals - residuals.mean()) / residuals.std()
+        
+        # Residuals vs Fitted plot data
+        resid_fitted = [
+            {"fitted": round(float(f), 4), "residual": round(float(r), 4)}
+            for f, r in zip(fitted, residuals)
+        ]
+        
+        # Q-Q plot data
+        sorted_resid = np.sort(standardized_resid)
+        theoretical_quantiles = scipy_stats.norm.ppf(
+            (np.arange(1, len(sorted_resid) + 1) - 0.5) / len(sorted_resid)
+        )
+        
+        qq_data = [
+            {"theoretical": round(float(t), 4), "sample": round(float(s), 4)}
+            for t, s in zip(theoretical_quantiles, sorted_resid)
+        ]
+        
+        # Scale-Location plot (sqrt of standardized residuals vs fitted)
+        sqrt_abs_resid = np.sqrt(np.abs(standardized_resid))
+        scale_location = [
+            {"fitted": round(float(f), 4), "sqrt_std_resid": round(float(r), 4)}
+            for f, r in zip(fitted, sqrt_abs_resid)
+        ]
+        
+        # Diagnostic tests
+        # Shapiro-Wilk for normality (on residuals)
+        if len(residuals) <= 5000:
+            shapiro_stat, shapiro_p = scipy_stats.shapiro(residuals)
+        else:
+            # Use a sample for large datasets
+            sample_resid = np.random.choice(residuals, 5000, replace=False)
+            shapiro_stat, shapiro_p = scipy_stats.shapiro(sample_resid)
+        
+        # Durbin-Watson for autocorrelation
+        from statsmodels.stats.stattools import durbin_watson
+        dw_stat = durbin_watson(residuals)
+        
+        # Breusch-Pagan for heteroscedasticity
+        try:
+            from statsmodels.stats.diagnostic import het_breuschpagan
+            bp_stat, bp_p, _, _ = het_breuschpagan(residuals, X)
+        except:
+            bp_stat, bp_p = None, None
+        
+        return {
+            "n_observations": len(df_model),
+            "r_squared": round(float(model.rsquared), 4),
+            "residuals_vs_fitted": resid_fitted[:200] if len(resid_fitted) > 200 else resid_fitted,
+            "qq_plot": qq_data[:200] if len(qq_data) > 200 else qq_data,
+            "scale_location": scale_location[:200] if len(scale_location) > 200 else scale_location,
+            "diagnostics": {
+                "shapiro_wilk": {
+                    "statistic": round(float(shapiro_stat), 4),
+                    "p_value": round(float(shapiro_p), 4),
+                    "normal": bool(shapiro_p > 0.05)
+                },
+                "durbin_watson": {
+                    "statistic": round(float(dw_stat), 4),
+                    "interpretation": "No autocorrelation" if 1.5 < dw_stat < 2.5 else "Possible autocorrelation"
+                },
+                "breusch_pagan": {
+                    "statistic": round(float(bp_stat), 4) if bp_stat else None,
+                    "p_value": round(float(bp_p), 4) if bp_p else None,
+                    "homoscedastic": bool(bp_p > 0.05) if bp_p else None
+                } if bp_stat else None
+            },
+            "summary": {
+                "mean_residual": round(float(residuals.mean()), 6),
+                "std_residual": round(float(residuals.std()), 4),
+                "min_residual": round(float(residuals.min()), 4),
+                "max_residual": round(float(residuals.max()), 4)
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Residual analysis failed: {str(e)}")
+
