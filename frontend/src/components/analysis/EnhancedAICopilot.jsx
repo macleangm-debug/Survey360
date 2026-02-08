@@ -380,6 +380,30 @@ export function EnhancedAICopilot({ formId, snapshotId, orgId, fields, getToken 
                                   )}
                                 </div>
 
+                                {/* Evidence-Linked Narrative */}
+                                {conv.results && (
+                                  <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-100">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <FileText className="h-4 w-4 text-purple-600" />
+                                      <span className="font-medium text-purple-800 text-sm">AI Narrative Summary</span>
+                                    </div>
+                                    <p className="text-sm text-slate-700 leading-relaxed">
+                                      {generateNarrative(conv.results, conv.analysisPlan)}
+                                    </p>
+                                    <div className="mt-2 flex flex-wrap gap-1">
+                                      {conv.results.interpretation && (
+                                        <Badge variant="outline" className="text-xs bg-white">
+                                          <CheckCircle className="h-3 w-3 mr-1 text-emerald-500" />
+                                          Interpretation verified
+                                        </Badge>
+                                      )}
+                                      <Badge variant="outline" className="text-xs bg-white">
+                                        Source: {conv.analysisPlan?.api_endpoint?.split('/').pop() || 'analysis'}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                )}
+
                                 {/* Full Results (expandable) */}
                                 {expandedResults[conv.id] && (
                                   <pre className="bg-slate-800 text-slate-100 p-3 rounded text-xs overflow-x-auto max-h-[300px]">
