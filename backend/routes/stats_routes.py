@@ -637,6 +637,7 @@ async def run_reliability(
 # ============ Factor Analysis ============
 
 @router.post("/factor-analysis")
+@log_action("run_factor_analysis", target_type="analysis")
 async def run_factor_analysis(
     request: Request,
     req: FactorAnalysisRequest
