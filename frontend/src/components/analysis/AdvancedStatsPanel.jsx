@@ -1533,6 +1533,162 @@ function ANOVAResults({ data }) {
   );
 }
 
+// ANCOVA Results Component
+function ANCOVAResults({ data }) {
+  const isSignificant = data.group_effect?.significant;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        {isSignificant ? (
+          <Badge variant="destructive" className="flex items-center gap-1">
+            <AlertCircle className="h-3 w-3" />
+            Significant
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" />
+            Not Significant
+          </Badge>
+        )}
+        <Badge variant="outline">ANCOVA</Badge>
+        <Badge variant="outline">N = {data.n_observations}</Badge>
+      </div>
+
+      <Separator />
+
+      {/* Group Effect */}
+      <h4 className="font-medium">Group Effect (controlling for covariates)</h4>
+      <div className="grid grid-cols-4 gap-4">
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">F-Statistic</p>
+          <p className="text-lg font-semibold">{data.group_effect?.F}</p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">P-Value</p>
+          <p className={`text-lg font-semibold ${isSignificant ? 'text-red-600' : ''}`}>
+            {data.group_effect?.p_value < 0.001 ? '< 0.001' : data.group_effect?.p_value}
+          </p>
+        </div>
+        <div className="p-3 bg-slate-50 rounded">
+          <p className="text-sm text-slate-500">df</p>
+          <p className="text-lg font-semibold">{data.group_effect?.df}</p>
+        </div>
+        <div className="p-3 bg-sky-50 rounded">
+          <p className="text-sm text-slate-500">Partial η²</p>
+          <p className="text-lg font-semibold">{data.group_effect?.partial_eta_squared}</p>
+        </div>
+      </div>
+
+      {/* Adjusted Means */}
+      {data.adjusted_means && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Adjusted Group Means</h4>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-slate-50">
+                  <th className="p-2 text-left">Group</th>
+                  <th className="p-2 text-right">N</th>
+                  <th className="p-2 text-right">Raw Mean</th>
+                  <th className="p-2 text-right">Adjusted Mean</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.adjusted_means.map((row, idx) => (
+                  <tr key={idx} className="border-b">
+                    <td className="p-2 font-medium">{row.group}</td>
+                    <td className="p-2 text-right">{row.n}</td>
+                    <td className="p-2 text-right">{row.raw_mean}</td>
+                    <td className="p-2 text-right font-medium text-sky-600">{row.adjusted_mean}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-slate-500">Adjusted means estimated at covariate mean values</p>
+        </>
+      )}
+
+      {/* Covariate Effects */}
+      {data.covariate_effects && data.covariate_effects.length > 0 && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Covariate Effects</h4>
+          <div className="space-y-2">
+            {data.covariate_effects.map((cov, idx) => (
+              <div 
+                key={idx} 
+                className={`flex justify-between items-center p-2 rounded ${
+                  cov.significant ? 'bg-amber-50' : 'bg-slate-50'
+                }`}
+              >
+                <span className="font-medium">{cov.variable}</span>
+                <span className="text-sm text-slate-600">
+                  β = {cov.coefficient}, t = {cov.t_value}, p = {cov.p_value}
+                  {cov.significant && <span className="text-amber-600 ml-1">*</span>}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Pairwise Comparisons */}
+      {data.pairwise_comparisons && data.pairwise_comparisons.length > 0 && (
+        <>
+          <Separator />
+          <h4 className="font-medium">Pairwise Comparisons (Adjusted Means)</h4>
+          <div className="space-y-2">
+            {data.pairwise_comparisons.map((comp, idx) => (
+              <div 
+                key={idx} 
+                className={`flex justify-between items-center p-2 rounded ${
+                  comp.significant ? 'bg-red-50' : 'bg-slate-50'
+                }`}
+              >
+                <span className="text-sm">
+                  {comp.group1} vs {comp.group2}
+                </span>
+                <span className="text-sm">
+                  Δ = {comp.diff_adjusted}, t = {comp.t_statistic}, p_adj = {comp.p_adjusted}
+                  {comp.significant && <span className="text-red-600 ml-1">*</span>}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-500">{data.pairwise_note}</p>
+        </>
+      )}
+
+      {/* Model Fit */}
+      {data.model_fit && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-3 bg-emerald-50 rounded">
+            <p className="text-sm text-slate-500">R²</p>
+            <p className="text-lg font-semibold">{data.model_fit.r_squared}</p>
+          </div>
+          <div className="p-3 bg-emerald-50 rounded">
+            <p className="text-sm text-slate-500">Adjusted R²</p>
+            <p className="text-lg font-semibold">{data.model_fit.adj_r_squared}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Interpretation */}
+      {data.interpretation && (
+        <div className={`p-3 rounded-lg flex items-start gap-2 ${isSignificant ? 'bg-red-50' : 'bg-emerald-50'}`}>
+          <Info className={`h-4 w-4 mt-0.5 ${isSignificant ? 'text-red-600' : 'text-emerald-600'}`} />
+          <p className={`text-sm ${isSignificant ? 'text-red-800' : 'text-emerald-800'}`}>
+            {data.interpretation}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Correlation Results Component
 function CorrelationResults({ data }) {
   return (
