@@ -108,10 +108,15 @@ async def run_proportions_test(request: Request, req: ProportionsRequest):
 
 
 @router.post("/chi-square")
+@limiter.limit(RATE_LIMIT_STATS)
 async def run_chi_square(request: Request, req: ChiSquareRequest):
     """Run chi-square test of independence"""
     db = request.app.state.db
-    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    df, schema, metadata = await get_analysis_data(
+        db, req.snapshot_id, req.form_id,
+        sample=getattr(req, 'sample', True),
+        sample_size=getattr(req, 'sample_size', 10000)
+    )
     
     if df.empty:
         raise HTTPException(status_code=404, detail="No data found")
