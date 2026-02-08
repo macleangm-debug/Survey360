@@ -11,6 +11,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
 
 from .utils import BaseStatsRequest, get_analysis_data, safe_float, safe_int
+from utils.rate_limiter import limiter
+from config.scalability import RATE_LIMIT_STATS
 
 router = APIRouter(prefix="/statistics", tags=["statistics"])
 
@@ -23,10 +25,14 @@ class ClusteringRequest(BaseStatsRequest):
 
 
 @router.post("/clustering")
+@limiter.limit(RATE_LIMIT_STATS)
 async def run_clustering(request: Request, req: ClusteringRequest):
     """Run clustering analysis (K-Means or Hierarchical)"""
     db = request.app.state.db
-    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    df, schema, metadata = await get_analysis_data(
+        db, req.snapshot_id, req.form_id,
+        sample=req.sample, sample_size=req.sample_size
+    )
     
     if df.empty:
         raise HTTPException(status_code=404, detail="No data found")

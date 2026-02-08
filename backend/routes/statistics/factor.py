@@ -9,6 +9,8 @@ from factor_analyzer import FactorAnalyzer
 from factor_analyzer.factor_analyzer import calculate_kmo, calculate_bartlett_sphericity
 
 from .utils import BaseStatsRequest, get_analysis_data, safe_float, safe_int
+from utils.rate_limiter import limiter
+from config.scalability import RATE_LIMIT_STATS
 
 router = APIRouter(prefix="/statistics", tags=["statistics"])
 
@@ -24,10 +26,14 @@ class FactorAnalysisRequest(BaseStatsRequest):
 
 
 @router.post("/reliability")
+@limiter.limit(RATE_LIMIT_STATS)
 async def run_reliability(request: Request, req: ReliabilityRequest):
     """Calculate Cronbach's alpha and item-total statistics"""
     db = request.app.state.db
-    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    df, schema, metadata = await get_analysis_data(
+        db, req.snapshot_id, req.form_id,
+        sample=req.sample, sample_size=req.sample_size
+    )
     
     if df.empty:
         raise HTTPException(status_code=404, detail="No data found")
