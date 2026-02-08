@@ -767,6 +767,13 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
    - Stats Routes: `descriptives`, `ttest`, `anova`, `factor_analysis`, `clustering`, `nonparametric`, `regression`
    - Report Routes: `create_report`, `generate_report`
 
+4. **Chart Export Functionality** (`ChartStudio.jsx`)
+   - Export charts as PNG (high resolution 2x)
+   - Export charts as SVG (vector format)
+   - Export charts as PDF with title/subtitle (via backend)
+   - Format selector dropdown in UI
+   - Backend endpoint: `/api/analysis/export-chart-pdf`
+
 ### Files Created/Modified
 - `/app/backend/utils/__init__.py` (NEW)
 - `/app/backend/utils/security.py` (NEW)
@@ -774,6 +781,8 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 - `/app/backend/routes/export_routes.py` (MODIFIED)
 - `/app/backend/routes/stats_routes.py` (MODIFIED)
 - `/app/backend/routes/report_routes.py` (MODIFIED)
+- `/app/backend/routes/analysis_routes.py` (MODIFIED - added chart PDF export)
+- `/app/frontend/src/components/analysis/ChartStudio.jsx` (MODIFIED - export UI)
 
 ---
 
