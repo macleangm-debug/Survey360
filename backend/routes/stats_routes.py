@@ -788,6 +788,325 @@ async def run_factor_analysis(
     }
 
 
+# ============ Nonparametric Tests ============
+
+class NonparametricRequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    test_type: str  # mann_whitney, wilcoxon, kruskal_wallis, friedman
+    dependent_var: str
+    group_var: Optional[str] = None  # For Mann-Whitney and Kruskal-Wallis
+    paired_var: Optional[str] = None  # For Wilcoxon signed-rank
+
+
+@router.post("/nonparametric")
+async def run_nonparametric_test(
+    request: Request,
+    req: NonparametricRequest
+):
+    """Run nonparametric statistical tests"""
+    db = request.app.state.db
+    
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df.empty:
+        return {"error": "No data available"}
+    
+    # Validate variables
+    if req.dependent_var not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Variable {req.dependent_var} not found")
+    
+    # Convert to numeric
+    df[req.dependent_var] = pd.to_numeric(df[req.dependent_var], errors='coerce')
+    
+    result = {
+        "test_type": req.test_type,
+        "dependent_var": req.dependent_var
+    }
+    
+    if req.test_type == "mann_whitney":
+        # Mann-Whitney U test (two independent samples)
+        if not req.group_var or req.group_var not in df.columns:
+            raise HTTPException(status_code=400, detail="Group variable required for Mann-Whitney test")
+        
+        groups = df[req.group_var].dropna().unique()
+        if len(groups) != 2:
+            raise HTTPException(status_code=400, detail=f"Mann-Whitney test requires exactly 2 groups, found {len(groups)}")
+        
+        group1_data = df[df[req.group_var] == groups[0]][req.dependent_var].dropna()
+        group2_data = df[df[req.group_var] == groups[1]][req.dependent_var].dropna()
+        
+        if len(group1_data) < 3 or len(group2_data) < 3:
+            return {"error": "Each group needs at least 3 observations"}
+        
+        statistic, p_value = scipy_stats.mannwhitneyu(group1_data, group2_data, alternative='two-sided')
+        
+        # Effect size (rank-biserial correlation)
+        n1, n2 = len(group1_data), len(group2_data)
+        r = 1 - (2 * statistic) / (n1 * n2)
+        
+        result.update({
+            "group_var": req.group_var,
+            "groups": [
+                {"name": str(groups[0]), "n": len(group1_data), "median": round(float(group1_data.median()), 4), "mean_rank": round(float(scipy_stats.rankdata(list(group1_data) + list(group2_data))[:len(group1_data)].mean()), 2)},
+                {"name": str(groups[1]), "n": len(group2_data), "median": round(float(group2_data.median()), 4), "mean_rank": round(float(scipy_stats.rankdata(list(group1_data) + list(group2_data))[len(group1_data):].mean()), 2)}
+            ],
+            "U_statistic": round(float(statistic), 4),
+            "p_value": round(float(p_value), 4),
+            "effect_size_r": round(float(r), 4),
+            "significant": p_value < 0.05,
+            "interpretation": "Significant difference between groups" if p_value < 0.05 else "No significant difference between groups"
+        })
+    
+    elif req.test_type == "wilcoxon":
+        # Wilcoxon signed-rank test (paired samples)
+        if not req.paired_var or req.paired_var not in df.columns:
+            raise HTTPException(status_code=400, detail="Paired variable required for Wilcoxon test")
+        
+        df[req.paired_var] = pd.to_numeric(df[req.paired_var], errors='coerce')
+        paired_df = df[[req.dependent_var, req.paired_var]].dropna()
+        
+        if len(paired_df) < 6:
+            return {"error": "Wilcoxon test requires at least 6 paired observations"}
+        
+        var1 = paired_df[req.dependent_var]
+        var2 = paired_df[req.paired_var]
+        
+        statistic, p_value = scipy_stats.wilcoxon(var1, var2)
+        
+        # Effect size (matched-pairs rank-biserial)
+        diff = var1 - var2
+        n = len(diff[diff != 0])
+        r = 1 - (2 * statistic) / (n * (n + 1) / 2) if n > 0 else 0
+        
+        result.update({
+            "paired_var": req.paired_var,
+            "n_pairs": len(paired_df),
+            "var1_median": round(float(var1.median()), 4),
+            "var2_median": round(float(var2.median()), 4),
+            "median_diff": round(float((var1 - var2).median()), 4),
+            "W_statistic": round(float(statistic), 4),
+            "p_value": round(float(p_value), 4),
+            "effect_size_r": round(float(r), 4),
+            "significant": p_value < 0.05,
+            "interpretation": "Significant difference between paired observations" if p_value < 0.05 else "No significant difference between paired observations"
+        })
+    
+    elif req.test_type == "kruskal_wallis":
+        # Kruskal-Wallis H test (>2 independent groups)
+        if not req.group_var or req.group_var not in df.columns:
+            raise HTTPException(status_code=400, detail="Group variable required for Kruskal-Wallis test")
+        
+        groups = df[req.group_var].dropna().unique()
+        if len(groups) < 2:
+            raise HTTPException(status_code=400, detail="Kruskal-Wallis test requires at least 2 groups")
+        
+        group_data = []
+        group_stats = []
+        for g in groups:
+            gdata = df[df[req.group_var] == g][req.dependent_var].dropna()
+            if len(gdata) >= 2:
+                group_data.append(gdata)
+                group_stats.append({
+                    "name": str(g),
+                    "n": len(gdata),
+                    "median": round(float(gdata.median()), 4),
+                    "mean": round(float(gdata.mean()), 4)
+                })
+        
+        if len(group_data) < 2:
+            return {"error": "Need at least 2 groups with sufficient data"}
+        
+        statistic, p_value = scipy_stats.kruskal(*group_data)
+        
+        # Effect size (eta-squared)
+        n_total = sum(len(g) for g in group_data)
+        k = len(group_data)
+        eta_sq = (statistic - k + 1) / (n_total - k) if n_total > k else 0
+        
+        # Post-hoc Dunn test (pairwise comparisons)
+        posthoc_results = []
+        if p_value < 0.05 and len(groups) > 2:
+            for i, g1 in enumerate(groups):
+                for j, g2 in enumerate(groups):
+                    if i < j:
+                        d1 = df[df[req.group_var] == g1][req.dependent_var].dropna()
+                        d2 = df[df[req.group_var] == g2][req.dependent_var].dropna()
+                        if len(d1) >= 2 and len(d2) >= 2:
+                            u_stat, u_p = scipy_stats.mannwhitneyu(d1, d2, alternative='two-sided')
+                            # Bonferroni correction
+                            adj_p = min(1.0, u_p * (len(groups) * (len(groups) - 1) / 2))
+                            posthoc_results.append({
+                                "group1": str(g1),
+                                "group2": str(g2),
+                                "U_statistic": round(float(u_stat), 4),
+                                "p_value": round(float(u_p), 4),
+                                "adj_p_value": round(float(adj_p), 4),
+                                "significant": adj_p < 0.05
+                            })
+        
+        result.update({
+            "group_var": req.group_var,
+            "n_groups": len(group_data),
+            "groups": group_stats,
+            "H_statistic": round(float(statistic), 4),
+            "df": len(group_data) - 1,
+            "p_value": round(float(p_value), 4),
+            "eta_squared": round(float(eta_sq), 4),
+            "significant": p_value < 0.05,
+            "posthoc": posthoc_results if posthoc_results else None,
+            "interpretation": "Significant difference among groups" if p_value < 0.05 else "No significant difference among groups"
+        })
+    
+    elif req.test_type == "friedman":
+        # Friedman test (repeated measures, >2 conditions)
+        raise HTTPException(status_code=501, detail="Friedman test requires repeated measures data structure")
+    
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown test type: {req.test_type}")
+    
+    return result
+
+
+# ============ Proportions Tests ============
+
+class ProportionsRequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    test_type: str  # one_sample, two_sample, chi_square
+    variable: str
+    success_value: Optional[str] = None  # Value to count as "success"
+    hypothesized_prop: Optional[float] = None  # For one-sample test
+    group_var: Optional[str] = None  # For two-sample test
+
+
+@router.post("/proportions")
+async def run_proportions_test(
+    request: Request,
+    req: ProportionsRequest
+):
+    """Run proportions tests (one-sample, two-sample, chi-square)"""
+    db = request.app.state.db
+    
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df.empty:
+        return {"error": "No data available"}
+    
+    if req.variable not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Variable {req.variable} not found")
+    
+    result = {
+        "test_type": req.test_type,
+        "variable": req.variable
+    }
+    
+    if req.test_type == "one_sample":
+        # One-sample proportions test
+        if req.hypothesized_prop is None:
+            raise HTTPException(status_code=400, detail="Hypothesized proportion required")
+        if not req.success_value:
+            raise HTTPException(status_code=400, detail="Success value required")
+        
+        valid_data = df[req.variable].dropna()
+        n = len(valid_data)
+        successes = (valid_data == req.success_value).sum()
+        observed_prop = successes / n if n > 0 else 0
+        
+        # Z-test for proportion
+        p0 = req.hypothesized_prop
+        se = np.sqrt(p0 * (1 - p0) / n) if n > 0 else 0
+        z = (observed_prop - p0) / se if se > 0 else 0
+        p_value = 2 * (1 - scipy_stats.norm.cdf(abs(z)))
+        
+        # Confidence interval
+        se_ci = np.sqrt(observed_prop * (1 - observed_prop) / n) if n > 0 else 0
+        ci_lower = observed_prop - 1.96 * se_ci
+        ci_upper = observed_prop + 1.96 * se_ci
+        
+        result.update({
+            "success_value": req.success_value,
+            "n": n,
+            "successes": int(successes),
+            "observed_proportion": round(float(observed_prop), 4),
+            "hypothesized_proportion": req.hypothesized_prop,
+            "z_statistic": round(float(z), 4),
+            "p_value": round(float(p_value), 4),
+            "ci_95": [round(float(max(0, ci_lower)), 4), round(float(min(1, ci_upper)), 4)],
+            "significant": p_value < 0.05
+        })
+    
+    elif req.test_type == "two_sample":
+        # Two-sample proportions test
+        if not req.group_var or req.group_var not in df.columns:
+            raise HTTPException(status_code=400, detail="Group variable required")
+        if not req.success_value:
+            raise HTTPException(status_code=400, detail="Success value required")
+        
+        groups = df[req.group_var].dropna().unique()
+        if len(groups) != 2:
+            raise HTTPException(status_code=400, detail="Two-sample test requires exactly 2 groups")
+        
+        g1_data = df[df[req.group_var] == groups[0]][req.variable].dropna()
+        g2_data = df[df[req.group_var] == groups[1]][req.variable].dropna()
+        
+        n1, n2 = len(g1_data), len(g2_data)
+        x1 = (g1_data == req.success_value).sum()
+        x2 = (g2_data == req.success_value).sum()
+        p1, p2 = x1/n1 if n1 > 0 else 0, x2/n2 if n2 > 0 else 0
+        
+        # Pooled proportion
+        p_pooled = (x1 + x2) / (n1 + n2) if (n1 + n2) > 0 else 0
+        se = np.sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2)) if n1 > 0 and n2 > 0 else 0
+        z = (p1 - p2) / se if se > 0 else 0
+        p_value = 2 * (1 - scipy_stats.norm.cdf(abs(z)))
+        
+        result.update({
+            "group_var": req.group_var,
+            "success_value": req.success_value,
+            "groups": [
+                {"name": str(groups[0]), "n": n1, "successes": int(x1), "proportion": round(float(p1), 4)},
+                {"name": str(groups[1]), "n": n2, "successes": int(x2), "proportion": round(float(p2), 4)}
+            ],
+            "difference": round(float(p1 - p2), 4),
+            "z_statistic": round(float(z), 4),
+            "p_value": round(float(p_value), 4),
+            "significant": p_value < 0.05
+        })
+    
+    elif req.test_type == "chi_square":
+        # Chi-square test for independence
+        if not req.group_var or req.group_var not in df.columns:
+            raise HTTPException(status_code=400, detail="Group variable required for chi-square test")
+        
+        # Create contingency table
+        contingency = pd.crosstab(df[req.variable], df[req.group_var])
+        
+        chi2, p_value, dof, expected = scipy_stats.chi2_contingency(contingency)
+        
+        # Effect size (Cramér's V)
+        n = contingency.sum().sum()
+        min_dim = min(contingency.shape) - 1
+        cramers_v = np.sqrt(chi2 / (n * min_dim)) if n > 0 and min_dim > 0 else 0
+        
+        result.update({
+            "group_var": req.group_var,
+            "contingency_table": contingency.to_dict(),
+            "chi_square": round(float(chi2), 4),
+            "df": int(dof),
+            "p_value": round(float(p_value), 4),
+            "cramers_v": round(float(cramers_v), 4),
+            "significant": p_value < 0.05
+        })
+    
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown test type: {req.test_type}")
+    
+    return result
+
+
 # ============ Regression ============
 
 @router.post("/regression")
