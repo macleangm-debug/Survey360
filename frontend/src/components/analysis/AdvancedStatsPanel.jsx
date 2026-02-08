@@ -864,6 +864,102 @@ export function AdvancedStatsPanel({
               </div>
             </TabsContent>
 
+            {/* Proportions Test Configuration */}
+            <TabsContent value="props" className="space-y-4 mt-4">
+              <div className="space-y-3">
+                <div>
+                  <Label>Test Type</Label>
+                  <Select 
+                    value={propConfig.testType} 
+                    onValueChange={(v) => setPropConfig({...propConfig, testType: v, groupVar: ''})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="one_sample">One-Sample (vs hypothesized)</SelectItem>
+                      <SelectItem value="two_sample">Two-Sample (compare groups)</SelectItem>
+                      <SelectItem value="chi_square_gof">Chi-Square Goodness of Fit</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Variable</Label>
+                  <Select 
+                    value={propConfig.variable} 
+                    onValueChange={(v) => setPropConfig({...propConfig, variable: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select variable..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allFields.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {propConfig.testType !== 'chi_square_gof' && (
+                  <div>
+                    <Label>Success Value (what counts as "success")</Label>
+                    <Input
+                      value={propConfig.successValue}
+                      onChange={e => setPropConfig({...propConfig, successValue: e.target.value})}
+                      placeholder="e.g., Yes, 1, Agree"
+                    />
+                  </div>
+                )}
+
+                {propConfig.testType === 'one_sample' && (
+                  <div>
+                    <Label>Hypothesized Proportion</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="1"
+                      value={propConfig.hypothesizedProp}
+                      onChange={e => setPropConfig({...propConfig, hypothesizedProp: e.target.value})}
+                      placeholder="0.5"
+                    />
+                  </div>
+                )}
+
+                {propConfig.testType === 'two_sample' && (
+                  <div>
+                    <Label>Grouping Variable (2 groups)</Label>
+                    <Select 
+                      value={propConfig.groupVar} 
+                      onValueChange={(v) => setPropConfig({...propConfig, groupVar: v})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select grouping variable..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoricalFields.map(f => (
+                          <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="bg-slate-50 p-2 rounded text-xs text-slate-600">
+                  <Info className="h-3 w-3 inline mr-1" />
+                  {propConfig.testType === 'one_sample' && 'Tests if observed proportion differs from a hypothesized value.'}
+                  {propConfig.testType === 'two_sample' && 'Compares proportions between two groups (Z-test).'}
+                  {propConfig.testType === 'chi_square_gof' && 'Tests if observed distribution matches expected proportions.'}
+                </div>
+
+                <Button onClick={runProportionsTest} disabled={loading} className="w-full">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Run Proportions Test
+                </Button>
+              </div>
+            </TabsContent>
+
             {/* Correlation Configuration */}
             <TabsContent value="correlation" className="space-y-4 mt-4">
               <div className="space-y-3">
