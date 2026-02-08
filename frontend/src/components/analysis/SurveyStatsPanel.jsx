@@ -618,25 +618,82 @@ function RegressionResults({ data }) {
 function DeffResults({ data }) {
   return (
     <div className="space-y-4">
-      <div className="p-3 bg-sky-50 rounded-lg">
+      <div className="p-3 bg-sky-50 dark:bg-sky-950/30 rounded-lg">
         <p className="text-sm"><strong>Average DEFF:</strong> {data.average_deff}</p>
-        <p className="text-sm text-slate-600">Observations: {data.design_info?.n_obs} | Clusters: {data.design_info?.n_clusters}</p>
+        <p className="text-sm text-muted-foreground">Observations: {data.design_info?.n_obs} | Clusters: {data.design_info?.n_clusters}</p>
       </div>
       <h4 className="font-medium">Variable Design Effects</h4>
       <div className="space-y-2">
         {data.effects?.map((e, i) => (
-          <div key={i} className="p-3 bg-slate-50 rounded-lg">
+          <div key={i} className="p-3 bg-muted/50 rounded-lg">
             <div className="flex justify-between items-center">
               <span className="font-medium">{e.variable}</span>
               <Badge variant={e.design_effect > 2 ? 'destructive' : 'outline'}>DEFF: {e.design_effect}</Badge>
             </div>
-            <div className="text-sm text-slate-600 mt-1">
+            <div className="text-sm text-muted-foreground mt-1">
               N: {e.n} | Effective N: {e.effective_n}
             </div>
-            <div className="text-xs text-slate-500 mt-1">{e.interpretation}</div>
+            <div className="text-xs text-muted-foreground mt-1">{e.interpretation}</div>
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ReplicateResults({ data }) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Badge variant="outline">{data.method?.toUpperCase()}</Badge>
+        <Badge>{data.variable}</Badge>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-4">
+        <div className="p-4 bg-sky-50 dark:bg-sky-950/30 rounded-lg text-center">
+          <p className="text-2xl font-bold text-sky-700 dark:text-sky-400">{data.estimate}</p>
+          <p className="text-sm text-muted-foreground">Point Estimate</p>
+        </div>
+        <div className="p-4 bg-muted/50 rounded-lg text-center">
+          <p className="text-2xl font-bold">{data.std_error}</p>
+          <p className="text-sm text-muted-foreground">Std. Error</p>
+        </div>
+        <div className="p-4 bg-muted/50 rounded-lg text-center">
+          <p className="text-2xl font-bold">{data.n}</p>
+          <p className="text-sm text-muted-foreground">N</p>
+        </div>
+      </div>
+
+      <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg space-y-2">
+        <p className="text-sm"><strong>95% CI:</strong> [{data.ci_95?.[0]}, {data.ci_95?.[1]}]</p>
+        <p className="text-sm"><strong>Design Effect:</strong> {data.design_effect}</p>
+        <p className="text-sm"><strong>Effective Sample Size:</strong> {data.effective_sample_size}</p>
+        {data.cv_percent && <p className="text-sm"><strong>CV:</strong> {data.cv_percent}%</p>}
+      </div>
+
+      {data.n_replicates && (
+        <div className="p-3 bg-muted/50 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <Repeat className="h-4 w-4" />
+            <span className="font-medium">Replicate Information</span>
+          </div>
+          <div className="text-sm space-y-1">
+            <p><strong>Number of Replicates:</strong> {data.n_replicates}</p>
+            <p><strong>Weighted N:</strong> {data.n_weighted}</p>
+            {data.variance && <p><strong>Variance:</strong> {data.variance}</p>}
+          </div>
+        </div>
+      )}
+
+      {data.interpretation && (
+        <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="flex items-center gap-2 mb-1">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <span className="font-medium text-green-800 dark:text-green-400">Interpretation</span>
+          </div>
+          <p className="text-sm text-green-700 dark:text-green-300">{data.interpretation}</p>
+        </div>
+      )}
     </div>
   );
 }
