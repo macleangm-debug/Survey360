@@ -246,10 +246,10 @@ export function DashboardLayout({ children }) {
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-50">
+                <button className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-muted">
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={user?.avatar} />
-                    <AvatarFallback className="bg-sky-100 text-sky-600 text-xs">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
                       {user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
@@ -266,7 +266,7 @@ export function DashboardLayout({ children }) {
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign out
                 </DropdownMenuItem>
