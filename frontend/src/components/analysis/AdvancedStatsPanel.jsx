@@ -727,6 +727,77 @@ export function AdvancedStatsPanel({
               </div>
             </TabsContent>
 
+            {/* ANCOVA Configuration */}
+            <TabsContent value="ancova" className="space-y-4 mt-4">
+              <div className="space-y-3">
+                <div>
+                  <Label>Dependent Variable (Numeric)</Label>
+                  <Select 
+                    value={ancovaConfig.dependentVar} 
+                    onValueChange={(v) => setAncovaConfig({...ancovaConfig, dependentVar: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select outcome variable..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {numericFields.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Grouping Variable (Factor)</Label>
+                  <Select 
+                    value={ancovaConfig.groupVar} 
+                    onValueChange={(v) => setAncovaConfig({...ancovaConfig, groupVar: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select grouping variable..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoricalFields.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Covariates ({ancovaConfig.covariates.length} selected)</Label>
+                  <ScrollArea className="h-[100px] border rounded-md p-2 mt-1">
+                    {numericFields.filter(f => f.id !== ancovaConfig.dependentVar).map(f => (
+                      <div key={f.id} className="flex items-center space-x-2 py-1">
+                        <Checkbox 
+                          id={`ancova-cov-${f.id}`}
+                          checked={ancovaConfig.covariates.includes(f.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setAncovaConfig({...ancovaConfig, covariates: [...ancovaConfig.covariates, f.id]});
+                            } else {
+                              setAncovaConfig({...ancovaConfig, covariates: ancovaConfig.covariates.filter(v => v !== f.id)});
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`ancova-cov-${f.id}`} className="text-sm">{f.label || f.id}</Label>
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+
+                <div className="bg-slate-50 p-2 rounded text-xs text-slate-600">
+                  <Info className="h-3 w-3 inline mr-1" />
+                  ANCOVA compares group means while controlling for covariates. Useful for pre/post designs or removing confounding effects.
+                </div>
+
+                <Button onClick={runANCOVA} disabled={loading || ancovaConfig.covariates.length === 0} className="w-full">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Run ANCOVA
+                </Button>
+              </div>
+            </TabsContent>
+
             {/* Correlation Configuration */}
             <TabsContent value="correlation" className="space-y-4 mt-4">
               <div className="space-y-3">
