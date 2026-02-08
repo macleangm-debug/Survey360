@@ -135,10 +135,15 @@ async def run_ttest(request: Request, req: TTestRequest):
 
 
 @router.post("/anova")
+@limiter.limit(RATE_LIMIT_STATS)
 async def run_anova(request: Request, req: ANOVARequest):
     """Run one-way ANOVA with optional post-hoc tests"""
     db = request.app.state.db
-    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    df, schema, metadata = await get_analysis_data(
+        db, req.snapshot_id, req.form_id,
+        sample=getattr(req, 'sample', True),
+        sample_size=getattr(req, 'sample_size', 10000)
+    )
     
     if df.empty:
         raise HTTPException(status_code=404, detail="No data found")
