@@ -1572,7 +1572,7 @@ async def generate_roc_curve(request: Request, req: ROCRequest):
             try:
                 auc_boot = roc_auc_score(actual.iloc[idx], predicted.iloc[idx])
                 auc_scores.append(auc_boot)
-            except:
+            except Exception:
                 pass
         
         ci_lower = np.percentile(auc_scores, 2.5) if auc_scores else roc_auc
