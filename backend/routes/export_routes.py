@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import io
 import csv
 import json
+import pandas as pd
 
 from models import ExportRequest, ExportJob
 from auth import get_current_user
