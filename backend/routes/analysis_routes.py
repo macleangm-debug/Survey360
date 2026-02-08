@@ -1784,8 +1784,6 @@ async def apply_transformation(request: Request, transformation: dict):
     action = transformation.get("action")
     variable = transformation.get("variable")
     snapshot_id = transformation.get("snapshot_id")
-    form_id = transformation.get("form_id")
-    org_id = transformation.get("org_id")
     
     if not action:
         raise HTTPException(status_code=400, detail="Action required")
