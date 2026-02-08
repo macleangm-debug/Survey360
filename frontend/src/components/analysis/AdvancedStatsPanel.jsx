@@ -115,8 +115,18 @@ export function AdvancedStatsPanel({
     linkage: 'ward'
   });
 
+  // Proportions test state
+  const [propConfig, setPropConfig] = useState({
+    testType: 'one_sample',
+    variable: '',
+    successValue: '',
+    hypothesizedProp: '0.5',
+    groupVar: ''
+  });
+
   const numericFields = fields.filter(f => f.type === 'number' || f.type === 'integer' || f.type === 'decimal');
   const categoricalFields = fields.filter(f => f.type === 'select' || f.type === 'radio' || f.type === 'text');
+  const allFields = fields;
 
   const runTTest = async () => {
     if (!ttestConfig.variable) {
