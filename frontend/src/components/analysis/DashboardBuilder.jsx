@@ -423,6 +423,7 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
       case 'chart':
         const chartData = data?.data || [];
         const chartType = widget.config.chart_type || 'bar';
+        const isClickable = !previewMode && widget.config?.variable;
 
         if (chartType === 'pie' || chartType === 'donut') {
           return (
@@ -437,9 +438,15 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
                   innerRadius={chartType === 'donut' ? '40%' : 0}
                   outerRadius="70%"
                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  onClick={isClickable ? (entry) => handleDrillDown(widget, entry) : undefined}
+                  cursor={isClickable ? 'pointer' : 'default'}
                 >
                   {chartData.map((entry, index) => (
-                    <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                    <Cell 
+                      key={index} 
+                      fill={CHART_COLORS[index % CHART_COLORS.length]}
+                      style={isClickable ? { cursor: 'pointer' } : {}}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -451,12 +458,18 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
         if (chartType === 'line') {
           return (
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
+              <LineChart data={chartData} onClick={isClickable ? (e) => e?.activePayload && handleDrillDown(widget, e.activePayload[0]) : undefined}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#0ea5e9" strokeWidth={2} />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#0ea5e9" 
+                  strokeWidth={2}
+                  activeDot={isClickable ? { r: 8, cursor: 'pointer' } : { r: 5 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           );
@@ -464,12 +477,17 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
 
         return (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
+            <BarChart data={chartData} onClick={isClickable ? (e) => e?.activePayload && handleDrillDown(widget, e.activePayload[0]) : undefined}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="name" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} />
               <Tooltip />
-              <Bar dataKey="value" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+              <Bar 
+                dataKey="value" 
+                fill="#0ea5e9" 
+                radius={[4, 4, 0, 0]}
+                cursor={isClickable ? 'pointer' : 'default'}
+              />
             </BarChart>
           </ResponsiveContainer>
         );
