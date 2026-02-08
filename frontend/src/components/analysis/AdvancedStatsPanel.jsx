@@ -2837,7 +2837,7 @@ function ProportionsResults({ data }) {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-slate-500">Standardized residuals > |2| indicate categories contributing most to chi-square</p>
+          <p className="text-xs text-slate-500">Standardized residuals greater than |2| indicate categories contributing most to chi-square</p>
         </>
       )}
 
