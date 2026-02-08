@@ -286,8 +286,6 @@ export function DashboardLayout({ children }) {
 
           {/* Bottom section - Profile */}
           <div className="mt-auto flex flex-col items-center gap-2">
-            <OfflineStatusIndicator compact />
-            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-muted">
