@@ -283,12 +283,12 @@ export function DashboardLayout({ children }) {
               animate={{ width: 260, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="hidden lg:block bg-white border-r border-slate-100 overflow-hidden"
+              className="hidden lg:block bg-card border-r border-border overflow-hidden"
             >
               <div className="w-[260px] h-full flex flex-col">
                 {/* Panel Header */}
-                <div className="p-4 border-b border-slate-100">
-                  <h2 className="font-semibold text-slate-900">{currentGroup?.label}</h2>
+                <div className="p-4 border-b border-border">
+                  <h2 className="font-semibold text-foreground">{currentGroup?.label}</h2>
                 </div>
 
                 {/* Panel Items */}
@@ -305,8 +305,8 @@ export function DashboardLayout({ children }) {
                         className={cn(
                           "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                           isActive 
-                            ? "bg-sky-50 text-sky-600 font-medium" 
-                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                            ? "bg-primary/10 text-primary font-medium" 
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         )}
                       >
                         <Icon className="w-4 h-4" />
@@ -321,19 +321,19 @@ export function DashboardLayout({ children }) {
 
                 {/* Organization Selector */}
                 {organizations?.length > 0 && (
-                  <div className="p-3 border-t border-slate-100">
+                  <div className="p-3 border-t border-border">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors text-left">
-                          <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center text-sky-600 font-medium text-xs">
+                        <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-left">
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-medium text-xs">
                             {currentOrg?.name?.charAt(0) || 'O'}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-900 truncate">
+                            <p className="text-sm font-medium text-foreground truncate">
                               {currentOrg?.name || 'Select Org'}
                             </p>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-slate-400" />
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="w-56">
@@ -342,10 +342,10 @@ export function DashboardLayout({ children }) {
                             key={org.id}
                             onClick={() => setCurrentOrg(org)}
                             className={cn(
-                              currentOrg?.id === org.id && "bg-sky-50"
+                              currentOrg?.id === org.id && "bg-primary/10"
                             )}
                           >
-                            <div className="w-6 h-6 rounded bg-sky-100 flex items-center justify-center text-sky-600 text-xs mr-2">
+                            <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center text-primary text-xs mr-2">
                               {org.name?.charAt(0)}
                             </div>
                             {org.name}
