@@ -329,12 +329,12 @@ export function MissingDataImputation({ formId, snapshotId, orgId, fields, getTo
               {(method === 'mean' || method === 'median') && (
                 <div>
                   <Label>Group By (Optional)</Label>
-                  <Select value={groupBy} onValueChange={setGroupBy}>
+                  <Select value={groupBy || "none"} onValueChange={(val) => setGroupBy(val === "none" ? "" : val)}>
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="No grouping" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No grouping</SelectItem>
+                      <SelectItem value="none">No grouping</SelectItem>
                       {fields.filter(f => f.type === 'select' || f.type === 'radio').map(f => (
                         <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
                       ))}
