@@ -1016,6 +1016,182 @@ export function AdvancedStatsPanel({
                 </Button>
               </div>
             </TabsContent>
+
+            {/* Nonparametric Tests Configuration */}
+            <TabsContent value="nonparam" className="space-y-4 mt-4">
+              <div className="space-y-3">
+                <div>
+                  <Label>Test Type</Label>
+                  <Select 
+                    value={npConfig.testType} 
+                    onValueChange={(v) => setNpConfig({...npConfig, testType: v, groupVar: '', pairedVar: ''})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mann_whitney">Mann-Whitney U (2 groups)</SelectItem>
+                      <SelectItem value="wilcoxon">Wilcoxon Signed-Rank (paired)</SelectItem>
+                      <SelectItem value="kruskal_wallis">Kruskal-Wallis H (3+ groups)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Dependent Variable (Numeric)</Label>
+                  <Select 
+                    value={npConfig.dependentVar} 
+                    onValueChange={(v) => setNpConfig({...npConfig, dependentVar: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select variable..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {numericFields.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {(npConfig.testType === 'mann_whitney' || npConfig.testType === 'kruskal_wallis') && (
+                  <div>
+                    <Label>Grouping Variable</Label>
+                    <Select 
+                      value={npConfig.groupVar} 
+                      onValueChange={(v) => setNpConfig({...npConfig, groupVar: v})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select grouping variable..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoricalFields.map(f => (
+                          <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {npConfig.testType === 'wilcoxon' && (
+                  <div>
+                    <Label>Paired Variable (Numeric)</Label>
+                    <Select 
+                      value={npConfig.pairedVar} 
+                      onValueChange={(v) => setNpConfig({...npConfig, pairedVar: v})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select paired variable..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {numericFields.filter(f => f.id !== npConfig.dependentVar).map(f => (
+                          <SelectItem key={f.id} value={f.id}>{f.label || f.id}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="bg-slate-50 p-2 rounded text-xs text-slate-600">
+                  <Info className="h-3 w-3 inline mr-1" />
+                  {npConfig.testType === 'mann_whitney' && 'Mann-Whitney U: Non-parametric alternative to independent t-test for 2 groups.'}
+                  {npConfig.testType === 'wilcoxon' && 'Wilcoxon: Non-parametric alternative to paired t-test for related samples.'}
+                  {npConfig.testType === 'kruskal_wallis' && 'Kruskal-Wallis H: Non-parametric alternative to one-way ANOVA for 3+ groups.'}
+                </div>
+
+                <Button onClick={runNonparametricTest} disabled={loading} className="w-full">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Run Test
+                </Button>
+              </div>
+            </TabsContent>
+
+            {/* Clustering Configuration */}
+            <TabsContent value="cluster" className="space-y-4 mt-4">
+              <div className="space-y-3">
+                <div>
+                  <Label>Clustering Method</Label>
+                  <Select 
+                    value={clusterConfig.method} 
+                    onValueChange={(v) => setClusterConfig({...clusterConfig, method: v})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="kmeans">K-Means</SelectItem>
+                      <SelectItem value="hierarchical">Hierarchical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Variables ({clusterConfig.variables.length} selected)</Label>
+                  <ScrollArea className="h-[120px] border rounded-md p-2 mt-1">
+                    {numericFields.map(f => (
+                      <div key={f.id} className="flex items-center space-x-2 py-1">
+                        <Checkbox 
+                          id={`cluster-${f.id}`}
+                          checked={clusterConfig.variables.includes(f.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setClusterConfig({...clusterConfig, variables: [...clusterConfig.variables, f.id]});
+                            } else {
+                              setClusterConfig({...clusterConfig, variables: clusterConfig.variables.filter(v => v !== f.id)});
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`cluster-${f.id}`} className="text-sm">{f.label || f.id}</Label>
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+
+                <div>
+                  <Label>Number of Clusters</Label>
+                  <Input
+                    type="number"
+                    min="2"
+                    max="20"
+                    value={clusterConfig.nClusters}
+                    onChange={e => setClusterConfig({...clusterConfig, nClusters: e.target.value})}
+                    placeholder="Auto (elbow method)"
+                    className="mt-1"
+                  />
+                </div>
+
+                {clusterConfig.method === 'hierarchical' && (
+                  <div>
+                    <Label>Linkage Method</Label>
+                    <Select 
+                      value={clusterConfig.linkage} 
+                      onValueChange={(v) => setClusterConfig({...clusterConfig, linkage: v})}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ward">Ward (minimize variance)</SelectItem>
+                        <SelectItem value="complete">Complete (max distance)</SelectItem>
+                        <SelectItem value="average">Average (UPGMA)</SelectItem>
+                        <SelectItem value="single">Single (min distance)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="bg-slate-50 p-2 rounded text-xs text-slate-600">
+                  <Info className="h-3 w-3 inline mr-1" />
+                  {clusterConfig.method === 'kmeans' && 'K-Means partitions data into K clusters by minimizing within-cluster variance. Auto-detects optimal K using elbow method.'}
+                  {clusterConfig.method === 'hierarchical' && 'Hierarchical clustering builds a tree of clusters. Ward linkage typically produces compact, well-separated clusters.'}
+                </div>
+
+                <Button onClick={runClustering} disabled={loading || clusterConfig.variables.length < 2} className="w-full">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Run Clustering
+                </Button>
+              </div>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
