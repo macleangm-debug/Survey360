@@ -21,7 +21,8 @@ const survey360Api = axios.create({
 
 // Request interceptor to add auth token
 survey360Api.interceptors.request.use((config) => {
-  const authData = localStorage.getItem('survey360-auth');
+  // Get token from auth-storage (the main auth store)
+  const authData = localStorage.getItem('auth-storage');
   if (authData) {
     try {
       const { state } = JSON.parse(authData);
@@ -29,7 +30,7 @@ survey360Api.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${state.token}`;
       }
     } catch (e) {
-      console.error('Failed to parse auth data');
+      console.error('Failed to parse auth data:', e);
     }
   }
   return config;
