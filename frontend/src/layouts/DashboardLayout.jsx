@@ -189,9 +189,9 @@ export function DashboardLayout({ children }) {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen bg-slate-50">
+      <div className="flex h-screen bg-background">
         {/* Rail - Thin icon sidebar with labels */}
-        <aside className="hidden lg:flex flex-col items-center w-[80px] bg-white border-r border-slate-100 py-4">
+        <aside className="hidden lg:flex flex-col items-center w-[80px] bg-card border-r border-border py-4">
           {/* Logo */}
           <Link to="/dashboard" className="mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-sky-500/20">
