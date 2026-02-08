@@ -77,6 +77,64 @@ const SUGGESTED_QUERIES = [
   }
 ];
 
+// Generate evidence-linked narrative from results
+const generateNarrative = (results, plan) => {
+  if (!results) return "Analysis complete.";
+  
+  const parts = [];
+  
+  // Add context from plan
+  if (plan?.analysis_type) {
+    parts.push(`This ${plan.analysis_type.replace('_', ' ')} analysis`);
+  } else {
+    parts.push("This analysis");
+  }
+  
+  // Add sample size
+  if (results.total_n || results.n || results.n_observations) {
+    const n = results.total_n || results.n || results.n_observations;
+    parts.push(`was conducted on ${n} observations`);
+  }
+  
+  // Add key findings
+  if (results.anova) {
+    const a = results.anova;
+    if (a.significant) {
+      parts.push(`and found a statistically significant difference (F = ${a.f_statistic}, p = ${a.p_value})`);
+    } else {
+      parts.push(`and found no statistically significant difference (F = ${a.f_statistic}, p = ${a.p_value})`);
+    }
+  }
+  
+  if (results.ttest) {
+    const t = results.ttest;
+    if (t.significant) {
+      parts.push(`revealing a significant difference between groups (t = ${t.t_statistic}, p = ${t.p_value})`);
+    } else {
+      parts.push(`showing no significant difference between groups (p = ${t.p_value})`);
+    }
+  }
+  
+  if (results.correlation_matrix) {
+    const vars = Object.keys(results.correlation_matrix);
+    parts.push(`examining correlations among ${vars.length} variables`);
+  }
+  
+  if (results.regression) {
+    const r = results.regression;
+    parts.push(`with the regression model explaining ${(r.r_squared * 100).toFixed(1)}% of variance`);
+  }
+  
+  // Add interpretation if available
+  if (results.interpretation) {
+    parts.push(`. ${results.interpretation}`);
+  } else {
+    parts.push(".");
+  }
+  
+  return parts.join(" ");
+};
+
 export function EnhancedAICopilot({ formId, snapshotId, orgId, fields, getToken }) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
