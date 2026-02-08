@@ -837,22 +837,40 @@ export function DataAnalysisPage() {
             />
           </TabsContent>
 
-          {/* AI Copilot Tab - Enhanced */}
+          {/* AI Copilot Tab - Enhanced with Data Prep */}
           <TabsContent value="ai" className="space-y-4">
             {selectedFormId ? (
-              <EnhancedAICopilot
-                formId={selectedFormId}
-                snapshotId={selectedSnapshotId}
-                orgId={currentOrg?.id}
-                fields={formFields}
-                getToken={getToken}
-              />
+              <Tabs defaultValue="copilot" className="w-full">
+                <TabsList className="grid grid-cols-2 w-[300px]">
+                  <TabsTrigger value="copilot">AI Copilot</TabsTrigger>
+                  <TabsTrigger value="dataprep">Data Prep</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="copilot" className="mt-4">
+                  <EnhancedAICopilot
+                    formId={selectedFormId}
+                    snapshotId={selectedSnapshotId}
+                    orgId={currentOrg?.id}
+                    fields={formFields}
+                    getToken={getToken}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="dataprep" className="mt-4">
+                  <AIDataPrep
+                    formId={selectedFormId}
+                    snapshotId={selectedSnapshotId}
+                    orgId={currentOrg?.id}
+                    onRefresh={fetchResponseData}
+                  />
+                </TabsContent>
+              </Tabs>
             ) : (
               <Card>
                 <CardContent className="py-12">
                   <div className="text-center text-slate-500">
                     <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Select a form to use AI Copilot</p>
+                    <p>Select a form to use AI features</p>
                   </div>
                 </CardContent>
               </Card>
