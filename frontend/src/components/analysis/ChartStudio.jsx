@@ -376,6 +376,112 @@ export function ChartStudio({ formId, orgId, fields, stats, getToken }) {
           </ResponsiveContainer>
         );
 
+      case 'violin':
+        // Violin plot approximation using box plot style
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <ComposedChart {...commonProps}>
+              {config.showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />}
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip 
+                contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: 'white' }}
+                formatter={(value, name) => [value, name]}
+              />
+              {config.showLegend && <Legend />}
+              {/* Box (IQR) */}
+              <Bar dataKey="q3" stackId="box" fill="transparent" />
+              <Bar dataKey="median" stackId="box" fill={colors[0]} opacity={0.7} />
+              <Bar dataKey="q1" stackId="box" fill={colors[0]} opacity={0.3} />
+              {/* Whiskers as lines */}
+              <Line type="monotone" dataKey="max" stroke={colors[0]} strokeWidth={2} dot={{ r: 4 }} />
+              <Line type="monotone" dataKey="min" stroke={colors[0]} strokeWidth={2} dot={{ r: 4 }} />
+              <Line type="monotone" dataKey="mean" stroke={colors[1]} strokeWidth={2} strokeDasharray="5 5" dot={{ r: 6, fill: colors[1] }} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        );
+
+      case 'coef':
+        // Coefficient plot with confidence intervals
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <ComposedChart {...commonProps} layout="vertical">
+              {config.showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />}
+              <XAxis type="number" tick={{ fontSize: 12 }} />
+              <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={120} />
+              <Tooltip 
+                contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: 'white' }}
+                formatter={(value, name) => [typeof value === 'number' ? value.toFixed(4) : value, name]}
+              />
+              <ReferenceLine x={0} stroke="#ef4444" strokeWidth={2} strokeDasharray="5 5" />
+              {/* Error bars represented as area */}
+              <Bar 
+                dataKey="value" 
+                fill={colors[0]} 
+                barSize={12}
+                radius={[0, 4, 4, 0]}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.significant ? colors[0] : '#94a3b8'}
+                    opacity={entry.significant ? 1 : 0.5}
+                  />
+                ))}
+              </Bar>
+              {/* CI markers */}
+              <Line 
+                type="monotone" 
+                dataKey="ci_upper" 
+                stroke={colors[0]} 
+                strokeWidth={0}
+                dot={{ r: 2, fill: colors[0] }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="ci_lower" 
+                stroke={colors[0]} 
+                strokeWidth={0}
+                dot={{ r: 2, fill: colors[0] }}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        );
+
+      case 'heatmap':
+        // Heatmap approximation
+        const heatmapColors = ['#ef4444', '#f97316', '#fcd34d', '#86efac', '#22d3ee', '#3b82f6', '#8b5cf6'];
+        return (
+          <div className="h-[400px] overflow-auto p-4">
+            <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(chartData.length))}, minmax(60px, 1fr))` }}>
+              {chartData.map((item, idx) => {
+                const normalizedValue = (item.value + 1) / 2; // Normalize -1 to 1 => 0 to 1
+                const colorIdx = Math.floor(normalizedValue * (heatmapColors.length - 1));
+                return (
+                  <div 
+                    key={idx}
+                    className="aspect-square flex items-center justify-center text-xs font-mono rounded"
+                    style={{ 
+                      backgroundColor: heatmapColors[colorIdx] || '#94a3b8',
+                      color: normalizedValue > 0.5 ? 'white' : 'black'
+                    }}
+                    title={`${item.x} × ${item.y}: ${item.value}`}
+                  >
+                    {item.value?.toFixed(2)}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex justify-center mt-4 gap-1">
+              <span className="text-xs text-slate-500">-1</span>
+              {heatmapColors.map((color, i) => (
+                <div key={i} className="w-6 h-4 rounded" style={{ backgroundColor: color }} />
+              ))}
+              <span className="text-xs text-slate-500">+1</span>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
