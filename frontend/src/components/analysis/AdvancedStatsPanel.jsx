@@ -555,6 +555,59 @@ export function AdvancedStatsPanel({
     }
   };
 
+  const runProportionsTest = async () => {
+    if (!propConfig.variable) {
+      toast.error('Please select a variable');
+      return;
+    }
+    if (!propConfig.successValue) {
+      toast.error('Please specify a success value');
+      return;
+    }
+    if (propConfig.testType === 'two_sample' && !propConfig.groupVar) {
+      toast.error('Please select a grouping variable');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/statistics/proportions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          snapshot_id: snapshotId || null,
+          form_id: snapshotId ? null : formId,
+          org_id: orgId,
+          test_type: propConfig.testType,
+          variable: propConfig.variable,
+          success_value: propConfig.successValue,
+          hypothesized_proportion: propConfig.testType === 'one_sample' ? parseFloat(propConfig.hypothesizedProp) : null,
+          group_var: propConfig.testType === 'two_sample' ? propConfig.groupVar : null
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.error) {
+          toast.error(data.error);
+        } else {
+          setResults({ type: 'proportions', data });
+          toast.success('Proportions test completed');
+        }
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Proportions test failed');
+      }
+    } catch (error) {
+      toast.error('Proportions test failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderResults = () => {
     if (!results) return null;
 
