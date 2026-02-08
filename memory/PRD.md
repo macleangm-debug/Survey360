@@ -668,7 +668,38 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
   - `/api/analysis/charts/violin` - Distribution stats with percentiles
   - `/api/analysis/charts/coefficient` - OLS regression with confidence intervals
 
-### Phase 12: Future Enhancements (Backlog)
+### Phase 12: Audit Trail & RBAC - COMPLETE (Feb 7, 2026)
+- ✅ **Audit Trail System**:
+  - `/api/audit/log` - Create audit log entries
+  - `/api/audit/logs` - Paginated logs with filtering
+  - `/api/audit/summary/{org_id}` - Activity summary with aggregations
+  - `/api/audit/exports/{org_id}` - Export-specific history
+  - Action types: export_*, transform_*, snapshot_*, dashboard_*, report_*, pii_access
+- ✅ **Role-Based Access Control (RBAC)**:
+  - 4 default roles: Viewer, Analyst, Senior Analyst, Admin
+  - 28 granular permissions across 7 categories
+  - Custom role creation and management
+  - Permission checking endpoint
+- ✅ **Frontend Audit Trail UI** in Reports tab → Audit Trail sub-tab:
+  - Summary cards (Total Actions, Exports, PII Access, Active Users)
+  - Paginated activity log with filtering
+  - Activity breakdown by action type
+
+### Phase 13: Statistical Tests Completion - COMPLETE (Feb 7, 2026)
+- ✅ **Nonparametric Tests** (`/api/statistics/nonparametric`):
+  - Mann-Whitney U test (2 independent groups)
+  - Wilcoxon signed-rank test (paired samples)
+  - Kruskal-Wallis H test (3+ groups with post-hoc)
+- ✅ **Proportions Tests** (`/api/statistics/proportions`):
+  - One-sample z-test for proportions
+  - Two-sample proportions comparison
+  - Chi-square test with Cramér's V
+- ✅ **Clustering Algorithms** (`/api/statistics/clustering`):
+  - K-means with elbow method and silhouette scores
+  - Hierarchical clustering with dendrogram
+  - Cluster profiles with variable means
+
+### Phase 14: Future Enhancements (Backlog)
 - Factor Analysis visualization
 - Missing data imputation UI
 - Violin plots, coefficient plots, heatmaps
