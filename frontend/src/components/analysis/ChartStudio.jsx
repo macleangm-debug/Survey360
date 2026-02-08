@@ -55,7 +55,9 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  Radar
+  Radar,
+  ComposedChart,
+  ReferenceLine
 } from 'recharts';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
