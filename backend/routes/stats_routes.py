@@ -807,6 +807,7 @@ async def run_factor_analysis(
 # ============ Clustering ============
 
 @router.post("/clustering")
+@log_action("run_clustering", target_type="analysis")
 async def run_clustering(
     request: Request,
     req: ClusteringRequest
