@@ -97,8 +97,10 @@ class RegressionRequest(BaseModel):
     org_id: str
     dependent_var: str
     independent_vars: List[str]
-    model_type: str = "ols"  # ols, logistic, poisson
+    model_type: str = "ols"  # ols, logistic, poisson, negbin
     robust_se: bool = False
+    interactions: Optional[List[str]] = None  # List of interaction terms like ["var1*var2"]
+    include_diagnostics: bool = True
 
 
 # ============ Helper Functions ============
