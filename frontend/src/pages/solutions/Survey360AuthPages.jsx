@@ -14,7 +14,7 @@ export function Survey360LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuthStore();
+  const { setAuth } = useAuthStore();
   const { setOrganizations, setCurrentOrg } = useOrgStore();
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ export function Survey360LoginPage() {
       console.log('Making API call to Survey360 backend...');
       const response = await survey360Api.post('/auth/login', { email, password });
       console.log('Login response:', response.data);
-      login(response.data.user, response.data.access_token);
+      setAuth(response.data.user, response.data.access_token);
       
       // Load organizations
       try {
