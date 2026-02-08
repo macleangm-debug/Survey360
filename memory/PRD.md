@@ -709,8 +709,37 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 
 ### Phase 14: Future Enhancements (Backlog)
 - Dashboard sharing and permissions UI
-- Role-gating for sensitive analysis features
-- Export-to-PowerPoint for charts
+- Replicate weights (BRR/jackknife)
+- Enhanced AI narratives with evidence-linked claims
+- Parquet export format
+
+---
+
+## UPDATE: Feb 8, 2026 - Proportions Tests & PPTX Export
+
+### Features Completed
+1. **Proportions Tests** (new Props tab in Advanced Statistics)
+   - One-Sample Z-Test: Test observed vs hypothesized proportion
+   - Two-Sample Z-Test: Compare proportions between groups with Cohen's h
+   - Chi-Square Goodness of Fit: Test distribution against expected proportions
+   - Full results with CI, effect sizes, standardized residuals
+
+2. **PowerPoint Export**
+   - Export charts as PPTX slides with title/subtitle
+   - Widescreen 16:9 format
+   - Centered chart with footer
+   - New format option in ChartStudio dropdown
+
+### Backend Endpoints Added
+- `POST /api/statistics/proportions` - All three proportions test types
+- `POST /api/analysis/export-chart-pptx` - PowerPoint slide generation
+
+### Frontend Changes
+- Advanced Statistics now has 11 tabs (added Props)
+- ChartStudio export dropdown now includes PPTX option
+
+### Dependencies Added
+- `python-pptx==1.0.2` - PowerPoint generation
 
 ---
 
