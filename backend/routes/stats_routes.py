@@ -253,6 +253,7 @@ async def get_descriptive_stats(
 # ============ T-Tests ============
 
 @router.post("/ttest")
+@log_action("run_ttest", target_type="analysis")
 async def run_ttest(
     request: Request,
     req: TTestRequest
