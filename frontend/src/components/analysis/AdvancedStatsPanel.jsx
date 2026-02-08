@@ -531,7 +531,7 @@ export function AdvancedStatsPanel({
         </CardHeader>
         <CardContent>
           <Tabs value={activeTest} onValueChange={setActiveTest}>
-            <TabsList className="grid grid-cols-7 w-full">
+            <TabsList className="grid grid-cols-9 w-full">
               <TabsTrigger value="ttest">T-Test</TabsTrigger>
               <TabsTrigger value="anova">ANOVA</TabsTrigger>
               <TabsTrigger value="correlation">Corr</TabsTrigger>
@@ -539,6 +539,8 @@ export function AdvancedStatsPanel({
               <TabsTrigger value="glm">GLM</TabsTrigger>
               <TabsTrigger value="mixed">Mixed</TabsTrigger>
               <TabsTrigger value="factor">EFA</TabsTrigger>
+              <TabsTrigger value="nonparam">NonP</TabsTrigger>
+              <TabsTrigger value="cluster">Cluster</TabsTrigger>
             </TabsList>
 
             {/* T-Test Configuration */}
