@@ -157,7 +157,7 @@ export function ReportBuilder({ formId, snapshotId, orgId, getToken }) {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-2 mb-4">
+      <TabsList className="grid w-full grid-cols-3 mb-4">
         <TabsTrigger value="reports" className="flex items-center gap-2">
           <FileText className="h-4 w-4" />
           Reports
@@ -165,6 +165,10 @@ export function ReportBuilder({ formId, snapshotId, orgId, getToken }) {
         <TabsTrigger value="reproducibility" className="flex items-center gap-2">
           <Package className="h-4 w-4" />
           Reproducibility
+        </TabsTrigger>
+        <TabsTrigger value="audit" className="flex items-center gap-2">
+          <Shield className="h-4 w-4" />
+          Audit Trail
         </TabsTrigger>
       </TabsList>
 
