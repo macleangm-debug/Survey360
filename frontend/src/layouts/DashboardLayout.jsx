@@ -368,11 +368,11 @@ export function DashboardLayout({ children }) {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top Header */}
-          <header className="h-14 bg-white border-b border-slate-100 flex items-center px-4 lg:px-6 gap-4">
+          <header className="h-14 bg-card border-b border-border flex items-center px-4 lg:px-6 gap-4">
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-lg hover:bg-slate-100"
+              className="lg:hidden p-2 rounded-lg hover:bg-muted"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -381,7 +381,7 @@ export function DashboardLayout({ children }) {
             {showPanel && (
               <button
                 onClick={() => setPanelOpen(!panelOpen)}
-                className="hidden lg:flex p-2 rounded-lg hover:bg-slate-100 text-slate-500"
+                className="hidden lg:flex p-2 rounded-lg hover:bg-muted text-muted-foreground"
               >
                 {panelOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </button>
@@ -390,31 +390,31 @@ export function DashboardLayout({ children }) {
             {/* Search */}
             <div className="flex-1 max-w-md">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border-0 rounded-lg focus:bg-white focus:ring-2 focus:ring-sky-500/20 transition-all"
+                  className="w-full pl-9 pr-4 py-2 text-sm bg-muted border-0 rounded-lg focus:bg-background focus:ring-2 focus:ring-ring transition-all text-foreground placeholder:text-muted-foreground"
                 />
               </div>
             </div>
 
             {/* Right side actions */}
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-lg hover:bg-slate-100 text-slate-500 relative">
+              <button className="p-2 rounded-lg hover:bg-muted text-muted-foreground relative">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-sky-500 rounded-full" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
               </button>
 
               {/* Desktop Profile */}
-              <div className="hidden lg:flex items-center gap-2 pl-2 border-l border-slate-100">
-                <span className="text-sm text-slate-600">{user?.name}</span>
+              <div className="hidden lg:flex items-center gap-2 pl-2 border-l border-border">
+                <span className="text-sm text-muted-foreground">{user?.name}</span>
               </div>
             </div>
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 overflow-y-auto bg-slate-50">
+          <main className="flex-1 overflow-y-auto bg-background">
             <div className="p-6 lg:p-8">
               {children}
             </div>
