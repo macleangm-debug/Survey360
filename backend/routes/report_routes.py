@@ -13,6 +13,8 @@ import io
 import json
 import os
 
+from utils.audit import log_action
+
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
 
