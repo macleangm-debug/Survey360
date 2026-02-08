@@ -1293,7 +1293,7 @@ async def export_chart_pdf(request: Request, req: ChartExportRequest):
     try:
         image_data = req.image_data.split(',')[1] if ',' in req.image_data else req.image_data
         image_bytes = base64.b64decode(image_data)
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid image data")
     
     # Create PDF
