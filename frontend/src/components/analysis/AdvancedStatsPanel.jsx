@@ -509,6 +509,10 @@ export function AdvancedStatsPanel({
         return <MixedModelResults data={results.data} />;
       case 'factor':
         return <FactorAnalysisResults data={results.data} />;
+      case 'nonparametric':
+        return <NonparametricResults data={results.data} />;
+      case 'clustering':
+        return <ClusteringResults data={results.data} />;
       default:
         return null;
     }
