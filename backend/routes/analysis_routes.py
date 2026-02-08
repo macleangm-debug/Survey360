@@ -1365,6 +1365,105 @@ async def export_chart_pdf(request: Request, req: ChartExportRequest):
     )
 
 
+@router.post("/export-chart-pptx")
+async def export_chart_pptx(request: Request, req: ChartExportRequest):
+    """Export chart as PowerPoint slide"""
+    import base64
+    
+    try:
+        from pptx import Presentation
+        from pptx.util import Inches, Pt
+        from pptx.dml.color import RgbColor
+        from pptx.enum.text import PP_ALIGN
+    except ImportError:
+        raise HTTPException(status_code=500, detail="python-pptx required for PowerPoint export. Install with: pip install python-pptx")
+    
+    # Decode base64 image
+    try:
+        image_data = req.image_data.split(',')[1] if ',' in req.image_data else req.image_data
+        image_bytes = base64.b64decode(image_data)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid image data")
+    
+    # Create presentation
+    prs = Presentation()
+    prs.slide_width = Inches(13.333)  # Widescreen 16:9
+    prs.slide_height = Inches(7.5)
+    
+    # Add blank slide
+    blank_layout = prs.slide_layouts[6]  # Blank layout
+    slide = prs.slides.add_slide(blank_layout)
+    
+    # Add title
+    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.3), Inches(12.333), Inches(0.6))
+    title_frame = title_box.text_frame
+    title_para = title_frame.paragraphs[0]
+    title_para.text = req.title
+    title_para.font.size = Pt(28)
+    title_para.font.bold = True
+    title_para.alignment = PP_ALIGN.CENTER
+    
+    # Add subtitle if present
+    if req.subtitle:
+        subtitle_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.9), Inches(12.333), Inches(0.4))
+        subtitle_frame = subtitle_box.text_frame
+        subtitle_para = subtitle_frame.paragraphs[0]
+        subtitle_para.text = req.subtitle
+        subtitle_para.font.size = Pt(16)
+        subtitle_para.font.color.rgb = RgbColor(100, 100, 100)
+        subtitle_para.alignment = PP_ALIGN.CENTER
+    
+    # Save image to temp file and add to slide
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+        tmp.write(image_bytes)
+        tmp_path = tmp.name
+    
+    # Calculate image position to center it
+    img_top = Inches(1.5) if req.subtitle else Inches(1.2)
+    available_height = Inches(5.5) if req.subtitle else Inches(5.8)
+    available_width = Inches(12.333)
+    
+    # Maintain aspect ratio
+    aspect = req.width / req.height
+    if available_width / aspect <= available_height:
+        img_width = available_width
+        img_height = available_width / aspect
+    else:
+        img_height = available_height
+        img_width = available_height * aspect
+    
+    img_left = (Inches(13.333) - img_width) / 2
+    
+    slide.shapes.add_picture(tmp_path, img_left, img_top, width=img_width, height=img_height)
+    
+    # Add footer
+    footer_box = slide.shapes.add_textbox(Inches(0.5), Inches(7.1), Inches(12.333), Inches(0.3))
+    footer_frame = footer_box.text_frame
+    footer_para = footer_frame.paragraphs[0]
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    footer_para.text = f"DataPulse Analytics | Generated: {timestamp}"
+    footer_para.font.size = Pt(10)
+    footer_para.font.color.rgb = RgbColor(150, 150, 150)
+    footer_para.alignment = PP_ALIGN.CENTER
+    
+    # Clean up temp file
+    import os
+    os.unlink(tmp_path)
+    
+    # Save to buffer
+    buffer = io.BytesIO()
+    prs.save(buffer)
+    buffer.seek(0)
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        headers={
+            "Content-Disposition": f"attachment; filename=chart_{req.title.replace(' ', '_')}.pptx"
+        }
+    )
+
 
 # ============ AI-Assisted Data Preparation ============
 
