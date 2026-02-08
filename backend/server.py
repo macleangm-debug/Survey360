@@ -66,6 +66,7 @@ from routes.simulation_routes import router as simulation_router
 from routes.device_routes import router as device_router
 from routes.analysis_routes import router as analysis_router
 from routes.stats_routes import router as stats_router
+from routes.statistics import router as statistics_modular_router
 from routes.ai_copilot_routes import router as ai_copilot_router
 from routes.analysis_export_routes import router as analysis_export_router
 from routes.report_routes import router as report_router
