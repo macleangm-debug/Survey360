@@ -1581,7 +1581,22 @@ async def run_regression(
     import statsmodels.api as sm
     
     y = df_model[req.dependent_var]
-    X = df_model[req.independent_vars]
+    X = df_model[req.independent_vars].copy()
+    
+    # Add interaction terms if specified
+    interaction_info = []
+    if req.interactions:
+        for interaction in req.interactions:
+            if '*' in interaction:
+                var1, var2 = interaction.split('*')
+                if var1 in X.columns and var2 in X.columns:
+                    interaction_name = f"{var1}_x_{var2}"
+                    X[interaction_name] = X[var1] * X[var2]
+                    interaction_info.append({
+                        "term": interaction_name,
+                        "components": [var1, var2]
+                    })
+    
     X = sm.add_constant(X)  # Add intercept
     
     try:
@@ -1598,6 +1613,10 @@ async def run_regression(
         
         elif req.model_type == "poisson":
             model = sm.Poisson(y, X)
+            results = model.fit(disp=0)
+        
+        elif req.model_type == "negbin":
+            model = sm.NegativeBinomial(y, X)
             results = model.fit(disp=0)
         
         else:
