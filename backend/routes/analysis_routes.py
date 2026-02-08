@@ -564,7 +564,7 @@ async def get_crosstab(
                 "degrees_of_freedom": int(dof),
                 "significant": bool(p_value < 0.05)
             }
-        except:
+        except Exception:
             pass
     
     # Format output
@@ -705,7 +705,7 @@ async def preview_imputation(
         try:
             numeric_series = pd.to_numeric(series, errors='coerce')
             is_numeric = numeric_series.notna().sum() > 0
-        except:
+        except Exception:
             is_numeric = False
             numeric_series = series
         
@@ -860,7 +860,7 @@ async def apply_imputation(
         try:
             numeric_series = pd.to_numeric(series, errors='coerce')
             is_numeric = numeric_series.notna().sum() > 0
-        except:
+        except Exception:
             is_numeric = False
             numeric_series = series
         
@@ -967,7 +967,7 @@ async def get_missing_summary(
         try:
             pd.to_numeric(df[col], errors='raise')
             is_numeric = True
-        except:
+        except Exception:
             is_numeric = False
         
         variables_summary.append({
