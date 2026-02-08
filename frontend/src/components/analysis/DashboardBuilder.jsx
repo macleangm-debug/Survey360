@@ -101,6 +101,16 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
   const [drillDownFilters, setDrillDownFilters] = useState({});
   const [drillDownSource, setDrillDownSource] = useState(null);
 
+  // Sharing state
+  const [shareSettings, setShareSettings] = useState({
+    public: false,
+    passwordProtected: false,
+    password: '',
+    users: []
+  });
+  const [newShareEmail, setNewShareEmail] = useState('');
+  const [newShareRole, setNewShareRole] = useState('viewer');
+
   // New dashboard form
   const [newDashboard, setNewDashboard] = useState({
     name: '',
@@ -114,6 +124,35 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
     title: '',
     config: {}
   });
+
+  const saveShareSettings = async () => {
+    if (!currentDashboard) return;
+    
+    try {
+      const response = await fetch(`${API_URL}/api/dashboards/${currentDashboard.id}/share`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          public: shareSettings.public,
+          password: shareSettings.passwordProtected ? shareSettings.password : null,
+          user_ids: shareSettings.users.map(u => u.email),
+          role: 'viewer'
+        })
+      });
+      
+      if (response.ok) {
+        toast.success('Sharing settings saved');
+        setShowShareDialog(false);
+      } else {
+        toast.error('Failed to save sharing settings');
+      }
+    } catch (error) {
+      toast.error('Failed to save sharing settings');
+    }
+  };
 
   useEffect(() => {
     if (orgId) {
