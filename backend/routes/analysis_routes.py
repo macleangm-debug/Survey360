@@ -1364,3 +1364,542 @@ async def export_chart_pdf(request: Request, req: ChartExportRequest):
         }
     )
 
+
+
+# ============ AI-Assisted Data Preparation ============
+
+class DataPrepRequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    variables: Optional[List[str]] = None  # If None, analyze all variables
+
+
+class SuggestionPriority(str, Enum):
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+
+
+@router.post("/data-prep-suggestions")
+async def get_data_prep_suggestions(request: Request, req: DataPrepRequest):
+    """
+    AI-Assisted Data Preparation: Analyze dataset and provide intelligent suggestions
+    for data cleaning, transformations, and recoding.
+    """
+    db = request.app.state.db
+    
+    # Get data
+    if req.snapshot_id:
+        snapshot = await db.snapshots.find_one({"id": req.snapshot_id}, {"_id": 0})
+        if not snapshot:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        df = pd.DataFrame(snapshot.get("data", []))
+        schema = snapshot.get("schema", {})
+    elif req.form_id:
+        form = await db.forms.find_one({"id": req.form_id}, {"_id": 0})
+        if not form:
+            raise HTTPException(status_code=404, detail="Form not found")
+        
+        responses = await db.responses.find(
+            {"form_id": req.form_id, "is_deleted": {"$ne": True}},
+            {"_id": 0}
+        ).to_list(10000)
+        
+        if not responses:
+            return {"suggestions": [], "summary": "No data available for analysis"}
+        
+        df = pd.DataFrame([r.get("data", {}) for r in responses])
+        schema = {f["id"]: f for f in form.get("fields", [])}
+    else:
+        raise HTTPException(status_code=400, detail="Either snapshot_id or form_id required")
+    
+    if df.empty:
+        return {"suggestions": [], "summary": "No data available for analysis"}
+    
+    # Filter variables if specified
+    if req.variables:
+        available = [v for v in req.variables if v in df.columns]
+        if not available:
+            raise HTTPException(status_code=400, detail="No specified variables found in data")
+        df = df[available]
+    
+    suggestions = []
+    
+    # Analyze each variable
+    for col in df.columns:
+        col_suggestions = analyze_variable(df[col], col, schema.get(col, {}))
+        suggestions.extend(col_suggestions)
+    
+    # Dataset-level suggestions
+    dataset_suggestions = analyze_dataset(df, schema)
+    suggestions.extend(dataset_suggestions)
+    
+    # Sort by priority
+    priority_order = {"high": 0, "medium": 1, "low": 2}
+    suggestions.sort(key=lambda x: priority_order.get(x.get("priority", "low"), 2))
+    
+    # Generate summary
+    high_count = len([s for s in suggestions if s.get("priority") == "high"])
+    medium_count = len([s for s in suggestions if s.get("priority") == "medium"])
+    
+    summary = f"Found {len(suggestions)} suggestions: {high_count} high priority, {medium_count} medium priority."
+    if high_count > 0:
+        summary += " Address high-priority items first for data quality."
+    
+    return {
+        "suggestions": suggestions,
+        "summary": summary,
+        "variables_analyzed": len(df.columns),
+        "observations": len(df)
+    }
+
+
+def analyze_variable(series: pd.Series, var_name: str, schema_info: dict) -> List[dict]:
+    """Analyze a single variable and return suggestions"""
+    suggestions = []
+    var_label = schema_info.get("label", var_name)
+    var_type = schema_info.get("type", "unknown")
+    
+    # 1. Missing Data Analysis
+    missing_count = series.isna().sum()
+    missing_pct = (missing_count / len(series)) * 100 if len(series) > 0 else 0
+    
+    if missing_pct > 50:
+        suggestions.append({
+            "type": "missing_data",
+            "priority": "high",
+            "variable": var_name,
+            "variable_label": var_label,
+            "title": f"High missing data in '{var_label}'",
+            "description": f"{missing_pct:.1f}% of values are missing ({missing_count} of {len(series)}). Consider removing this variable or using imputation.",
+            "actions": [
+                {"action": "impute_mean", "label": "Impute with mean"},
+                {"action": "impute_median", "label": "Impute with median"},
+                {"action": "impute_mode", "label": "Impute with mode"},
+                {"action": "drop_variable", "label": "Drop variable"}
+            ]
+        })
+    elif missing_pct > 10:
+        suggestions.append({
+            "type": "missing_data",
+            "priority": "medium",
+            "variable": var_name,
+            "variable_label": var_label,
+            "title": f"Moderate missing data in '{var_label}'",
+            "description": f"{missing_pct:.1f}% of values are missing. Consider imputation or listwise deletion.",
+            "actions": [
+                {"action": "impute_mean", "label": "Impute with mean"},
+                {"action": "impute_median", "label": "Impute with median"},
+                {"action": "drop_missing", "label": "Drop rows with missing"}
+            ]
+        })
+    elif missing_pct > 0:
+        suggestions.append({
+            "type": "missing_data",
+            "priority": "low",
+            "variable": var_name,
+            "variable_label": var_label,
+            "title": f"Some missing data in '{var_label}'",
+            "description": f"{missing_pct:.1f}% missing values ({missing_count}). May be acceptable for most analyses.",
+            "actions": [
+                {"action": "drop_missing", "label": "Drop rows with missing"},
+                {"action": "ignore", "label": "Ignore (use listwise deletion)"}
+            ]
+        })
+    
+    # Work with non-missing values
+    valid_series = series.dropna()
+    if len(valid_series) == 0:
+        return suggestions
+    
+    # 2. Numeric Variable Analysis
+    numeric_series = pd.to_numeric(valid_series, errors='coerce')
+    if numeric_series.notna().sum() > len(valid_series) * 0.8:  # Mostly numeric
+        numeric_valid = numeric_series.dropna()
+        
+        if len(numeric_valid) > 10:
+            # Outlier detection using IQR
+            q1 = numeric_valid.quantile(0.25)
+            q3 = numeric_valid.quantile(0.75)
+            iqr = q3 - q1
+            lower_bound = q1 - 1.5 * iqr
+            upper_bound = q3 + 1.5 * iqr
+            
+            outliers = numeric_valid[(numeric_valid < lower_bound) | (numeric_valid > upper_bound)]
+            outlier_pct = (len(outliers) / len(numeric_valid)) * 100
+            
+            if outlier_pct > 10:
+                suggestions.append({
+                    "type": "outliers",
+                    "priority": "high",
+                    "variable": var_name,
+                    "variable_label": var_label,
+                    "title": f"Many outliers in '{var_label}'",
+                    "description": f"{outlier_pct:.1f}% of values are outliers ({len(outliers)} values outside [{lower_bound:.2f}, {upper_bound:.2f}]). This may affect statistical analyses.",
+                    "stats": {
+                        "outlier_count": int(len(outliers)),
+                        "lower_bound": round(float(lower_bound), 2),
+                        "upper_bound": round(float(upper_bound), 2),
+                        "min_outlier": round(float(outliers.min()), 2) if len(outliers) > 0 else None,
+                        "max_outlier": round(float(outliers.max()), 2) if len(outliers) > 0 else None
+                    },
+                    "actions": [
+                        {"action": "winsorize", "label": "Winsorize (cap at bounds)"},
+                        {"action": "remove_outliers", "label": "Remove outliers"},
+                        {"action": "log_transform", "label": "Log transform"}
+                    ]
+                })
+            elif outlier_pct > 2:
+                suggestions.append({
+                    "type": "outliers",
+                    "priority": "low",
+                    "variable": var_name,
+                    "variable_label": var_label,
+                    "title": f"Some outliers in '{var_label}'",
+                    "description": f"{len(outliers)} outlier(s) detected. Review if they are valid data points.",
+                    "stats": {
+                        "outlier_count": int(len(outliers)),
+                        "values": [round(float(v), 2) for v in outliers.head(5).tolist()]
+                    },
+                    "actions": [
+                        {"action": "review", "label": "Review manually"},
+                        {"action": "winsorize", "label": "Winsorize"}
+                    ]
+                })
+            
+            # Skewness check
+            from scipy import stats as scipy_stats
+            skewness = scipy_stats.skew(numeric_valid)
+            
+            if abs(skewness) > 2:
+                transform_suggestion = "log" if skewness > 0 and numeric_valid.min() > 0 else "sqrt" if skewness > 0 else "square"
+                suggestions.append({
+                    "type": "distribution",
+                    "priority": "medium",
+                    "variable": var_name,
+                    "variable_label": var_label,
+                    "title": f"Highly skewed distribution in '{var_label}'",
+                    "description": f"Skewness = {skewness:.2f}. {'Positively' if skewness > 0 else 'Negatively'} skewed data may violate normality assumptions.",
+                    "stats": {
+                        "skewness": round(float(skewness), 2),
+                        "mean": round(float(numeric_valid.mean()), 2),
+                        "median": round(float(numeric_valid.median()), 2)
+                    },
+                    "actions": [
+                        {"action": "log_transform", "label": "Log transform"} if numeric_valid.min() > 0 else None,
+                        {"action": "sqrt_transform", "label": "Square root transform"} if numeric_valid.min() >= 0 else None,
+                        {"action": "box_cox", "label": "Box-Cox transform"} if numeric_valid.min() > 0 else None,
+                        {"action": "ignore", "label": "Use non-parametric tests"}
+                    ]
+                })
+            
+            # Zero variance check
+            if numeric_valid.std() == 0:
+                suggestions.append({
+                    "type": "zero_variance",
+                    "priority": "high",
+                    "variable": var_name,
+                    "variable_label": var_label,
+                    "title": f"Zero variance in '{var_label}'",
+                    "description": f"All values are identical ({numeric_valid.iloc[0]}). This variable provides no information.",
+                    "actions": [
+                        {"action": "drop_variable", "label": "Drop variable"}
+                    ]
+                })
+    
+    # 3. Categorical Variable Analysis
+    else:
+        unique_values = valid_series.unique()
+        value_counts = valid_series.value_counts()
+        
+        # Check for inconsistent labels (case variations, whitespace)
+        str_values = [str(v).strip() for v in unique_values]
+        lower_values = [v.lower() for v in str_values]
+        
+        # Find potential duplicates due to case/whitespace
+        seen = {}
+        inconsistent = []
+        for orig, lower in zip(str_values, lower_values):
+            if lower in seen and seen[lower] != orig:
+                inconsistent.append((seen[lower], orig))
+            seen[lower] = orig
+        
+        if inconsistent:
+            suggestions.append({
+                "type": "inconsistent_labels",
+                "priority": "high",
+                "variable": var_name,
+                "variable_label": var_label,
+                "title": f"Inconsistent labels in '{var_label}'",
+                "description": f"Found similar values that may be the same category: {inconsistent[:3]}",
+                "examples": inconsistent[:5],
+                "actions": [
+                    {"action": "standardize_case", "label": "Standardize to lowercase"},
+                    {"action": "trim_whitespace", "label": "Trim whitespace"},
+                    {"action": "review_recode", "label": "Review and recode manually"}
+                ]
+            })
+        
+        # Check for rare categories
+        total = len(valid_series)
+        rare_categories = value_counts[value_counts < total * 0.02]  # Less than 2%
+        
+        if len(rare_categories) > 0 and len(rare_categories) < len(value_counts):
+            suggestions.append({
+                "type": "rare_categories",
+                "priority": "low",
+                "variable": var_name,
+                "variable_label": var_label,
+                "title": f"Rare categories in '{var_label}'",
+                "description": f"{len(rare_categories)} categories have less than 2% of responses. Consider combining into 'Other'.",
+                "categories": {str(k): int(v) for k, v in rare_categories.head(5).items()},
+                "actions": [
+                    {"action": "combine_rare", "label": "Combine into 'Other'"},
+                    {"action": "ignore", "label": "Keep as is"}
+                ]
+            })
+        
+        # Too many unique values for categorical
+        if len(unique_values) > 20 and var_type in ['select', 'radio', 'categorical']:
+            suggestions.append({
+                "type": "high_cardinality",
+                "priority": "medium",
+                "variable": var_name,
+                "variable_label": var_label,
+                "title": f"High cardinality in '{var_label}'",
+                "description": f"{len(unique_values)} unique values. May need grouping for meaningful analysis.",
+                "actions": [
+                    {"action": "group_values", "label": "Create value groups"},
+                    {"action": "review", "label": "Review manually"}
+                ]
+            })
+    
+    # Filter out None actions
+    for s in suggestions:
+        if "actions" in s:
+            s["actions"] = [a for a in s["actions"] if a is not None]
+    
+    return suggestions
+
+
+def analyze_dataset(df: pd.DataFrame, schema: dict) -> List[dict]:
+    """Analyze dataset-level issues"""
+    suggestions = []
+    
+    # 1. Sample size check
+    if len(df) < 30:
+        suggestions.append({
+            "type": "sample_size",
+            "priority": "high",
+            "variable": None,
+            "variable_label": None,
+            "title": "Small sample size",
+            "description": f"Only {len(df)} observations. Many statistical tests require n ≥ 30 for reliable results.",
+            "actions": [
+                {"action": "use_nonparametric", "label": "Use non-parametric tests"},
+                {"action": "acknowledge", "label": "Acknowledge limitation"}
+            ]
+        })
+    
+    # 2. Check for duplicate rows
+    duplicates = df.duplicated().sum()
+    if duplicates > 0:
+        dup_pct = (duplicates / len(df)) * 100
+        suggestions.append({
+            "type": "duplicates",
+            "priority": "medium" if dup_pct > 5 else "low",
+            "variable": None,
+            "variable_label": None,
+            "title": "Duplicate rows detected",
+            "description": f"{duplicates} duplicate rows ({dup_pct:.1f}%). May indicate data collection issues.",
+            "actions": [
+                {"action": "remove_duplicates", "label": "Remove duplicates"},
+                {"action": "review", "label": "Review duplicates"}
+            ]
+        })
+    
+    # 3. Check for highly correlated numeric variables
+    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    if len(numeric_cols) >= 2:
+        try:
+            corr_matrix = df[numeric_cols].corr()
+            high_corr = []
+            
+            for i, col1 in enumerate(numeric_cols):
+                for col2 in numeric_cols[i+1:]:
+                    corr_val = corr_matrix.loc[col1, col2]
+                    if abs(corr_val) > 0.9 and not pd.isna(corr_val):
+                        high_corr.append({
+                            "var1": col1,
+                            "var2": col2,
+                            "correlation": round(float(corr_val), 3)
+                        })
+            
+            if high_corr:
+                suggestions.append({
+                    "type": "multicollinearity",
+                    "priority": "medium",
+                    "variable": None,
+                    "variable_label": None,
+                    "title": "Highly correlated variables",
+                    "description": f"{len(high_corr)} variable pair(s) with correlation > 0.9. May cause multicollinearity in regression.",
+                    "pairs": high_corr[:5],
+                    "actions": [
+                        {"action": "remove_one", "label": "Remove one variable from each pair"},
+                        {"action": "pca", "label": "Use PCA to combine"},
+                        {"action": "acknowledge", "label": "Acknowledge in analysis"}
+                    ]
+                })
+        except Exception:
+            pass
+    
+    # 4. ID-like columns that shouldn't be analyzed
+    for col in df.columns:
+        if len(df[col].dropna()) > 0:
+            unique_ratio = df[col].nunique() / len(df[col].dropna())
+            col_lower = col.lower()
+            
+            if unique_ratio > 0.95 and any(kw in col_lower for kw in ['id', 'uuid', 'key', 'index', 'email', 'phone']):
+                suggestions.append({
+                    "type": "identifier_column",
+                    "priority": "low",
+                    "variable": col,
+                    "variable_label": schema.get(col, {}).get("label", col),
+                    "title": f"Possible identifier column: '{col}'",
+                    "description": "This column appears to be an identifier (nearly all unique values). Exclude from statistical analysis.",
+                    "actions": [
+                        {"action": "exclude", "label": "Exclude from analysis"},
+                        {"action": "ignore", "label": "Keep in dataset"}
+                    ]
+                })
+    
+    return suggestions
+
+
+@router.post("/apply-transformation")
+async def apply_transformation(request: Request, transformation: dict):
+    """Apply a data transformation based on suggestion action"""
+    db = request.app.state.db
+    
+    action = transformation.get("action")
+    variable = transformation.get("variable")
+    snapshot_id = transformation.get("snapshot_id")
+    form_id = transformation.get("form_id")
+    org_id = transformation.get("org_id")
+    
+    if not action:
+        raise HTTPException(status_code=400, detail="Action required")
+    
+    # Get data
+    if snapshot_id:
+        snapshot = await db.snapshots.find_one({"id": snapshot_id})
+        if not snapshot:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        df = pd.DataFrame(snapshot.get("data", []))
+    else:
+        raise HTTPException(status_code=400, detail="Snapshot ID required for transformations")
+    
+    if df.empty:
+        raise HTTPException(status_code=400, detail="No data to transform")
+    
+    # Apply transformation
+    result = {"success": False, "message": "", "affected_rows": 0}
+    
+    try:
+        if action == "impute_mean" and variable:
+            if variable in df.columns:
+                mean_val = pd.to_numeric(df[variable], errors='coerce').mean()
+                affected = df[variable].isna().sum()
+                df[variable] = pd.to_numeric(df[variable], errors='coerce').fillna(mean_val)
+                result = {"success": True, "message": f"Imputed {affected} values with mean ({mean_val:.2f})", "affected_rows": int(affected)}
+        
+        elif action == "impute_median" and variable:
+            if variable in df.columns:
+                median_val = pd.to_numeric(df[variable], errors='coerce').median()
+                affected = df[variable].isna().sum()
+                df[variable] = pd.to_numeric(df[variable], errors='coerce').fillna(median_val)
+                result = {"success": True, "message": f"Imputed {affected} values with median ({median_val:.2f})", "affected_rows": int(affected)}
+        
+        elif action == "impute_mode" and variable:
+            if variable in df.columns:
+                mode_val = df[variable].mode().iloc[0] if len(df[variable].mode()) > 0 else None
+                if mode_val is not None:
+                    affected = df[variable].isna().sum()
+                    df[variable] = df[variable].fillna(mode_val)
+                    result = {"success": True, "message": f"Imputed {affected} values with mode ({mode_val})", "affected_rows": int(affected)}
+        
+        elif action == "drop_missing" and variable:
+            if variable in df.columns:
+                original_len = len(df)
+                df = df.dropna(subset=[variable])
+                affected = original_len - len(df)
+                result = {"success": True, "message": f"Removed {affected} rows with missing values", "affected_rows": affected}
+        
+        elif action == "remove_duplicates":
+            original_len = len(df)
+            df = df.drop_duplicates()
+            affected = original_len - len(df)
+            result = {"success": True, "message": f"Removed {affected} duplicate rows", "affected_rows": affected}
+        
+        elif action == "standardize_case" and variable:
+            if variable in df.columns:
+                df[variable] = df[variable].astype(str).str.lower().str.strip()
+                result = {"success": True, "message": f"Standardized case for '{variable}'", "affected_rows": len(df)}
+        
+        elif action == "trim_whitespace" and variable:
+            if variable in df.columns:
+                df[variable] = df[variable].astype(str).str.strip()
+                result = {"success": True, "message": f"Trimmed whitespace for '{variable}'", "affected_rows": len(df)}
+        
+        elif action == "log_transform" and variable:
+            if variable in df.columns:
+                numeric_col = pd.to_numeric(df[variable], errors='coerce')
+                if numeric_col.min() > 0:
+                    df[f"{variable}_log"] = np.log(numeric_col)
+                    result = {"success": True, "message": f"Created log-transformed variable '{variable}_log'", "affected_rows": len(df)}
+                else:
+                    result = {"success": False, "message": "Cannot log transform: contains zero or negative values"}
+        
+        elif action == "winsorize" and variable:
+            if variable in df.columns:
+                numeric_col = pd.to_numeric(df[variable], errors='coerce')
+                q1 = numeric_col.quantile(0.25)
+                q3 = numeric_col.quantile(0.75)
+                iqr = q3 - q1
+                lower = q1 - 1.5 * iqr
+                upper = q3 + 1.5 * iqr
+                
+                affected = ((numeric_col < lower) | (numeric_col > upper)).sum()
+                df[variable] = numeric_col.clip(lower=lower, upper=upper)
+                result = {"success": True, "message": f"Winsorized {affected} outliers to [{lower:.2f}, {upper:.2f}]", "affected_rows": int(affected)}
+        
+        else:
+            result = {"success": False, "message": f"Unknown action: {action}"}
+        
+        # Save transformed data back to snapshot
+        if result["success"]:
+            await db.snapshots.update_one(
+                {"id": snapshot_id},
+                {
+                    "$set": {
+                        "data": df.to_dict(orient="records"),
+                        "row_count": len(df),
+                        "updated_at": datetime.now(timezone.utc)
+                    },
+                    "$push": {
+                        "transformations": {
+                            "action": action,
+                            "variable": variable,
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
+                            "affected_rows": result["affected_rows"]
+                        }
+                    }
+                }
+            )
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Transformation failed: {str(e)}")
+
