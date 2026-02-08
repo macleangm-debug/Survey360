@@ -59,6 +59,7 @@ import { SurveyStatsPanel } from '../components/analysis/SurveyStatsPanel';
 import { DashboardBuilder } from '../components/analysis/DashboardBuilder';
 import { FactorAnalysis } from '../components/analysis/FactorAnalysis';
 import { MissingDataImputation } from '../components/analysis/MissingDataImputation';
+import { AuditTrail } from '../components/analysis/AuditTrail';
 import {
   BarChart,
   Bar,
