@@ -202,7 +202,7 @@ export function DashboardLayout({ children }) {
           {/* Create Button */}
           <button
             onClick={() => navigate('/forms/new')}
-            className="w-14 h-14 rounded-xl bg-sky-500 hover:bg-sky-600 text-white shadow-md shadow-sky-500/20 mb-4 flex flex-col items-center justify-center gap-0.5 transition-colors"
+            className="w-14 h-14 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20 mb-4 flex flex-col items-center justify-center gap-0.5 transition-colors"
           >
             <Plus className="w-5 h-5" />
             <span className="text-[9px] font-medium">Create</span>
@@ -222,8 +222,8 @@ export function DashboardLayout({ children }) {
                       className={cn(
                         "w-16 py-2 flex flex-col items-center justify-center gap-1 rounded-xl transition-colors",
                         isActive 
-                          ? "bg-sky-50 text-sky-600" 
-                          : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                          ? "bg-primary/10 text-primary" 
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       )}
                     >
                       <Icon className="w-5 h-5" />
@@ -232,7 +232,7 @@ export function DashboardLayout({ children }) {
                       </span>
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-slate-900 text-white">
+                  <TooltipContent side="right" className="bg-popover text-popover-foreground border border-border">
                     {group.label}
                   </TooltipContent>
                 </Tooltip>
