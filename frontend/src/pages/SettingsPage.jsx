@@ -277,17 +277,19 @@ export function SettingsPage() {
       <div className="space-y-6 max-w-4xl" data-testid="settings-page">
         {/* Header */}
         <div>
-          <h1 className="font-barlow text-3xl font-bold tracking-tight text-white">Settings</h1>
-          <p className="text-gray-400">Manage your account and preferences</p>
+          <h1 className="font-barlow text-3xl font-bold tracking-tight text-foreground">Settings</h1>
+          <p className="text-muted-foreground">Manage your account and preferences</p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-[500px]">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 lg:w-[700px]">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="notifications">Alerts</TabsTrigger>
-            <TabsTrigger value="organization">Organization</TabsTrigger>
-            <TabsTrigger value="api">API & Export</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="privacy">Privacy</TabsTrigger>
+            <TabsTrigger value="organization">Org</TabsTrigger>
+            <TabsTrigger value="api">API</TabsTrigger>
           </TabsList>
 
           {/* Profile Tab */}
