@@ -711,8 +711,31 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
 - AI-Assisted Data Preparation suggestions
 - Dashboard sharing and permissions UI
 - Role-gating for sensitive analysis features
-- ANCOVA and additional statistics tests
 - Export-to-PowerPoint for charts
+
+---
+
+## UPDATE: Feb 8, 2026 - ANCOVA Implementation
+
+### Features Completed
+1. **ANCOVA (Analysis of Covariance)**
+   - Compare group means while controlling for continuous covariates
+   - Displays raw vs adjusted means for each group
+   - Effect sizes: Partial η² with interpretation
+   - Covariate regression coefficients and significance
+   - Post-hoc pairwise comparisons with Bonferroni correction
+   - Model fit statistics (R², Adjusted R²)
+   - Interpretive text
+
+### Backend
+- `POST /api/statistics/ancova` - Full ANCOVA analysis
+- Uses statsmodels for Type II ANOVA (correct for unbalanced designs)
+- Returns adjusted means estimated at covariate means
+
+### Frontend
+- New "ANCOVA" tab in AdvancedStatsPanel (now 10 tabs total)
+- Configuration: dependent variable, grouping factor, multiple covariates
+- Rich results display with tables, badges, and effect interpretations
 
 ---
 
