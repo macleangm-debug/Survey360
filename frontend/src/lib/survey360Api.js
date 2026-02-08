@@ -1,8 +1,16 @@
 import axios from 'axios';
 
 // Survey360 uses the main backend's /api/survey360 routes
-const API_BASE = process.env.REACT_APP_BACKEND_URL || '';
-const SURVEY360_API_URL = `${API_BASE}/api/survey360`;
+// In browser context, use window location origin or the REACT_APP_BACKEND_URL
+const getApiBase = () => {
+  // For production/preview, use the same origin
+  if (typeof window !== 'undefined' && window.location.hostname.includes('preview.emergentagent.com')) {
+    return window.location.origin;
+  }
+  return process.env.REACT_APP_BACKEND_URL || '';
+};
+
+const SURVEY360_API_URL = `${getApiBase()}/api/survey360`;
 
 const survey360Api = axios.create({
   baseURL: SURVEY360_API_URL,
