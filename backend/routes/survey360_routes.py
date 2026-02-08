@@ -351,6 +351,44 @@ async def survey360_duplicate_survey(survey_id: str, user=Depends(get_survey360_
         response_count=0
     )
 
+# Response routes (authenticated)
+class Survey360ResponseItem(BaseModel):
+    id: str
+    survey_id: str
+    respondent_email: Optional[str] = None
+    respondent_name: Optional[str] = None
+    status: str = "completed"
+    answers: dict = {}
+    submitted_at: str
+    completion_time: Optional[int] = None
+
+@router.get("/surveys/{survey_id}/responses", response_model=List[Survey360ResponseItem])
+async def survey360_list_responses(survey_id: str, page: int = 1, limit: int = 50, user=Depends(get_survey360_user)):
+    from server import app
+    db = app.state.db
+    
+    skip = (page - 1) * limit
+    responses = await db.survey360_responses.find(
+        {"survey_id": survey_id},
+        {"_id": 0}
+    ).sort("submitted_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    return [Survey360ResponseItem(**r) for r in responses]
+
+@router.get("/surveys/{survey_id}/responses/{response_id}")
+async def survey360_get_response(survey_id: str, response_id: str, user=Depends(get_survey360_user)):
+    from server import app
+    db = app.state.db
+    
+    response = await db.survey360_responses.find_one(
+        {"id": response_id, "survey_id": survey_id},
+        {"_id": 0}
+    )
+    if not response:
+        raise HTTPException(status_code=404, detail="Response not found")
+    
+    return response
+
 # Dashboard routes
 @router.get("/dashboard/stats")
 async def survey360_get_dashboard_stats(org_id: Optional[str] = None, user=Depends(get_survey360_user)):
