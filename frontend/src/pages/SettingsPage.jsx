@@ -24,7 +24,22 @@ import {
   Plus,
   Trash2,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Monitor,
+  Smartphone,
+  Laptop,
+  Lock,
+  Unlock,
+  HardDrive,
+  Wifi,
+  WifiOff,
+  LogOut,
+  UserX,
+  Clock,
+  Calendar,
+  MapPin,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -34,6 +49,7 @@ import { Switch } from '../components/ui/switch';
 import { Separator } from '../components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
+import { Progress } from '../components/ui/progress';
 import {
   Select,
   SelectContent,
@@ -41,6 +57,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { useAuthStore, useOrgStore, useUIStore } from '../store';
