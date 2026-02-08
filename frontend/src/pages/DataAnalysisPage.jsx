@@ -901,6 +901,16 @@ export function DataAnalysisPage() {
             )}
           </TabsContent>
 
+          {/* Diagnostics Tab */}
+          <TabsContent value="diagnostics" className="space-y-4">
+            <DiagnosticPlots
+              formId={selectedFormId}
+              snapshotId={selectedSnapshotId}
+              orgId={selectedOrg?.id}
+              fields={formFields}
+            />
+          </TabsContent>
+
           {/* Export Tab */}
           <TabsContent value="export" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
