@@ -1263,3 +1263,104 @@ async def get_coefficient_plot_data(
     except Exception as e:
         return {"error": f"Regression failed: {str(e)}"}
 
+
+
+# ============ Chart Export ============
+
+class ChartExportRequest(BaseModel):
+    image_data: str  # Base64 PNG data
+    title: str
+    subtitle: Optional[str] = None
+    width: int = 800
+    height: int = 600
+
+
+@router.post("/export-chart-pdf")
+async def export_chart_pdf(request: Request, req: ChartExportRequest):
+    """Export chart as PDF with title and subtitle"""
+    from fastapi.responses import StreamingResponse
+    import base64
+    
+    try:
+        from reportlab.lib.pagesizes import letter, landscape
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.units import inch
+        from reportlab.lib import colors
+    except ImportError:
+        raise HTTPException(status_code=500, detail="PDF generation not available")
+    
+    # Decode base64 image
+    try:
+        image_data = req.image_data.split(',')[1] if ',' in req.image_data else req.image_data
+        image_bytes = base64.b64decode(image_data)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid image data")
+    
+    # Create PDF
+    buffer = io.BytesIO()
+    
+    # Use landscape if chart is wider than tall
+    if req.width > req.height:
+        page_size = landscape(letter)
+    else:
+        page_size = letter
+    
+    c = canvas.Canvas(buffer, pagesize=page_size)
+    page_width, page_height = page_size
+    
+    # Title
+    c.setFont("Helvetica-Bold", 18)
+    c.drawCentredString(page_width / 2, page_height - 0.75 * inch, req.title)
+    
+    # Subtitle
+    if req.subtitle:
+        c.setFont("Helvetica", 12)
+        c.setFillColor(colors.gray)
+        c.drawCentredString(page_width / 2, page_height - 1.1 * inch, req.subtitle)
+        c.setFillColor(colors.black)
+    
+    # Calculate image size to fit page with margins
+    margin = 0.75 * inch
+    title_space = 1.5 * inch if req.subtitle else 1.2 * inch
+    available_width = page_width - 2 * margin
+    available_height = page_height - title_space - margin
+    
+    # Maintain aspect ratio
+    aspect = req.width / req.height
+    if available_width / aspect <= available_height:
+        img_width = available_width
+        img_height = available_width / aspect
+    else:
+        img_height = available_height
+        img_width = available_height * aspect
+    
+    # Center the image
+    x = (page_width - img_width) / 2
+    y = page_height - title_space - img_height
+    
+    # Draw image from bytes
+    from reportlab.lib.utils import ImageReader
+    from PIL import Image
+    
+    img = Image.open(io.BytesIO(image_bytes))
+    img_reader = ImageReader(img)
+    c.drawImage(img_reader, x, y, width=img_width, height=img_height)
+    
+    # Footer with timestamp
+    c.setFont("Helvetica", 8)
+    c.setFillColor(colors.gray)
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    c.drawString(margin, 0.4 * inch, f"Generated: {timestamp}")
+    c.drawRightString(page_width - margin, 0.4 * inch, "DataPulse Analytics")
+    
+    c.save()
+    buffer.seek(0)
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename=chart_{req.title.replace(' ', '_')}.pdf"
+        }
+    )
+
