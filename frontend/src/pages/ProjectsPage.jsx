@@ -228,7 +228,7 @@ export function ProjectsPage() {
     return (
       <DashboardLayout>
         <div className="text-center py-12">
-          <p className="text-gray-400">Please select an organization first</p>
+          <p className="text-muted-foreground">Please select an organization first</p>
         </div>
       </DashboardLayout>
     );
