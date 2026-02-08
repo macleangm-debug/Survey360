@@ -284,6 +284,59 @@ export function ChartStudio({ formId, orgId, fields, stats, getToken }) {
       }
       return;
     }
+
+    if (format === 'pptx') {
+      // Download as PowerPoint via backend
+      try {
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new window.Image();
+        
+        img.onload = async () => {
+          canvas.width = img.width * 2;
+          canvas.height = img.height * 2;
+          ctx.fillStyle = 'white';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          const pngData = canvas.toDataURL('image/png', 1.0);
+          
+          const response = await fetch(`${API_URL}/api/analysis/export-chart-pptx`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({
+              image_data: pngData,
+              title: config.title || chartTitle,
+              subtitle: config.subtitle || '',
+              width: canvas.width / 2,
+              height: canvas.height / 2
+            })
+          });
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `${fileName}.pptx`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+            toast.success('Chart downloaded as PowerPoint');
+          } else {
+            toast.error('PowerPoint export failed');
+          }
+        };
+        
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      } catch (error) {
+        toast.error('Failed to export PowerPoint');
+      }
+      return;
+    }
   };
 
   const renderChart = () => {
