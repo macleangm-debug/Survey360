@@ -207,7 +207,7 @@ export function Survey360RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuthStore();
+  const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -215,7 +215,7 @@ export function Survey360RegisterPage() {
     setLoading(true);
     try {
       const response = await survey360Api.post('/auth/register', { email, password, name });
-      login(response.data.user, response.data.access_token);
+      setAuth(response.data.user, response.data.access_token);
       toast.success('Account created successfully!');
       navigate('/solutions/survey360/app/dashboard');
     } catch (error) {
