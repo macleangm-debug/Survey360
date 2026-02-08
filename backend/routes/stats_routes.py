@@ -964,6 +964,7 @@ class NonparametricRequest(BaseModel):
 
 
 @router.post("/nonparametric")
+@log_action("run_nonparametric_test", target_type="analysis")
 async def run_nonparametric_test(
     request: Request,
     req: NonparametricRequest
