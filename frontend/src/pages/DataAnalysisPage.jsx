@@ -63,6 +63,7 @@ import { MissingDataImputation } from '../components/analysis/MissingDataImputat
 import { AuditTrail } from '../components/analysis/AuditTrail';
 import DiagnosticPlots from '../components/analysis/DiagnosticPlots';
 import AIDataPrep from '../components/analysis/AIDataPrep';
+import QuickAnalysis from '../components/analysis/QuickAnalysis';
 import {
   BarChart,
   Bar,
