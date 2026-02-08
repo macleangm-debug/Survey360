@@ -291,12 +291,15 @@ function App() {
           <Route path="/solutions/survey360/app" element={<Survey360AppLayout />}>
             <Route path="dashboard" element={<Survey360DashboardPage />} />
             <Route path="surveys" element={<Survey360SurveysPage />} />
-            <Route path="surveys/new" element={<Survey360SurveysPage />} />
-            <Route path="surveys/:id/edit" element={<Survey360SurveysPage />} />
+            <Route path="surveys/new" element={<Survey360BuilderPage />} />
+            <Route path="surveys/:id/edit" element={<Survey360BuilderPage />} />
             <Route path="responses" element={<Survey360ResponsesPage />} />
             <Route path="settings" element={<Survey360SettingsPage />} />
             <Route index element={<Navigate to="dashboard" replace />} />
           </Route>
+          
+          {/* Public Survey Page (no auth required) */}
+          <Route path="/s/:surveyId" element={<PublicSurveyPage />} />
 
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
