@@ -861,7 +861,7 @@ export function DataAnalysisPage() {
                     formId={selectedFormId}
                     snapshotId={selectedSnapshotId}
                     orgId={currentOrg?.id}
-                    onRefresh={fetchResponseData}
+                    onRefresh={fetchResponses}
                   />
                 </TabsContent>
               </Tabs>
