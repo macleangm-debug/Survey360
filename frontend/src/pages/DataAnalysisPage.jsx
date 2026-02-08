@@ -564,12 +564,12 @@ export function DataAnalysisPage() {
             </Card>
 
             {/* Quick Analysis Wizard */}
-            {selectedFormId && formSchema.length > 0 && (
+            {selectedFormId && formFields.length > 0 && (
               <QuickAnalysis
                 formId={selectedFormId}
                 snapshotId={selectedSnapshotId}
                 orgId={currentOrg?.id}
-                fields={formSchema}
+                fields={formFields}
                 getToken={getToken}
                 onRunAnalysis={(testType, results) => {
                   toast.success(`${testType} analysis complete`);
