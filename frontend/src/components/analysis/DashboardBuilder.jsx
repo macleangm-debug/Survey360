@@ -882,6 +882,26 @@ export function DashboardBuilder({ formId, snapshotId, orgId, fields, getToken }
         </Card>
       )}
 
+      {/* Drill-Down Indicator */}
+      {drillDownSource && (
+        <Card className="p-3 bg-sky-50 border-sky-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-sky-600" />
+              <span className="text-sm font-medium text-sky-800">Drill-down active:</span>
+              <Badge className="bg-sky-100 text-sky-700">
+                {drillDownSource.variable} = "{drillDownSource.value}"
+              </Badge>
+            </div>
+            <Button variant="ghost" size="sm" onClick={clearDrillDown} className="text-sky-600 hover:text-sky-800">
+              <X className="h-4 w-4 mr-1" />
+              Clear
+            </Button>
+          </div>
+          <p className="text-xs text-sky-600 mt-1">Click on another chart element to change filter, or click Clear to remove</p>
+        </Card>
+      )}
+
       {/* Widget Grid */}
       <div className="bg-slate-50 border rounded-lg p-4 min-h-[500px]">
         {widgets.length > 0 ? (
