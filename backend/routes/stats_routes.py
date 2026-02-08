@@ -175,6 +175,7 @@ def interpret_eta_squared(eta):
 # ============ Descriptive Statistics ============
 
 @router.post("/descriptives")
+@log_action("run_descriptive_stats", target_type="analysis")
 async def get_descriptive_stats(
     request: Request,
     req: DescriptiveRequest
