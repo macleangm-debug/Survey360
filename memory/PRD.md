@@ -634,7 +634,25 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
   - Rotation method dropdown
   - Results display: summary stats, KMO/Bartlett, loading matrix, factor summary
 
-### Phase 10: Future Enhancements (Backlog)
+### Phase 10: Missing Data Imputation - COMPLETE (Feb 7, 2026)
+- ✅ Backend endpoints:
+  - `/api/analysis/imputation/missing-summary/{form_id}` - Get missing data statistics
+  - `/api/analysis/imputation/preview` - Preview imputation without applying
+  - `/api/analysis/imputation/apply` - Apply imputation and create new snapshot
+- ✅ 8 Imputation methods:
+  - Mean, Median (numeric only)
+  - Mode (most frequent)
+  - Constant (user-defined)
+  - Forward Fill, Backward Fill
+  - Linear Interpolation (numeric only)
+  - Drop Rows with missing
+- ✅ Features:
+  - Group-wise imputation (calculate mean/median within groups)
+  - Before/after preview with sample changes
+  - Creates immutable snapshot with transformation metadata
+- ✅ Frontend UI in Variables tab → Missing Data sub-tab
+
+### Phase 11: Future Enhancements (Backlog)
 - Factor Analysis visualization
 - Missing data imputation UI
 - Violin plots, coefficient plots, heatmaps
