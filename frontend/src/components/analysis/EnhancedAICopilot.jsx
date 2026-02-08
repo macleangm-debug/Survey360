@@ -523,25 +523,48 @@ export function EnhancedAICopilot({ formId, snapshotId, orgId, fields, getToken 
 
                                 {/* Evidence-Linked Narrative */}
                                 {conv.results && (
-                                  <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-100">
+                                  <div className="mt-3 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/30 dark:to-blue-950/30 rounded-lg border border-purple-100 dark:border-purple-800">
                                     <div className="flex items-center gap-2 mb-2">
-                                      <FileText className="h-4 w-4 text-purple-600" />
-                                      <span className="font-medium text-purple-800 text-sm">AI Narrative Summary</span>
+                                      <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                      <span className="font-medium text-purple-800 dark:text-purple-300 text-sm">AI Narrative Summary</span>
                                     </div>
-                                    <p className="text-sm text-slate-700 leading-relaxed">
-                                      {generateNarrative(conv.results, conv.analysisPlan)}
-                                    </p>
-                                    <div className="mt-2 flex flex-wrap gap-1">
-                                      {conv.results.interpretation && (
-                                        <Badge variant="outline" className="text-xs bg-white">
-                                          <CheckCircle className="h-3 w-3 mr-1 text-emerald-500" />
-                                          Interpretation verified
-                                        </Badge>
-                                      )}
-                                      <Badge variant="outline" className="text-xs bg-white">
-                                        Source: {conv.analysisPlan?.api_endpoint?.split('/').pop() || 'analysis'}
-                                      </Badge>
-                                    </div>
+                                    {(() => {
+                                      const narrativeData = generateNarrative(conv.results, conv.analysisPlan, conv.id);
+                                      const narrative = typeof narrativeData === 'string' ? narrativeData : narrativeData.narrative;
+                                      const evidenceLinks = typeof narrativeData === 'object' ? narrativeData.evidenceLinks : [];
+                                      
+                                      return (
+                                        <>
+                                          <div className="text-sm text-foreground leading-relaxed prose prose-sm dark:prose-invert max-w-none">
+                                            {narrative.split('\n\n').map((para, i) => (
+                                              <p key={i} className="mb-2" dangerouslySetInnerHTML={{ 
+                                                __html: para
+                                                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                                  .replace(/\(Table (\d+)\)/g, '<span class="text-purple-600 dark:text-purple-400 font-medium">(Table $1)</span>')
+                                                  .replace(/\(Chart (\d+)\)/g, '<span class="text-blue-600 dark:text-blue-400 font-medium">(Chart $1)</span>')
+                                              }} />
+                                            ))}
+                                          </div>
+                                          <div className="mt-3 flex flex-wrap gap-1">
+                                            {evidenceLinks.length > 0 && (
+                                              <Badge variant="outline" className="text-xs bg-white dark:bg-slate-800">
+                                                <CheckCircle className="h-3 w-3 mr-1 text-emerald-500" />
+                                                {evidenceLinks.length} evidence references
+                                              </Badge>
+                                            )}
+                                            {conv.results.interpretation && (
+                                              <Badge variant="outline" className="text-xs bg-white dark:bg-slate-800">
+                                                <CheckCircle className="h-3 w-3 mr-1 text-emerald-500" />
+                                                Interpretation verified
+                                              </Badge>
+                                            )}
+                                            <Badge variant="outline" className="text-xs bg-white dark:bg-slate-800">
+                                              Source: {conv.analysisPlan?.api_endpoint?.split('/').pop() || 'analysis'}
+                                            </Badge>
+                                          </div>
+                                        </>
+                                      );
+                                    })()}
                                   </div>
                                 )}
 
