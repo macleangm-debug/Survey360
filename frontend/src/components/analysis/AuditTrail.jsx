@@ -204,12 +204,12 @@ export function AuditTrail({ orgId, getToken }) {
           <CardContent className="space-y-4">
             <div>
               <Label>Action Type</Label>
-              <Select value={filters.action} onValueChange={v => { setFilters({...filters, action: v}); setPage(1); }}>
+              <Select value={filters.action || "all"} onValueChange={v => { setFilters({...filters, action: v === "all" ? '' : v}); setPage(1); }}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="All actions" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All actions</SelectItem>
+                  <SelectItem value="all">All actions</SelectItem>
                   <SelectItem value="export_csv">Export CSV</SelectItem>
                   <SelectItem value="export_excel">Export Excel</SelectItem>
                   <SelectItem value="export_spss">Export SPSS</SelectItem>
@@ -224,12 +224,12 @@ export function AuditTrail({ orgId, getToken }) {
             </div>
             <div>
               <Label>Resource Type</Label>
-              <Select value={filters.resource_type} onValueChange={v => { setFilters({...filters, resource_type: v}); setPage(1); }}>
+              <Select value={filters.resource_type || "all"} onValueChange={v => { setFilters({...filters, resource_type: v === "all" ? '' : v}); setPage(1); }}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="All resources" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All resources</SelectItem>
+                  <SelectItem value="all">All resources</SelectItem>
                   <SelectItem value="form">Form</SelectItem>
                   <SelectItem value="snapshot">Snapshot</SelectItem>
                   <SelectItem value="dashboard">Dashboard</SelectItem>
