@@ -12,6 +12,8 @@ from .utils import (
     BaseStatsRequest, get_analysis_data, calculate_effect_size,
     safe_float, safe_int, interpret_eta_squared
 )
+from utils.rate_limiter import limiter
+from config.scalability import RATE_LIMIT_STATS
 
 router = APIRouter(prefix="/statistics", tags=["statistics"])
 
