@@ -746,10 +746,26 @@ export function ChartStudio({ formId, orgId, fields, stats, getToken }) {
               <Button variant="outline" size="sm" onClick={fetchChartData} disabled={loading}>
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
               </Button>
-              <Button variant="outline" size="sm" onClick={downloadChart}>
-                <Download className="h-4 w-4 mr-2" />
-                PNG
-              </Button>
+              <div className="flex border rounded-md overflow-hidden">
+                <Select value={exportFormat} onValueChange={setExportFormat}>
+                  <SelectTrigger className="w-[80px] border-0 rounded-none h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="png">PNG</SelectItem>
+                    <SelectItem value="svg">SVG</SelectItem>
+                    <SelectItem value="pdf">PDF</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => downloadChart()} 
+                  className="rounded-none border-0 border-l h-8"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>
