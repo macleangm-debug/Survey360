@@ -176,6 +176,7 @@ async def export_to_json(
 
 
 @router.post("/xlsx")
+@log_action("export_excel", target_type="form")
 async def export_to_xlsx(
     request: Request,
     data: ExportRequest,
