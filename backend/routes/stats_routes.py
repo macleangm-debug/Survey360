@@ -1274,6 +1274,7 @@ async def run_proportions_test(
 # ============ Regression ============
 
 @router.post("/regression")
+@log_action("run_regression", target_type="analysis")
 async def run_regression(
     request: Request,
     req: RegressionRequest
