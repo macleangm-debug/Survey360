@@ -21,9 +21,12 @@ export function Survey360LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log('Survey360 Login attempt:', { email, password: '***' });
     try {
       // Use the Survey360 backend
+      console.log('Making API call to Survey360 backend...');
       const response = await survey360Api.post('/auth/login', { email, password });
+      console.log('Login response:', response.data);
       login(response.data.user, response.data.access_token);
       
       // Load organizations
@@ -40,6 +43,8 @@ export function Survey360LoginPage() {
       toast.success('Welcome back!');
       navigate('/solutions/survey360/app/dashboard');
     } catch (error) {
+      console.error('Survey360 Login error:', error);
+      console.error('Error response:', error.response);
       toast.error(error.response?.data?.detail || 'Invalid credentials');
     } finally {
       setLoading(false);
