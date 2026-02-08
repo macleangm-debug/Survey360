@@ -1,154 +1,171 @@
-<analysis>**original_problem_statement**: The user wants to build a comprehensive Data Analysis Module from scratch. The user provided a detailed checklist outlining all the required features, including response browsing, advanced statistical analysis (T-tests, ANOVA, ANCOVA, regression, non-parametric tests, clustering), an AI Copilot for natural language queries, data preparation suggestions, publication-quality chart generation with multiple export formats (PNG, SVG, PDF, PPTX), dashboarding, and robust role-based access control with audit trails.
-
-The final user request in this session was to fix a UI issue where cards across the application have poor contrast and visibility in dark mode, making them difficult to read.
+<analysis>**original_problem_statement:**
+The user initiated a series of feature requests and improvements for a data analysis platform named DataPulse. The requests evolved over the session:
+1.  **UI Fix**: Resolve poor contrast and visibility issues for UI elements, especially cards, in the application's dark mode.
+2.  **UI/UX Refactor**:
+    *   Move the Online status indicator from the bottom of the sidebar to the top.
+    *   Place the status indicator within a dropdown that contains quick links to various parts of the application.
+    *   Enhance the Settings page by adding multiple new sections/tabs for a more comprehensive user configuration experience (Profile, Appearance, Security, Privacy, etc.).
+3.  **Statistical Features**:
+    *   Implement a UI for configuring and running replicate weight analyses (BRR/jackknife).
+    *   Enhance the AI Copilot to provide better evidence-linked narratives in its output.
+    *   Add support for Poisson and Negative Binomial regressions, including interaction terms, in the backend.
+4.  **New Feature**: Introduce a Quick Analysis wizard to guide users in selecting the appropriate statistical test based on their data and research goals.
+5.  **Code Refactoring**:
+    *   Refactor the monolithic backend statistics route file () into a modular structure.
+    *   Refactor the large frontend component () into smaller, more manageable child components.
+6.  **Robustness and Scalability**: Implement significant backend improvements to handle large datasets and high traffic, including background job processing (Celery/Redis), cursor-based data loading, rate limiting, and streaming exports.
+7.  **Product Extraction**: Extract a new, focused, and standalone application named Survey360 from the existing DataPulse codebase. This new application should have its own branding and be deployable independently.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A nearly complete data analysis application has been developed.
+The primary application, DataPulse, is a feature-rich, full-stack data analysis platform. It has a React frontend and a FastAPI backend. The backend has been significantly hardened with a background job queue (Celery/Redis), rate limiting, and paginated data loaders to ensure scalability. The frontend and backend codebases were recently refactored for better maintainability.
 
--   **Backend (FastAPI)**: Endpoints for a wide array of statistical tests, data/chart exports (including CSV, SPSS, Parquet, PNG, PDF, PPTX), AI-driven data analysis/preparation, and audit logging are implemented. Security decorators for role-based access control have been created and applied to critical endpoints.
--   **Frontend (React)**: A comprehensive UI exists within the , featuring a tabbed interface for different tools:
-    -   Advanced statistics panel with 11 analysis types (T-Test, ANOVA, ANCOVA, Proportions, Correlation, Regression, GLM, Mixed Models, EFA, Nonparametric, Clustering).
-    -   Chart studio for building and exporting visualizations.
-    -   Diagnostic plots for model validation (ROC, Residuals).
-    -   An AI tab with a Copilot for natural language queries and a Data Prep assistant.
-    -   A dashboard builder with sharing capabilities.
--   **Security**: Demo credentials are now displayed on the login page for easy access.
+The agent has just begun the process of extracting the Survey360 application. A new project directory  has been created. This directory contains the initial setup for a standalone React/Vite application, including , configuration files (, ), and the basic  and . The agent has also copied over some UI components from DataPulse and created a new landing page () for Survey360.
 
 **Last working item**:
-    - Last item agent was working: The agent was actively debugging a UI issue where various cards (e.g., on the Projects page) have poor visibility due to a dark gradient background that clashes with the text in the application's dark mode. The agent correctly deduced that the issue is not with the card component itself but likely with a parent container applying an unexpected background gradient. The agent's last action was to inspect the  as the potential source of the style.
-    - Status: IN PROGRESS
-    - Agent Testing Done: N
-    - Which testing method agent to use? screenshot tool
-    - User Testing Done: N
+-   **Last item agent was working**: The agent was in the process of creating the new standalone application, Survey360. After setting up the initial project structure and configuration, it created the  file for the new application.
+-   **Status**: IN PROGRESS
+-   **Agent Testing Done**: N
+-   **Which testing method agent to use?**: Frontend testing agent
+-   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-  - Issue 1: UI cards have poor visibility and contrast in dark mode (P0)
-  
-  Issues Detail:
-  - Issue 1: 
-     - **Description**: Cards on pages like Projects, Forms, and Dashboards are hard to read in dark mode because of a dark gradient background that causes low contrast with the foreground text.
-     - **Attempted fixes**: The agent tried removing semi-transparent backgrounds () and explicitly setting  on the card components. These attempts failed because the issue stems from a gradient style inherited from a parent element.
-     - **Next debug checklist**:
-       1.  Inspect the component hierarchy for pages exhibiting the issue (e.g., , ).
-       2.  Identify which parent container is applying the gradient background (e.g., a  with classes like ).
-       3.  Remove or adjust the gradient styling on the parent container, or override it on the  components with a solid background color () to ensure proper contrast.
-     - **Why fix this issue and what will be achieved with the fix?**: This is a critical UI/UX bug. Fixing it will make the application usable and accessible in dark mode by ensuring text on cards is legible.
-     - **Status**: IN PROGRESS
-     - **Is recurring issue?**: N
-     - **Should Test frontend/backend/both after fix?**: Frontend
-     - **Blocked on other issue**: None
+There are no pending bugs or issues. The sole focus is the in-progress task of creating the Survey360 application.
 
 **In progress Task List**:
-None.
+-   **Task 1**: Complete the extraction of the Survey360 application (Priority: P0)
+    -   **Where to resume**: The agent has just created the landing page at . The next steps are:
+        1.  Copy and adapt the necessary shared components from the DataPulse project (, , etc.) into the  directory.
+        2.  Re-create or adapt the core feature components required for Survey360, such as the Form Builder, Submissions Dashboard, and survey-related settings pages.
+        3.  Set up the application routing ( or similar) to connect the landing page, login, dashboard, and other pages.
+        4.  Filter out features from DataPulse that are not relevant to Survey360 (e.g., advanced statistical analysis, complex regression models).
+        5.  Ensure the new application can be built and run independently.
+    -   **What will be achieved with this?**: A complete, standalone Survey360 frontend application, ready for deployment.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: Frontend
+    -   **Blocked on something**: The backend for Survey360 has not been defined or created yet. The next agent needs to clarify if it should use the existing DataPulse backend or if a new, separate backend instance needs to be set up.
 
 **Upcoming and Future Tasks**
-- **Future Tasks**:
-    - **(P2) Frontend for Replicate Weights**: Implement a UI in  to allow users to configure and run analyses with replicate weights (BRR/jackknife), using the existing  backend endpoint.
-    - **(P2) Enhance AI Narrative Evidence Linking**: Improve the AI Copilot's output in  to ensure every claim in the generated narrative is explicitly and verifiably linked to a specific chart, table, or model output artifact.
-    - **(P3) Enhance Design-Based Regressions**: The current implementation is basic and can be expanded to cover more complex survey regression models.
-    - **(P3) Full PPTX Report Export**: Expand the export functionality to allow entire reports or dashboards to be exported to PowerPoint, not just individual charts.
+-   **Upcoming Tasks**:
+    -   (P1) **Setup Backend for Survey360**: Based on the user's request for a completely standalone app with separate deployment, a separate backend will be required. This involves copying the DataPulse backend, removing unnecessary APIs (e.g., advanced stats), and configuring it for a new deployment.
+-   **Future Tasks**:
+    -   **Extract StatsPro Product**: As discussed during the extraction strategy, create another standalone application focused on advanced statistics.
+    -   **Extract FieldOps Product**: Create a product focused on field operations and data collection logistics.
 
 **Completed work in this session**
-- **Statistical Features**:
-  - Frontend and backend for **Nonparametric Tests** (Mann-Whitney, Wilcoxon, Kruskal-Wallis).
-  - Frontend and backend for **Clustering** (K-Means, Hierarchical).
-  - Frontend and backend for **ANCOVA**.
-  - Frontend and backend for **Proportions Tests**.
-  - Backend for **Replicate Weights** (BRR/Jackknife).
-- **AI & Diagnostics**:
-  - **AI-Assisted Data Preparation** feature with backend endpoint and frontend UI.
-  - **Diagnostic Visualizations** (ROC curves, residual plots) with backend and frontend.
-  - Enhanced **AI Copilot** with evidence-linked narratives.
-- **Export & Security**:
-  - Enhanced **Chart Export** to include PNG, SVG, PDF, and PPTX formats.
-  - Added **Parquet** data export option.
-  - Implemented **Security Decorators** (, ) and applied them to critical API endpoints for RBAC and audit logging.
-- **UI/UX**:
-  - Created a **Dashboard Sharing UI** with permission controls.
-  - Added demo login credentials directly onto the **Login Page** for easy access.
-- **Bug Fixes**:
-  - Resolved a critical backend bug involving  serialization in statistical test results.
+-   **Dark Mode UI Fix**: Fixed contrast issues across the application by replacing hardcoded colors with TailwindCSS theme variables (, , etc.). Verified fixes on Projects, Forms, Dashboard, and Data Analysis pages.
+-   **Sidebar and Settings Refactor**:
+    -   Moved  to the top of the sidebar within a new dropdown menu containing quick links.
+    -   File modified: .
+    -   Overhauled  to use a tabbed interface with seven new sections: Profile, Appearance, Alerts, Security, Privacy, Org, and API.
+-   **Advanced Statistical Features**:
+    -   Added a Replicate Weights tab and functionality to .
+    -   Enhanced the AI Copilot for better narrative generation in .
+    -   Updated the backend regression endpoint () to support Poisson and Negative Binomial models with interaction terms.
+-   **Quick Analysis Wizard**:
+    -   Created and integrated a new component  into the .
+-   **Major Code Refactoring**:
+    -   **Backend**: Decomposed  into a modular package under  (with files like , , , etc.).
+    -   **Frontend**: Broke down the large  into smaller components like , , and  under .
+-   **Backend Robustness Overhaul**:
+    -   Integrated **Celery and Redis** for background job processing.
+    -   Created a new  endpoint to track task status.
+    -   Implemented a robust data loader () with cursor-based pagination and data sampling.
+    -   Added rate limiting () to statistics endpoints.
+    -   Added utilities for streaming data exports ().
 
 **Earlier issues found/mentioned but not fixed**
-None.
+-   None. All identified issues were addressed during the session.
 
 **Known issue recurrence from previous fork**
-None.
+-   None.
 
 **Code Architecture**
-
+-   **DataPulse (Original App)**:
+    -   : Root directory for the FastAPI backend.
+        -   : Contains all API routes, now modularized (e.g., , ).
+        -   : Core application logic, including Celery/Redis configuration.
+        -   : Shared utilities for data loading, rate limiting, etc.
+        -   : Main FastAPI application entry point.
+    -   : Root directory for the React frontend.
+        -   : Reusable UI and shared components.
+        -   : Top-level page components.
+        -   : Zustand state management stores.
+        -   : Main React application entry point.
+-   **Survey360 (New App)**:
+    -   : Root directory for the new standalone project.
+        -   : Contains the React source code, being populated with adapted components from DataPulse.
+        -   , : Project configuration for a standalone Vite-based deployment.
 
 **Key Technical Concepts**
--   **Backend**: FastAPI, Python
--   **Frontend**: React, Vite, Tailwind CSS, shadcn/ui, Recharts
--   **Database**: MongoDB (for audit logs)
--   **Core Libraries**: , , , , , 
--   **Architecture**: Monorepo with a distinct FastAPI backend and React frontend.
+-   **Frontend**: React, Vite, TailwindCSS, Zustand, Framer Motion
+-   **Backend**: FastAPI (Python), Motor (async MongoDB driver)
+-   **Database**: MongoDB
+-   **Infrastructure**: Celery, Redis (for background jobs and caching)
+-   **Architecture**: Monorepo-style (previously) transitioning to multi-repo with the Survey360 extraction. Modular API design.
 
 **key DB schema**
--   **audit_logs (MongoDB collection)**: 
+-   : {, , , }
+-   : {, , , , }
+-   : {, , , , }
+-   : {, , , }
 
 **changes in tech stack**
-None.
+-   **Celery** and **Redis** were added to the backend stack to enable asynchronous background job processing for robust, large-scale computations.
 
 **All files of reference**
--   : The central hub for most frontend features.
--   : Contains endpoints for almost all statistical analyses.
--   : The UI for advanced statistical tests.
--   : Contains the  decorator.
--   : Contains the  decorator.
--   : A page where the card visibility bug is present.
--   : A potential location for problematic global styles.
--   : The product requirements document, updated throughout the session.
+-   **Key New Files (Survey360)**:
+    -   : Defines the new project's dependencies and scripts.
+    -   : Build configuration for the new frontend app.
+    -   : Entry point for the Survey360 React app.
+    -   : The newly created landing page for Survey360.
+-   **Key New/Refactored Files (DataPulse)**:
+    -   : Directory containing modularized statistics endpoints.
+    -   : New endpoint for querying background job status.
+    -   , : Celery configuration.
+    -   , : Core robustness utilities.
+    -   : Directory containing refactored frontend components.
 
 **Areas that need refactoring**:
--   ****: This file is excessively long. It should be broken down into multiple files based on statistical domains (e.g., regression, descriptives, etc.) for better maintainability.
--   ** & **: These React components are managing a large amount of state and logic. They should be refactored into smaller, more focused components, potentially leveraging a state management library or React Context for cleaner state flow.
+-   The new  project is being built by copying files from . Care must be taken to remove unused props, logic, and dependencies to keep the new codebase lean and maintainable.
 
 **key api endpoints**
--   : Suite of endpoints for statistical tests (e.g., , , ).
--   : AI-powered data cleaning suggestions.
--   : Endpoints for exporting charts (e.g., , ).
--   : Endpoints for data export (e.g., , ).
--   : Endpoint for retrieving audit trail data.
+-   : New modular statistics endpoints.
+-   : New endpoint to get the status of a background job.
 
 **Critical Info for New Agent**
--   Your immediate priority is to fix the UI card visibility bug. The problem is not the card component itself but a gradient background being inherited from a parent element. Start your investigation in the component hierarchy of pages like  and .
--   The project is very close to fulfilling the user's extensive requirements checklist. Refer to the checklist in the message history to understand the full scope.
--   Be aware that  and  are very large files. Navigate them carefully.
+-   The user has explicitly requested that **Survey360 be a completely standalone app with separate deployment.**
+-   The agent has only started building the **standalone frontend**.
+-   The **backend for Survey360 does not exist yet**. The next agent's first major task, after completing the frontend skeleton, will be to create this separate backend. This will likely involve duplicating the DataPulse backend, stripping out non-essential APIs, and configuring it for a separate deployment and database connection. This is a critical distinction from the agent's initial plan of sharing a backend.
 
 **documents and test reports created in this job**
--   
+-   : The Product Requirements Document was updated multiple times throughout the session to reflect completed work and new tasks.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **How far have you gone with this?**: User requested a progress report against a detailed feature checklist. (DONE)
-2.  **Proceed**: User approved the plan to implement the next set of features. (DONE)
-3.  **PRoceed to completion**: User instructed the agent to implement all remaining features from the checklist. (DONE)
-4.  **Share the Web URL and credentials**: User requested access details for the application. (DONE)
-5.  **Add the login details to the top**: User asked for credentials to be displayed on the login page UI. (DONE)
-6.  **Update all cards with such color format to be visible**: User reported the card visibility UI bug, which is the current pending task. (IN PROGRESS)
+1.  **User**: Asks if Survey360 can be extracted from DataPulse, providing a reference link.
+2.  **User**: Confirms they want to make it out of DataPulse first to reuse code.
+3.  **User**: Asks if a new product page will be created during the extraction.
+4.  **User**: Chooses the Completely standalone app with separate deployment option.
+5.  **User**: Confirms the agent's plan to create a new GitHub project, use the same interface but with different branding, and begin the extraction process.
+6.  **User**: Proceed - Approves the agent's step-by-step plan for project setup.
+7.  **User**: Approves the plan to copy backend files. (Agent action seems to be a mistake, as it was supposed to be a new project, but the user approved).
+8.  **User**: Approves the plan to copy UI components.
+9.  **User**: Approves the plan to create the landing page.
+10. **User**: Approves the final plan before the agent creates the  file.
 
 **Project Health Check:**
--   **Broken**: The visibility of UI cards in dark mode is broken, severely impacting usability. This is the highest priority fix.
--   **Mocked**: AI features depend on an external LLM service via the Emergent LLM Key.
+-   **Broken**: The testing environment experiences frequent session timeouts, which complicates verification steps. This is an environment issue, not an application bug.
+-   **Mocked**: No mocks are currently in use.
 
 **3rd Party Integrations**
--   **OpenAI/LLM**: Used for the AI Copilot and AI Data Preparation features — uses Emergent LLM Key.
--   **Frontend**: React, Vite, Tailwind CSS, shadcn/ui, Recharts.
--   **Backend**: FastAPI, pandas, numpy, statsmodels, scipy, , .
--   **Database**: MongoDB.
+-   **OpenAI GPT models**: Used for the AI Copilot feature. It likely uses an Emergent LLM Key.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES
+-   **Testing agent used after significant changes**: YES (for UI verification via screenshots and  for API testing).
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: None
--   **Known regressions**: The card visibility issue in dark mode is a new regression.
+-   **Test files created**: None. Testing was performed interactively.
+-   **Known regressions**: None.
 
 **Credentials to test flow:**
--   **Email**: 
--   **Password**: 
-
-**What agent forgot to execute**
-The agent was in the middle of debugging the card visibility issue and had correctly identified the next steps but had not yet executed them.</analysis>
+The agent successfully used a standard email/password login flow during its testing. The exact credentials can be found in the agent's  actions in the history. Example: .</analysis>
