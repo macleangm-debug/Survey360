@@ -24,7 +24,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { useOrgStore } from '../../store';
-import api from '../../lib/api';
+import survey360Api from '../../lib/survey360Api';
 
 const StatCard = ({ title, value, icon: Icon, description, onClick }) => (
   <motion.div
