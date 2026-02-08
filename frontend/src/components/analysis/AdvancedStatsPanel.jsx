@@ -92,6 +92,22 @@ export function AdvancedStatsPanel({
     rotation: 'varimax'
   });
 
+  // Nonparametric Tests state
+  const [npConfig, setNpConfig] = useState({
+    testType: 'mann_whitney',
+    dependentVar: '',
+    groupVar: '',
+    pairedVar: ''
+  });
+
+  // Clustering state
+  const [clusterConfig, setClusterConfig] = useState({
+    variables: [],
+    method: 'kmeans',
+    nClusters: '',
+    linkage: 'ward'
+  });
+
   const numericFields = fields.filter(f => f.type === 'number' || f.type === 'integer' || f.type === 'decimal');
   const categoricalFields = fields.filter(f => f.type === 'select' || f.type === 'radio' || f.type === 'text');
 
