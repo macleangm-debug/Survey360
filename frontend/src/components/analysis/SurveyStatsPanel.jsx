@@ -153,6 +153,41 @@ export function SurveyStatsPanel({ formId, snapshotId, orgId, fields, getToken }
     finally { setLoading(false); }
   };
 
+  const runReplicateWeights = async () => {
+    if (!repConfig.variable) { toast.error('Select a variable'); return; }
+    if (repConfig.method === 'brr' && repConfig.replicate_vars.length === 0) {
+      toast.error('BRR requires replicate weight columns');
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/statistics/survey/replicate-weights`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+        body: JSON.stringify({
+          form_id: formId,
+          snapshot_id: snapshotId,
+          org_id: orgId,
+          variable: repConfig.variable,
+          method: repConfig.method,
+          weight_var: design.weight_var || null,
+          replicate_vars: repConfig.replicate_vars,
+          psu_var: repConfig.psu_var || null,
+          fay_coefficient: repConfig.fay_coefficient,
+          n_replicates: repConfig.n_replicates
+        })
+      });
+      if (response.ok) {
+        setResults({ type: 'replicate', data: await response.json() });
+        toast.success('Replicate weights analysis complete');
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Analysis failed');
+      }
+    } catch (e) { toast.error('Network error'); }
+    finally { setLoading(false); }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Design & Config */}
