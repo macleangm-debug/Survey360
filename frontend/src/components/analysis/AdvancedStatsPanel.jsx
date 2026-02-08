@@ -395,6 +395,102 @@ export function AdvancedStatsPanel({
     }
   };
 
+  const runNonparametricTest = async () => {
+    if (!npConfig.dependentVar) {
+      toast.error('Please select a dependent variable');
+      return;
+    }
+    if ((npConfig.testType === 'mann_whitney' || npConfig.testType === 'kruskal_wallis') && !npConfig.groupVar) {
+      toast.error('Please select a grouping variable');
+      return;
+    }
+    if (npConfig.testType === 'wilcoxon' && !npConfig.pairedVar) {
+      toast.error('Please select a paired variable');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/statistics/nonparametric`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          snapshot_id: snapshotId || null,
+          form_id: snapshotId ? null : formId,
+          org_id: orgId,
+          test_type: npConfig.testType,
+          dependent_var: npConfig.dependentVar,
+          group_var: npConfig.groupVar || null,
+          paired_var: npConfig.pairedVar || null
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.error) {
+          toast.error(data.error);
+        } else {
+          setResults({ type: 'nonparametric', data });
+          toast.success('Test completed');
+        }
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Test failed');
+      }
+    } catch (error) {
+      toast.error('Nonparametric test failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const runClustering = async () => {
+    if (clusterConfig.variables.length < 2) {
+      toast.error('Please select at least 2 variables');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/statistics/clustering`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          snapshot_id: snapshotId || null,
+          form_id: snapshotId ? null : formId,
+          org_id: orgId,
+          variables: clusterConfig.variables,
+          method: clusterConfig.method,
+          n_clusters: clusterConfig.nClusters ? parseInt(clusterConfig.nClusters) : null,
+          linkage: clusterConfig.linkage
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.error) {
+          toast.error(data.error);
+        } else {
+          setResults({ type: 'clustering', data });
+          toast.success('Clustering completed');
+        }
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Clustering failed');
+      }
+    } catch (error) {
+      toast.error('Clustering failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderResults = () => {
     if (!results) return null;
 
