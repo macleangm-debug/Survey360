@@ -419,3 +419,60 @@ async def create_survey360_demo_user(db):
             "created_at": datetime.now(timezone.utc).isoformat()
         })
         print("Survey360 demo user created")
+
+# ============================================
+# PUBLIC ROUTES (No Authentication Required)
+# ============================================
+
+class PublicResponseSubmit(BaseModel):
+    respondent_email: Optional[str] = None
+    respondent_name: Optional[str] = None
+    answers: dict = {}
+    completion_time: Optional[int] = None
+
+@router.get("/public/surveys/{survey_id}")
+async def public_get_survey(survey_id: str):
+    """Public endpoint to get a published survey for respondents"""
+    from server import app
+    db = app.state.db
+    
+    survey = await db.survey360_surveys.find_one(
+        {"id": survey_id, "status": "published"}, 
+        {"_id": 0}
+    )
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found or not published")
+    
+    return survey
+
+@router.post("/public/surveys/{survey_id}/responses")
+async def public_submit_response(survey_id: str, data: PublicResponseSubmit):
+    """Public endpoint to submit a survey response"""
+    from server import app
+    db = app.state.db
+    
+    # Verify survey exists and is published
+    survey = await db.survey360_surveys.find_one(
+        {"id": survey_id, "status": "published"}, 
+        {"_id": 0}
+    )
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found or not published")
+    
+    response_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    response = {
+        "id": response_id,
+        "survey_id": survey_id,
+        "respondent_email": data.respondent_email,
+        "respondent_name": data.respondent_name,
+        "status": "completed",
+        "answers": data.answers,
+        "submitted_at": now,
+        "completion_time": data.completion_time
+    }
+    await db.survey360_responses.insert_one(response)
+    
+    return {"id": response_id, "message": "Response submitted successfully"}
+
