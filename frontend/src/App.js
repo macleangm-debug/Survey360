@@ -282,6 +282,20 @@ function App() {
             </ProtectedRoute>
           } />
 
+          {/* Survey360 Solution Routes */}
+          <Route path="/solutions/survey360" element={<Survey360LandingPage />} />
+          <Route path="/solutions/survey360/login" element={<Survey360LoginPage />} />
+          <Route path="/solutions/survey360/register" element={<Survey360RegisterPage />} />
+          <Route path="/solutions/survey360/app" element={<Survey360AppLayout />}>
+            <Route path="dashboard" element={<Survey360DashboardPage />} />
+            <Route path="surveys" element={<Survey360SurveysPage />} />
+            <Route path="surveys/new" element={<Survey360SurveysPage />} />
+            <Route path="surveys/:id/edit" element={<Survey360SurveysPage />} />
+            <Route path="responses" element={<Survey360ResponsesPage />} />
+            <Route path="settings" element={<Survey360SettingsPage />} />
+            <Route index element={<Navigate to="dashboard" replace />} />
+          </Route>
+
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
