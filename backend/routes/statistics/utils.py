@@ -4,28 +4,55 @@ from pydantic import BaseModel
 import pandas as pd
 import numpy as np
 
+# Import scalable data loader
+from utils.data_loader import (
+    load_analysis_data,
+    DataLoadResult,
+    sample_dataframe,
+    SAMPLING_THRESHOLD,
+    DEFAULT_SAMPLE_SIZE
+)
+
 
 class BaseStatsRequest(BaseModel):
     """Base request model for statistics endpoints"""
     snapshot_id: Optional[str] = None
     form_id: Optional[str] = None
     org_id: str
+    sample: Optional[bool] = True  # Auto-sample large datasets
+    sample_size: Optional[int] = DEFAULT_SAMPLE_SIZE
 
 
-async def get_analysis_data(db, snapshot_id: str = None, form_id: str = None) -> Tuple[pd.DataFrame, list]:
-    """Load data from snapshot or form submissions"""
-    if snapshot_id:
-        snapshot = await db.snapshots.find_one({"_id": snapshot_id})
-        if not snapshot:
-            return pd.DataFrame(), []
-        df = pd.DataFrame(snapshot.get("data", []))
-        schema = snapshot.get("schema", [])
-    else:
-        form = await db.forms.find_one({"id": form_id})
-        submissions = await db.submissions.find({"form_id": form_id}).to_list(1000)
-        df = pd.DataFrame([s.get("data", {}) for s in submissions])
-        schema = form.get("fields", []) if form else []
-    return df, schema
+async def get_analysis_data(
+    db,
+    snapshot_id: str = None,
+    form_id: str = None,
+    sample: bool = True,
+    sample_size: int = DEFAULT_SAMPLE_SIZE
+) -> Tuple[pd.DataFrame, list, dict]:
+    """
+    Load data from snapshot or form submissions with automatic sampling.
+    
+    Returns:
+        Tuple of (DataFrame, schema, metadata)
+        metadata includes: is_sampled, total_count, sample_size
+    """
+    result = await load_analysis_data(
+        db,
+        snapshot_id=snapshot_id,
+        form_id=form_id,
+        sample=sample,
+        sample_size=sample_size
+    )
+    
+    metadata = {
+        "is_sampled": result.is_sampled,
+        "total_count": result.total_count,
+        "loaded_count": len(result.data),
+        "sample_size": result.sample_size
+    }
+    
+    return result.data, result.schema, metadata
 
 
 def calculate_effect_size(stat_type: str, **kwargs) -> dict:
