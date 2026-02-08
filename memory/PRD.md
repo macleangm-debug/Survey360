@@ -1114,3 +1114,113 @@ All major features from the Data Analysis Module checklist have been implemented
 - **Email**: demo@datapulse.io
 - **Password**: Test123!
 - **Org**: ACME Research (a07e901a-bd5f-450d-8533-ed4f7ec629a5)
+
+---
+
+## Survey360 Product Extraction (Dec 2025) - COMPLETE
+
+### Overview
+Survey360 is a standalone survey management application extracted from DataPulse. It focuses on survey creation, response collection, and basic analytics.
+
+### Status: FRONTEND + BACKEND COMPLETE
+
+### Frontend Components Created
+```
+/app/survey360/frontend/src/
+├── components/ui/       # Shadcn UI components (copied from DataPulse)
+├── layouts/
+│   └── DashboardLayout.jsx    # Simplified navigation sidebar
+├── lib/
+│   ├── api.js                 # Axios API client
+│   └── utils.js               # Utility functions
+├── pages/
+│   ├── LandingPage.jsx        # Marketing page with teal branding
+│   ├── LoginPage.jsx          # Auth with demo credentials
+│   ├── RegisterPage.jsx       # User registration
+│   ├── DashboardPage.jsx      # Stats overview + activity feed
+│   ├── SurveysPage.jsx        # Survey list with CRUD
+│   ├── SurveyBuilderPage.jsx  # Drag-drop builder, 10 question types
+│   ├── ResponsesPage.jsx      # Response table with export
+│   └── SettingsPage.jsx       # Profile, theme, notifications, security
+├── store/
+│   └── index.js               # Zustand stores (auth, org, ui, survey)
+├── App.jsx                    # Router with protected routes
+└── main.jsx                   # Entry point
+```
+
+### Backend API Created
+```
+/app/survey360/backend/server.py
+- FastAPI application
+- MongoDB integration via Motor
+- JWT authentication
+- Demo user auto-creation
+
+Endpoints:
+- POST /api/auth/login, /api/auth/register, GET /api/auth/me
+- GET/POST /api/organizations
+- GET/POST/PUT/DELETE /api/surveys
+- POST /api/surveys/{id}/publish, /api/surveys/{id}/duplicate
+- GET/POST /api/surveys/{id}/responses
+- GET /api/dashboard/stats, /api/dashboard/activity
+- GET /api/health
+```
+
+### Question Types Supported
+1. Short Text
+2. Long Text
+3. Single Choice
+4. Multiple Choice
+5. Dropdown
+6. Date
+7. Number
+8. Email
+9. Phone
+10. Rating (configurable scale)
+
+### Survey360 vs DataPulse
+**Included in Survey360:**
+- Survey builder and management
+- Response collection
+- Basic dashboard/analytics
+- User authentication
+
+**NOT included (DataPulse-only features):**
+- Advanced statistical analysis
+- CATI/CAPI field operations
+- Quality AI monitoring
+- Offline-first PWA
+- Plugin SDK
+- Complex data analysis (regression, factor analysis, etc.)
+
+### Test Results (Iteration 27)
+- Frontend: 100% - All pages verified
+- Landing page branding: ✅
+- Login with demo credentials: ✅
+- Survey Builder with 10 question types: ✅
+- Navigation: ✅
+
+### Demo Credentials
+- Email: demo@survey360.io
+- Password: Test123!
+
+### Tech Stack
+- Frontend: React 18, Vite, TailwindCSS, Shadcn UI, Zustand, Framer Motion, Recharts
+- Backend: FastAPI, MongoDB, PyJWT
+
+---
+
+## Upcoming Tasks
+
+### P1 - Survey360 Completion
+- [ ] Deploy Survey360 backend as separate service
+- [ ] Set up separate MongoDB database for Survey360
+- [ ] Configure CI/CD for independent deployment
+
+### P2 - StatsPro Product Extraction
+- Extract advanced statistics features into standalone product
+- Target users: Data analysts, researchers
+
+### P3 - FieldOps Product Extraction
+- Extract CATI/CAPI features into standalone product
+- Target users: Field research teams
