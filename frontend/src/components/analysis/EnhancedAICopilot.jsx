@@ -78,61 +78,144 @@ const SUGGESTED_QUERIES = [
 ];
 
 // Generate evidence-linked narrative from results
-const generateNarrative = (results, plan) => {
+const generateNarrative = (results, plan, conversationId) => {
   if (!results) return "Analysis complete.";
   
   const parts = [];
+  const evidenceLinks = [];
+  let chartCounter = 1;
+  let tableCounter = 1;
   
   // Add context from plan
-  if (plan?.analysis_type) {
-    parts.push(`This ${plan.analysis_type.replace('_', ' ')} analysis`);
-  } else {
-    parts.push("This analysis");
+  const analysisType = plan?.analysis_type?.replace(/_/g, ' ') || 'statistical';
+  
+  // Sample size context
+  const n = results.total_n || results.n || results.n_observations;
+  if (n) {
+    parts.push(`**Sample Overview**: This ${analysisType} analysis examined ${n} observations`);
+    evidenceLinks.push({ type: 'data', ref: `N=${n}`, source: 'dataset' });
   }
   
-  // Add sample size
-  if (results.total_n || results.n || results.n_observations) {
-    const n = results.total_n || results.n || results.n_observations;
-    parts.push(`was conducted on ${n} observations`);
-  }
-  
-  // Add key findings
+  // ANOVA results
   if (results.anova) {
     const a = results.anova;
-    if (a.significant) {
-      parts.push(`and found a statistically significant difference (F = ${a.f_statistic}, p = ${a.p_value})`);
-    } else {
-      parts.push(`and found no statistically significant difference (F = ${a.f_statistic}, p = ${a.p_value})`);
+    const significance = a.significant ? 'statistically significant' : 'not statistically significant';
+    parts.push(`\n\n**ANOVA Results** (see Table ${tableCounter}): The analysis found a ${significance} difference between groups (F(${a.df_between || '?'}, ${a.df_within || '?'}) = ${a.f_statistic}, p ${a.p_value < 0.001 ? '< .001' : `= ${a.p_value}`})`);
+    
+    if (a.effect_size_eta_sq) {
+      const effectLabel = a.effect_size_eta_sq > 0.14 ? 'large' : a.effect_size_eta_sq > 0.06 ? 'medium' : 'small';
+      parts.push(`. Effect size (η²) = ${a.effect_size_eta_sq}, indicating a ${effectLabel} effect`);
+    }
+    
+    evidenceLinks.push({ type: 'table', ref: `Table ${tableCounter}`, data: 'ANOVA summary', fValue: a.f_statistic, pValue: a.p_value });
+    tableCounter++;
+    
+    if (a.post_hoc) {
+      parts.push(`\n\n**Post-hoc Comparisons** (Table ${tableCounter}): Pairwise comparisons revealed specific group differences`);
+      evidenceLinks.push({ type: 'table', ref: `Table ${tableCounter}`, data: 'Post-hoc tests' });
+      tableCounter++;
     }
   }
   
+  // T-test results
   if (results.ttest) {
     const t = results.ttest;
-    if (t.significant) {
-      parts.push(`revealing a significant difference between groups (t = ${t.t_statistic}, p = ${t.p_value})`);
-    } else {
-      parts.push(`showing no significant difference between groups (p = ${t.p_value})`);
+    const significance = t.significant ? 'statistically significant' : 'not statistically significant';
+    parts.push(`\n\n**T-Test Results** (Table ${tableCounter}): There was a ${significance} difference between groups (t(${t.df || '?'}) = ${t.t_statistic}, p ${t.p_value < 0.001 ? '< .001' : `= ${t.p_value}`})`);
+    
+    if (t.mean_difference) {
+      parts.push(`. Mean difference = ${t.mean_difference}`);
     }
+    if (t.cohens_d) {
+      const effectLabel = Math.abs(t.cohens_d) > 0.8 ? 'large' : Math.abs(t.cohens_d) > 0.5 ? 'medium' : 'small';
+      parts.push(`, Cohen's d = ${t.cohens_d} (${effectLabel} effect)`);
+    }
+    
+    evidenceLinks.push({ type: 'table', ref: `Table ${tableCounter}`, data: 'T-test results', tValue: t.t_statistic, pValue: t.p_value });
+    tableCounter++;
   }
   
+  // Correlation results
   if (results.correlation_matrix) {
     const vars = Object.keys(results.correlation_matrix);
-    parts.push(`examining correlations among ${vars.length} variables`);
+    parts.push(`\n\n**Correlation Analysis** (Table ${tableCounter}): Correlations were computed among ${vars.length} variables`);
+    
+    // Find strongest correlations
+    const correlations = [];
+    vars.forEach((v1, i) => {
+      vars.slice(i + 1).forEach(v2 => {
+        const r = results.correlation_matrix[v1]?.[v2];
+        if (r !== undefined && Math.abs(r) > 0.3) {
+          correlations.push({ v1, v2, r });
+        }
+      });
+    });
+    
+    if (correlations.length > 0) {
+      const strongest = correlations.sort((a, b) => Math.abs(b.r) - Math.abs(a.r)).slice(0, 3);
+      const strongDesc = strongest.map(c => `${c.v1}-${c.v2} (r = ${c.r})`).join(', ');
+      parts.push(`. Notable correlations: ${strongDesc}`);
+    }
+    
+    evidenceLinks.push({ type: 'table', ref: `Table ${tableCounter}`, data: 'Correlation matrix' });
+    tableCounter++;
   }
   
-  if (results.regression) {
-    const r = results.regression;
-    parts.push(`with the regression model explaining ${(r.r_squared * 100).toFixed(1)}% of variance`);
+  // Regression results
+  if (results.regression || results.model_fit) {
+    const r = results.regression || results;
+    parts.push(`\n\n**Regression Model** (Table ${tableCounter}): The model explained ${((r.r_squared || r.model_fit?.r_squared || 0) * 100).toFixed(1)}% of variance in the outcome`);
+    
+    if (r.model_fit?.f_statistic) {
+      parts.push(` (F = ${r.model_fit.f_statistic}, p ${r.model_fit.f_pvalue < 0.001 ? '< .001' : `= ${r.model_fit.f_pvalue}`})`);
+    }
+    
+    // Significant predictors
+    if (results.coefficients || r.coefficients) {
+      const coefs = results.coefficients || r.coefficients;
+      const sigPredictors = Object.entries(coefs)
+        .filter(([name, c]) => c.significant && name !== 'const' && name !== 'Intercept')
+        .map(([name, c]) => `${name} (β = ${c.coefficient}, p = ${c.p_value})`);
+      
+      if (sigPredictors.length > 0) {
+        parts.push(`\n\n**Significant Predictors** (Table ${tableCounter + 1}): ${sigPredictors.join('; ')}`);
+        evidenceLinks.push({ type: 'table', ref: `Table ${tableCounter + 1}`, data: 'Coefficient table' });
+        tableCounter++;
+      }
+    }
+    
+    evidenceLinks.push({ type: 'table', ref: `Table ${tableCounter}`, data: 'Model summary' });
+    tableCounter++;
+  }
+  
+  // Descriptive statistics
+  if (results.descriptives || results.statistics) {
+    const stats = results.descriptives || results.statistics;
+    parts.push(`\n\n**Descriptive Statistics** (Table ${tableCounter}): Summary statistics computed for analyzed variables`);
+    
+    if (stats.mean !== undefined) {
+      parts.push(`. Mean = ${stats.mean}, SD = ${stats.std || stats.sd}`);
+    }
+    
+    evidenceLinks.push({ type: 'table', ref: `Table ${tableCounter}`, data: 'Descriptive statistics' });
+    tableCounter++;
   }
   
   // Add interpretation if available
   if (results.interpretation) {
-    parts.push(`. ${results.interpretation}`);
-  } else {
-    parts.push(".");
+    parts.push(`\n\n**Interpretation**: ${results.interpretation}`);
   }
   
-  return parts.join(" ");
+  // Add evidence summary
+  const evidenceSummary = evidenceLinks.map(e => e.ref).join(', ');
+  
+  return {
+    narrative: parts.join(''),
+    evidenceLinks,
+    evidenceSummary,
+    chartCount: chartCounter - 1,
+    tableCount: tableCounter - 1
+  };
 };
 
 export function EnhancedAICopilot({ formId, snapshotId, orgId, fields, getToken }) {
