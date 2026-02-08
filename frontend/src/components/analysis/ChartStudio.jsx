@@ -171,36 +171,119 @@ export function ChartStudio({ formId, orgId, fields, stats, getToken }) {
   }, [selectedVar, fields, config.title]);
 
   const colors = COLOR_PALETTES[config.palette] || COLOR_PALETTES.default;
+  const [exportFormat, setExportFormat] = useState('png');
+  const chartRef = React.useRef(null);
 
-  const downloadChart = () => {
-    // Get the SVG element
+  const downloadChart = async (format = exportFormat) => {
     const svgElement = document.querySelector('.chart-container svg');
     if (!svgElement) {
       toast.error('No chart to download');
       return;
     }
 
-    // Create canvas and download
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const svgData = new XMLSerializer().serializeToString(svgElement);
-    const img = new window.Image();
-    
-    img.onload = () => {
-      canvas.width = img.width * 2;
-      canvas.height = img.height * 2;
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      
+    const chartTitle = config.title || selectedVar || 'chart';
+    const fileName = `${chartTitle.replace(/\s+/g, '_')}_${Date.now()}`;
+
+    if (format === 'svg') {
+      // Download as SVG
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(svgBlob);
       const link = document.createElement('a');
-      link.download = `chart_${selectedVar}_${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.download = `${fileName}.svg`;
+      link.href = url;
       link.click();
-      toast.success('Chart downloaded');
-    };
-    
-    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      URL.revokeObjectURL(url);
+      toast.success('Chart downloaded as SVG');
+      return;
+    }
+
+    if (format === 'png') {
+      // Download as PNG (high resolution)
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const img = new window.Image();
+      
+      img.onload = () => {
+        // High resolution export (2x)
+        canvas.width = img.width * 2;
+        canvas.height = img.height * 2;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        const link = document.createElement('a');
+        link.download = `${fileName}.png`;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+        toast.success('Chart downloaded as PNG');
+      };
+      
+      img.onerror = () => {
+        toast.error('Failed to export chart');
+      };
+      
+      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      return;
+    }
+
+    if (format === 'pdf') {
+      // Download as PDF via backend
+      try {
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new window.Image();
+        
+        img.onload = async () => {
+          canvas.width = img.width * 2;
+          canvas.height = img.height * 2;
+          ctx.fillStyle = 'white';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // Convert to base64 PNG
+          const pngData = canvas.toDataURL('image/png', 1.0);
+          
+          // Send to backend for PDF generation
+          const response = await fetch(`${API_URL}/api/analysis/export-chart-pdf`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({
+              image_data: pngData,
+              title: config.title || chartTitle,
+              subtitle: config.subtitle || '',
+              width: canvas.width / 2,
+              height: canvas.height / 2
+            })
+          });
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `${fileName}.pdf`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+            toast.success('Chart downloaded as PDF');
+          } else {
+            // Fallback: download as PNG if PDF fails
+            toast.info('PDF export not available, downloading as PNG');
+            downloadChart('png');
+          }
+        };
+        
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      } catch (error) {
+        toast.error('Failed to export PDF');
+      }
+      return;
+    }
   };
 
   const renderChart = () => {
