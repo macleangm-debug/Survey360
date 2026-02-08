@@ -423,6 +423,10 @@ export function DataAnalysisPage() {
               <FileText className="h-4 w-4" />
               Reports
             </TabsTrigger>
+            <TabsTrigger value="diagnostics" className="flex items-center gap-2 text-xs">
+              <TrendingUp className="h-4 w-4" />
+              Diag
+            </TabsTrigger>
             <TabsTrigger value="export" className="flex items-center gap-2 text-xs">
               <Download className="h-4 w-4" />
               Export
