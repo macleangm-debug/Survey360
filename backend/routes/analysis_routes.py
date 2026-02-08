@@ -1573,7 +1573,6 @@ def analyze_variable(series: pd.Series, var_name: str, schema_info: dict) -> Lis
             skewness = scipy_stats.skew(numeric_valid)
             
             if abs(skewness) > 2:
-                transform_suggestion = "log" if skewness > 0 and numeric_valid.min() > 0 else "sqrt" if skewness > 0 else "square"
                 suggestions.append({
                     "type": "distribution",
                     "priority": "medium",
