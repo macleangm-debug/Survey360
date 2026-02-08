@@ -22,6 +22,33 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 
 ## FINAL STATUS: DATA ANALYSIS MODULE - ONGOING (Last Update: Feb 8, 2026)
 
+### P2/P3 Features Implementation (Feb 8, 2026) - COMPLETE
+1. **Replicate Weights UI** (P2)
+   - Added new "Rep Wt" tab in Survey Statistics panel
+   - Supports BRR, Jackknife, and Bootstrap methods
+   - Configurable Fay coefficient for BRR (0-1 slider)
+   - PSU/Cluster variable selection for delete-a-group jackknife
+   - Bootstrap replicate count configuration (50-500)
+   - Connected to `/api/statistics/survey/replicate-weights` endpoint
+
+2. **Enhanced AI Narrative Evidence Linking** (P2)
+   - Improved narrative generator with explicit table/chart references
+   - Added evidence links with citation counts
+   - Supports ANOVA, T-tests, Correlation, Regression results
+   - Bold formatting for section headers (**Sample Overview**, **ANOVA Results**, etc.)
+   - Displays effect sizes and interpretation levels
+   - Dark mode compatible styling
+
+3. **Enhanced Design-Based Regressions** (P3)
+   - Added Negative Binomial model type
+   - Added interaction term support (var1*var2 format)
+   - Automatic interaction column generation
+   - Model diagnostics (Durbin-Watson, Jarque-Bera, condition number)
+   - Files modified:
+     - `/app/backend/routes/stats_routes.py` - Added negbin model, interactions, diagnostics
+     - `/app/frontend/src/components/analysis/SurveyStatsPanel.jsx` - New Rep Wt tab, enhanced regression UI
+     - `/app/frontend/src/components/analysis/EnhancedAICopilot.jsx` - Enhanced narrative generation
+
 ### Online Status Quick Links & Enhanced Settings (Feb 8, 2026) - COMPLETE
 - **Online Status Moved**: Relocated from bottom of sidebar to top, with dropdown containing quick navigation links
 - **Quick Links Added**: Dashboard, Recent Projects, Recent Forms, New Form, Data Analysis, Submissions, Settings
