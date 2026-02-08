@@ -55,6 +55,13 @@ export function AdvancedStatsPanel({
     postHoc: true
   });
 
+  // ANCOVA state
+  const [ancovaConfig, setAncovaConfig] = useState({
+    dependentVar: '',
+    groupVar: '',
+    covariates: []
+  });
+
   // Correlation state
   const [corrConfig, setCorrConfig] = useState({
     variables: [],
