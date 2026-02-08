@@ -327,6 +327,11 @@ export function ReportBuilder({ formId, snapshotId, orgId, getToken }) {
           </Card>
         </div>
       </TabsContent>
+
+      {/* Audit Trail Tab */}
+      <TabsContent value="audit">
+        <AuditTrail orgId={orgId} getToken={getToken} />
+      </TabsContent>
     </Tabs>
   );
 }
