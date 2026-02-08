@@ -2003,3 +2003,230 @@ async def generate_residual_plots(request: Request, req: ResidualPlotRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Residual analysis failed: {str(e)}")
 
+
+
+# ============ Replicate Weights (BRR/Jackknife) ============
+
+class ReplicateWeightsRequest(BaseModel):
+    snapshot_id: Optional[str] = None
+    form_id: Optional[str] = None
+    org_id: str
+    variable: str  # Variable to estimate
+    method: str = "brr"  # brr, jackknife, bootstrap
+    weight_var: Optional[str] = None  # Main sampling weight
+    replicate_vars: Optional[List[str]] = None  # Replicate weight columns (for BRR)
+    strata_var: Optional[str] = None  # Stratification variable (for Jackknife)
+    psu_var: Optional[str] = None  # PSU/cluster variable (for Jackknife)
+    n_replicates: int = 100  # Number of replicates for bootstrap
+
+
+@router.post("/survey/replicate-weights")
+@log_action("run_replicate_weights", target_type="analysis")
+async def run_replicate_weights_estimation(
+    request: Request,
+    req: ReplicateWeightsRequest
+):
+    """
+    Compute survey estimates with variance estimation using replicate weights.
+    Supports BRR (Balanced Repeated Replication), Jackknife, and Bootstrap methods.
+    """
+    db = request.app.state.db
+    df, schema = await get_analysis_data(db, req.snapshot_id, req.form_id)
+    
+    if df is None or df.empty:
+        raise HTTPException(status_code=404, detail="No data found")
+    
+    if req.variable not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Variable '{req.variable}' not found")
+    
+    # Convert to numeric
+    y = pd.to_numeric(df[req.variable], errors='coerce')
+    valid_mask = ~y.isna()
+    y = y[valid_mask]
+    
+    if len(y) < 10:
+        raise HTTPException(status_code=400, detail="Insufficient data for analysis")
+    
+    # Get weights
+    weights = None
+    if req.weight_var and req.weight_var in df.columns:
+        weights = pd.to_numeric(df[req.weight_var], errors='coerce')[valid_mask]
+        weights = weights.fillna(1)
+    else:
+        weights = pd.Series([1] * len(y), index=y.index)
+    
+    result = {
+        "method": req.method,
+        "variable": req.variable,
+        "n": len(y),
+        "n_weighted": round(float(weights.sum()), 2) if weights is not None else len(y)
+    }
+    
+    if req.method == "brr":
+        # Balanced Repeated Replication
+        if not req.replicate_vars:
+            raise HTTPException(
+                status_code=400, 
+                detail="BRR requires replicate weight columns. Provide replicate_vars."
+            )
+        
+        # Check replicate columns exist
+        missing_reps = [r for r in req.replicate_vars if r not in df.columns]
+        if missing_reps:
+            raise HTTPException(status_code=400, detail=f"Replicate columns not found: {missing_reps}")
+        
+        # Calculate point estimate (weighted mean)
+        point_estimate = np.average(y, weights=weights)
+        
+        # Calculate replicate estimates
+        replicate_estimates = []
+        for rep_var in req.replicate_vars:
+            rep_weights = pd.to_numeric(df[rep_var], errors='coerce')[valid_mask].fillna(1)
+            rep_estimate = np.average(y, weights=rep_weights)
+            replicate_estimates.append(rep_estimate)
+        
+        replicate_estimates = np.array(replicate_estimates)
+        n_reps = len(replicate_estimates)
+        
+        # BRR variance: (1/R) * sum((theta_r - theta)^2)
+        # Using Fay's BRR with adjustment factor
+        fay_factor = 0.5  # Standard Fay adjustment
+        variance = np.sum((replicate_estimates - point_estimate) ** 2) / (n_reps * (1 - fay_factor) ** 2)
+        se = np.sqrt(variance)
+        
+        # Design effect
+        simple_var = np.var(y, ddof=1) / len(y)
+        deff = variance / simple_var if simple_var > 0 else 1
+        
+        result.update({
+            "estimate": round(float(point_estimate), 4),
+            "std_error": round(float(se), 4),
+            "ci_95": [
+                round(float(point_estimate - 1.96 * se), 4),
+                round(float(point_estimate + 1.96 * se), 4)
+            ],
+            "n_replicates": n_reps,
+            "variance": round(float(variance), 6),
+            "design_effect": round(float(deff), 4),
+            "effective_sample_size": round(float(len(y) / deff), 1) if deff > 0 else len(y),
+            "cv_percent": round(float(se / point_estimate * 100), 2) if point_estimate != 0 else None
+        })
+    
+    elif req.method == "jackknife":
+        # Jackknife (Delete-1 or Delete-a-group)
+        point_estimate = np.average(y, weights=weights)
+        
+        # Determine groups
+        if req.psu_var and req.psu_var in df.columns:
+            # Delete-a-group jackknife (for clustered designs)
+            groups = df[req.psu_var][valid_mask].unique()
+            group_col = df[req.psu_var][valid_mask]
+        elif req.strata_var and req.strata_var in df.columns:
+            # Stratified jackknife
+            groups = df[req.strata_var][valid_mask].unique()
+            group_col = df[req.strata_var][valid_mask]
+        else:
+            # Simple delete-1 jackknife (for small samples, use subsample)
+            if len(y) > 100:
+                # Use delete-a-group with random groups
+                n_groups = min(50, len(y) // 2)
+                group_col = pd.Series(np.repeat(range(n_groups), len(y) // n_groups + 1)[:len(y)], index=y.index)
+                groups = range(n_groups)
+            else:
+                group_col = pd.Series(range(len(y)), index=y.index)
+                groups = range(len(y))
+        
+        # Calculate jackknife estimates
+        jackknife_estimates = []
+        for g in groups:
+            mask = group_col != g
+            if mask.sum() > 0:
+                jk_y = y[mask]
+                jk_w = weights[mask]
+                jk_estimate = np.average(jk_y, weights=jk_w)
+                jackknife_estimates.append(jk_estimate)
+        
+        jackknife_estimates = np.array(jackknife_estimates)
+        n_groups = len(jackknife_estimates)
+        
+        # Jackknife variance
+        variance = ((n_groups - 1) / n_groups) * np.sum((jackknife_estimates - point_estimate) ** 2)
+        se = np.sqrt(variance)
+        
+        # Design effect
+        simple_var = np.var(y, ddof=1) / len(y)
+        deff = variance / simple_var if simple_var > 0 else 1
+        
+        result.update({
+            "estimate": round(float(point_estimate), 4),
+            "std_error": round(float(se), 4),
+            "ci_95": [
+                round(float(point_estimate - 1.96 * se), 4),
+                round(float(point_estimate + 1.96 * se), 4)
+            ],
+            "n_groups": n_groups,
+            "variance": round(float(variance), 6),
+            "design_effect": round(float(deff), 4),
+            "effective_sample_size": round(float(len(y) / deff), 1) if deff > 0 else len(y),
+            "cv_percent": round(float(se / point_estimate * 100), 2) if point_estimate != 0 else None
+        })
+    
+    elif req.method == "bootstrap":
+        # Bootstrap variance estimation
+        n_boot = req.n_replicates
+        point_estimate = np.average(y, weights=weights)
+        
+        # Generate bootstrap samples
+        bootstrap_estimates = []
+        y_arr = y.values
+        w_arr = weights.values
+        n = len(y_arr)
+        
+        np.random.seed(42)  # For reproducibility
+        for _ in range(n_boot):
+            idx = np.random.choice(n, size=n, replace=True)
+            boot_estimate = np.average(y_arr[idx], weights=w_arr[idx])
+            bootstrap_estimates.append(boot_estimate)
+        
+        bootstrap_estimates = np.array(bootstrap_estimates)
+        
+        # Bootstrap variance and percentile CI
+        variance = np.var(bootstrap_estimates, ddof=1)
+        se = np.sqrt(variance)
+        ci_lower = np.percentile(bootstrap_estimates, 2.5)
+        ci_upper = np.percentile(bootstrap_estimates, 97.5)
+        
+        # Design effect
+        simple_var = np.var(y, ddof=1) / len(y)
+        deff = variance / simple_var if simple_var > 0 else 1
+        
+        result.update({
+            "estimate": round(float(point_estimate), 4),
+            "std_error": round(float(se), 4),
+            "ci_95": [round(float(ci_lower), 4), round(float(ci_upper), 4)],
+            "ci_type": "percentile",
+            "n_replicates": n_boot,
+            "variance": round(float(variance), 6),
+            "design_effect": round(float(deff), 4),
+            "effective_sample_size": round(float(len(y) / deff), 1) if deff > 0 else len(y),
+            "cv_percent": round(float(se / point_estimate * 100), 2) if point_estimate != 0 else None
+        })
+    
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown method: {req.method}")
+    
+    # Add interpretation
+    cv = result.get("cv_percent", 0)
+    if cv:
+        if cv < 10:
+            quality = "High reliability"
+        elif cv < 20:
+            quality = "Moderate reliability"
+        elif cv < 30:
+            quality = "Use with caution"
+        else:
+            quality = "Low reliability - interpret carefully"
+        result["reliability"] = quality
+    
+    return result
+
