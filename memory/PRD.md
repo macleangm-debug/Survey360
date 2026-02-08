@@ -652,7 +652,23 @@ The Data Analysis Module provides research-grade statistical analysis capabiliti
   - Creates immutable snapshot with transformation metadata
 - ✅ Frontend UI in Variables tab → Missing Data sub-tab
 
-### Phase 11: Future Enhancements (Backlog)
+### Phase 11: Dashboard Drill-Down & Advanced Charts - COMPLETE (Feb 7, 2026)
+- ✅ **Dashboard Drill-Down**:
+  - Click on chart elements to filter all other widgets
+  - Drill-down indicator shows active filter with Clear button
+  - Combines with regular filters in API calls
+  - Works with bar, pie, donut, and line charts
+- ✅ **New Chart Types in Chart Studio** (10 total):
+  - Bar, Horizontal Bar, Pie, Donut, Line, Area, Scatter (existing)
+  - **Violin Plot** - Distribution visualization with quartiles
+  - **Coefficient Plot** - Regression coefficients with confidence intervals
+  - **Heatmap** - Correlation matrix visualization
+- ✅ **Backend Endpoints**:
+  - `/api/analysis/charts/heatmap` - Correlation matrix for 2+ numeric vars
+  - `/api/analysis/charts/violin` - Distribution stats with percentiles
+  - `/api/analysis/charts/coefficient` - OLS regression with confidence intervals
+
+### Phase 12: Future Enhancements (Backlog)
 - Factor Analysis visualization
 - Missing data imputation UI
 - Violin plots, coefficient plots, heatmaps
