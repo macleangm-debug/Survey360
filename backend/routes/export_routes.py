@@ -41,6 +41,7 @@ def flatten_dict(d: Dict, parent_key: str = '', sep: str = '.') -> Dict:
 
 
 @router.post("/csv")
+@log_action("export_csv", target_type="form")
 async def export_to_csv(
     request: Request,
     data: ExportRequest,
