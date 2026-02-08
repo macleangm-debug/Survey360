@@ -19,6 +19,8 @@ import numpy as np
 from scipy import stats as scipy_stats
 import warnings
 
+from utils.audit import log_action
+
 router = APIRouter(prefix="/statistics", tags=["Advanced Statistics"])
 
 # Suppress warnings for cleaner output
