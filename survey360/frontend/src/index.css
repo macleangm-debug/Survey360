@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 166 47% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 166 47% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 166 47% 10%;
+    --primary: 168 76% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 166 30% 96%;
+    --secondary-foreground: 166 47% 15%;
+    --muted: 166 30% 96%;
+    --muted-foreground: 166 20% 45%;
+    --accent: 168 76% 42%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 166 20% 90%;
+    --input: 166 20% 90%;
+    --ring: 168 76% 42%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 166 50% 4%;
+    --foreground: 166 10% 98%;
+    --card: 166 45% 7%;
+    --card-foreground: 166 10% 98%;
+    --popover: 166 45% 7%;
+    --popover-foreground: 166 10% 98%;
+    --primary: 168 76% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 166 30% 12%;
+    --secondary-foreground: 166 10% 98%;
+    --muted: 166 30% 12%;
+    --muted-foreground: 166 15% 65%;
+    --accent: 168 76% 42%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 63% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 166 25% 18%;
+    --input: 166 25% 18%;
+    --ring: 168 76% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Survey360 Custom Styles */
+.gradient-teal {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #2dd4bf 100%);
+}
+
+.gradient-dark {
+  background: linear-gradient(180deg, #042f2e 0%, #134e4a 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
