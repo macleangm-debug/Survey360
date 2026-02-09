@@ -10,9 +10,9 @@ Survey360 is a lightweight subset of DataPulse for users who only need basic sur
 ### What's Included (Fully Functional)
 - **Survey Builder**: 10 question types (text, choice, rating, date, etc.)
 - **Simple Skip Logic**: Show/hide questions based on previous answers
-- **Survey Settings**: Close date, max responses, thank you message, brand color
+- **Survey Settings**: Close date, max responses, thank you message, brand color, logo upload
 - **Distribution**: Public link, QR code generation, embed code for websites
-- **Response Collection**: Public form with skip logic and branding
+- **Response Collection**: Public form with skip logic and custom branding
 - **Response Viewing**: Table view with filtering and detail modal
 - **Basic Analytics**: Pie/bar charts for choice questions
 - **CSV Export**: Download responses as CSV
