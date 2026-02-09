@@ -392,14 +392,22 @@ export function PublicSurveyPage() {
         .brand-bg-light { background-color: ${brandColor}20; }
       `}</style>
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
+        {/* Header - Logo or default icon */}
         <div className="mb-6 text-center">
-          <div 
-            className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
-            style={{ background: `linear-gradient(135deg, ${brandColor}, ${brandColor}cc)` }}
-          >
-            <ClipboardList className="w-6 h-6 text-white" />
-          </div>
+          {survey.logo_url ? (
+            <img 
+              src={survey.logo_url} 
+              alt="Survey logo" 
+              className="h-16 max-w-[200px] object-contain mx-auto mb-2"
+            />
+          ) : (
+            <div 
+              className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+              style={{ background: `linear-gradient(135deg, ${brandColor}, ${brandColor}cc)` }}
+            >
+              <ClipboardList className="w-6 h-6 text-white" />
+            </div>
+          )}
           <span className="text-sm font-medium" style={{ color: brandColor }}>Survey360</span>
         </div>
 
