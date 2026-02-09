@@ -3,6 +3,38 @@
 ## Original Problem Statement
 Build a modern, secure, scalable data collection platform similar to SurveyCTO, optimized for research, monitoring & evaluation, and field data collection. Support for online/offline data collection, strong data quality controls, and advanced analytics integrations.
 
+## Survey360 - Simplified Survey Product (Feb 9, 2026)
+
+Survey360 is a lightweight subset of DataPulse for users who only need basic survey functionality without advanced features.
+
+### What's Included (Fully Functional)
+- **Survey Builder**: 10 question types (text, choice, rating, date, etc.)
+- **Simple Skip Logic**: Show/hide questions based on previous answers
+- **Survey Settings**: Close date, max responses, thank you message, brand color
+- **Distribution**: Public link, QR code generation, embed code for websites
+- **Response Collection**: Public form with skip logic and branding
+- **Response Viewing**: Table view with filtering and detail modal
+- **Basic Analytics**: Pie/bar charts for choice questions
+- **CSV Export**: Download responses as CSV
+
+### What's Excluded (DataPulse Differentiators)
+- ❌ Advanced statistical analysis (t-tests, ANOVA, regression)
+- ❌ Offline/CAPI mode with encrypted storage
+- ❌ CATI call center features
+- ❌ AI quality monitoring & anomaly detection
+- ❌ Multi-language support
+- ❌ Complex skip logic (calculations, piping, rosters)
+- ❌ Role-based permissions beyond basic access
+- ❌ Audit trail / paradata
+- ❌ API access for integrations
+
+### Test Credentials
+- **URL**: `/solutions/survey360/login`
+- **Email**: `demo@survey360.io`
+- **Password**: `Test123!`
+
+---
+
 ## Target Users
 - Research institutions
 - NGOs
