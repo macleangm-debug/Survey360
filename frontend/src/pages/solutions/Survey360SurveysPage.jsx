@@ -393,11 +393,11 @@ export function Survey360SurveysPage() {
                       </DropdownMenuItem>
                       {survey.status === 'published' && (
                         <>
+                          <DropdownMenuItem onClick={(e) => openShareModal(e, survey)} className="text-gray-300 cursor-pointer">
+                            <Share2 className="w-4 h-4 mr-2" />Share (Link, QR, Embed)
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => openPublicSurvey(e, survey)} className="text-gray-300 cursor-pointer">
                             <ExternalLink className="w-4 h-4 mr-2" />Open Public Form
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={(e) => copyPublicLink(e, survey)} className="text-gray-300 cursor-pointer">
-                            <Link2 className="w-4 h-4 mr-2" />Copy Public Link
                           </DropdownMenuItem>
                         </>
                       )}
