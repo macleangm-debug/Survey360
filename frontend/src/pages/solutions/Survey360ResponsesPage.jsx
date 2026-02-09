@@ -422,93 +422,172 @@ export function Survey360ResponsesPage() {
         </Card>
       </div>
 
-      {/* Search */}
-      <div className="flex gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-          <Input
-            placeholder="Search by name or email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
-          />
-        </div>
-      </div>
+      {/* Tabs for Responses and Analytics */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="bg-white/5 border border-white/10">
+          <TabsTrigger 
+            value="responses" 
+            className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Responses
+          </TabsTrigger>
+          <TabsTrigger 
+            value="analytics"
+            disabled={selectedSurvey === 'all'}
+            className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
+          >
+            <PieChart className="w-4 h-4 mr-2" />
+            Analytics
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="responses" className="space-y-4">
+          {/* Search */}
+          <div className="flex gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Input
+                placeholder="Search by name or email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+              />
+            </div>
+          </div>
 
-      {/* Responses Table */}
-      <Card className="bg-white/5 border-white/10">
-        <CardContent className="p-0">
-          {loading ? (
-            <div className="p-6 space-y-4">
-              {Array(5).fill(0).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full bg-white/10" />
+          {/* Responses Table */}
+          <Card className="bg-white/5 border-white/10">
+            <CardContent className="p-0">
+              {loading ? (
+                <div className="p-6 space-y-4">
+                  {Array(5).fill(0).map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full bg-white/10" />
+                  ))}
+                </div>
+              ) : filteredResponses.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-white/10 hover:bg-transparent">
+                      <TableHead className="text-gray-400">Respondent</TableHead>
+                      <TableHead className="text-gray-400">Survey</TableHead>
+                      <TableHead className="text-gray-400">Status</TableHead>
+                      <TableHead className="text-gray-400">Time</TableHead>
+                      <TableHead className="text-gray-400">Submitted</TableHead>
+                      <TableHead className="text-gray-400 w-20">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredResponses.map((response) => (
+                      <TableRow key={response.id} className="border-white/10 hover:bg-white/5">
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-teal-500/10 flex items-center justify-center">
+                              <User className="w-4 h-4 text-teal-400" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-white">{response.respondent_name || 'Anonymous'}</p>
+                              <p className="text-xs text-gray-500">{response.respondent_email || '-'}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-gray-300">{response.survey_name}</TableCell>
+                        <TableCell>
+                          <Badge className="bg-teal-500/20 text-teal-400 border-0">
+                            {response.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-gray-400">
+                          {formatTime(response.completion_time)}
+                        </TableCell>
+                        <TableCell className="text-gray-400">
+                          {formatRelativeTime(response.submitted_at)}
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => viewResponse(response)}
+                            className="text-gray-400 hover:text-white"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                    <BarChart3 className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">No responses yet</h3>
+                  <p className="text-gray-500 text-center max-w-md">
+                    Responses will appear here once people start submitting your surveys
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="analytics" className="space-y-4">
+          {selectedSurvey === 'all' ? (
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="py-16 text-center">
+                <PieChart className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">Select a Survey</h3>
+                <p className="text-gray-500">Choose a specific survey from the dropdown to view analytics</p>
+              </CardContent>
+            </Card>
+          ) : loadingAnalytics ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Array(4).fill(0).map((_, i) => (
+                <Card key={i} className="bg-white/5 border-white/10">
+                  <CardContent className="p-6">
+                    <Skeleton className="h-6 w-1/2 mb-4 bg-white/10" />
+                    <Skeleton className="h-32 w-full bg-white/10" />
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          ) : filteredResponses.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-white/10 hover:bg-transparent">
-                  <TableHead className="text-gray-400">Respondent</TableHead>
-                  <TableHead className="text-gray-400">Survey</TableHead>
-                  <TableHead className="text-gray-400">Status</TableHead>
-                  <TableHead className="text-gray-400">Time</TableHead>
-                  <TableHead className="text-gray-400">Submitted</TableHead>
-                  <TableHead className="text-gray-400 w-20">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredResponses.map((response) => (
-                  <TableRow key={response.id} className="border-white/10 hover:bg-white/5">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-teal-500/10 flex items-center justify-center">
-                          <User className="w-4 h-4 text-teal-400" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-white">{response.respondent_name || 'Anonymous'}</p>
-                          <p className="text-xs text-gray-500">{response.respondent_email || '-'}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-gray-300">{response.survey_name}</TableCell>
-                    <TableCell>
-                      <Badge className="bg-teal-500/20 text-teal-400 border-0">
-                        {response.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-gray-400">
-                      {formatTime(response.completion_time)}
-                    </TableCell>
-                    <TableCell className="text-gray-400">
-                      {formatRelativeTime(response.submitted_at)}
-                    </TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => viewResponse(response)}
-                        className="text-gray-400 hover:text-white"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+          ) : analytics && Object.keys(analytics.questions).length > 0 ? (
+            <div className="space-y-6">
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white text-lg">Response Summary</CardTitle>
+                  <CardDescription className="text-gray-400">
+                    {analytics.total_responses} total responses
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Object.values(analytics.questions).map((q) => (
+                  <Card key={q.question_id} className="bg-white/5 border-white/10">
+                    <CardContent className="p-6">
+                      {q.question_type === 'single_choice' || q.question_type === 'dropdown' ? (
+                        <SimplePieChart data={q.chart_data} title={q.question_title} />
+                      ) : (
+                        <SimpleBarChart data={q.chart_data} title={q.question_title} />
+                      )}
+                    </CardContent>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-16">
-              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                <BarChart3 className="w-8 h-8 text-gray-600" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">No responses yet</h3>
-              <p className="text-gray-500 text-center max-w-md">
-                Responses will appear here once people start submitting your surveys
-              </p>
             </div>
+          ) : (
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="py-16 text-center">
+                <BarChart3 className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">No Analytics Data</h3>
+                <p className="text-gray-500">This survey has no responses with analyzable questions yet</p>
+              </CardContent>
+            </Card>
           )}
-        </CardContent>
-      </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Response Detail Dialog */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
