@@ -259,6 +259,58 @@ const QuestionCard = ({ question, index, onUpdate, onDelete, onDuplicate, isExpa
                 <Label className="text-gray-300">Required</Label>
               </div>
             </div>
+            
+            {/* Simple Skip Logic */}
+            {skipLogicQuestions.length > 0 && (
+              <div className="pt-4 border-t border-white/10">
+                <div className="flex items-center gap-2 mb-3">
+                  <GitBranch className="w-4 h-4 text-teal-400" />
+                  <Label className="text-gray-300 text-sm">Skip Logic (Show if...)</Label>
+                </div>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <Select
+                    value={question.showIf?.questionId || ''}
+                    onValueChange={(val) => updateShowIf('questionId', val)}
+                  >
+                    <SelectTrigger className="w-[180px] bg-white/5 border-white/10 text-white text-sm">
+                      <SelectValue placeholder="Select question" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0f1d32] border-white/10">
+                      <SelectItem value="" className="text-gray-400">Always show</SelectItem>
+                      {skipLogicQuestions.map((q, i) => (
+                        <SelectItem key={q.id} value={q.id} className="text-gray-300">
+                          Q{allQuestions.indexOf(q) + 1}: {q.title?.slice(0, 20) || 'Untitled'}...
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  {question.showIf?.questionId && selectedSkipQuestion && (
+                    <>
+                      <span className="text-gray-500 text-sm">=</span>
+                      <Select
+                        value={question.showIf?.equals || ''}
+                        onValueChange={(val) => updateShowIf('equals', val)}
+                      >
+                        <SelectTrigger className="w-[180px] bg-white/5 border-white/10 text-white text-sm">
+                          <SelectValue placeholder="Select answer" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#0f1d32] border-white/10">
+                          {(selectedSkipQuestion.options || []).map((opt, i) => (
+                            <SelectItem key={i} value={opt} className="text-gray-300">{opt}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </>
+                  )}
+                </div>
+                {question.showIf?.questionId && question.showIf?.equals && (
+                  <p className="text-xs text-teal-400 mt-2">
+                    This question will only show if Q{allQuestions.findIndex(q => q.id === question.showIf.questionId) + 1} = "{question.showIf.equals}"
+                  </p>
+                )}
+              </div>
+            )}
           </CardContent>
         )}
       </Card>
