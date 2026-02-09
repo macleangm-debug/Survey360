@@ -221,6 +221,7 @@ export function PublicSurveyPage() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [thankYouMessage, setThankYouMessage] = useState(null);
   const [respondentEmail, setRespondentEmail] = useState('');
   const [respondentName, setRespondentName] = useState('');
   const [startTime] = useState(Date.now());
@@ -236,6 +237,10 @@ export function PublicSurveyPage() {
         setError('This survey is not available');
         return;
       }
+      if (data.is_closed) {
+        setError('This survey is no longer accepting responses');
+        return;
+      }
       setSurvey(data);
     } catch (err) {
       setError('Survey not found');
@@ -244,11 +249,23 @@ export function PublicSurveyPage() {
     }
   };
 
+  // Check if a question should be shown based on skip logic
+  const shouldShowQuestion = (question) => {
+    if (!question.showIf || !question.showIf.questionId || !question.showIf.equals) {
+      return true;
+    }
+    const targetAnswer = answers[question.showIf.questionId];
+    return targetAnswer === question.showIf.equals;
+  };
+
+  // Get visible questions (after skip logic)
+  const visibleQuestions = survey?.questions?.filter(shouldShowQuestion) || [];
+
   const validateAnswers = () => {
     const newErrors = {};
     if (!survey) return false;
 
-    survey.questions.forEach(q => {
+    visibleQuestions.forEach(q => {
       if (q.required) {
         const answer = answers[q.id];
         if (!answer || (Array.isArray(answer) && answer.length === 0)) {
@@ -277,23 +294,30 @@ export function PublicSurveyPage() {
     setSubmitting(true);
     try {
       const completionTime = Math.round((Date.now() - startTime) / 1000);
-      await publicApi.submitResponse(surveyId, {
+      const result = await publicApi.submitResponse(surveyId, {
         respondent_email: respondentEmail || null,
         respondent_name: respondentName || null,
         answers,
         completion_time: completionTime
       });
+      setThankYouMessage(result.thank_you_message);
       setSubmitted(true);
     } catch (err) {
-      setErrors({ _form: 'Failed to submit response. Please try again.' });
+      setErrors({ _form: err.message || 'Failed to submit response. Please try again.' });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const progress = survey?.questions?.length 
-    ? (Object.keys(answers).filter(k => answers[k] && (Array.isArray(answers[k]) ? answers[k].length > 0 : true)).length / survey.questions.length) * 100
+  const progress = visibleQuestions.length 
+    ? (Object.keys(answers).filter(k => {
+        const q = visibleQuestions.find(vq => vq.id === k);
+        return q && answers[k] && (Array.isArray(answers[k]) ? answers[k].length > 0 : true);
+      }).length / visibleQuestions.length) * 100
     : 0;
+
+  // Get brand color or default
+  const brandColor = survey?.brand_color || '#14b8a6';
 
   if (loading) {
     return (
