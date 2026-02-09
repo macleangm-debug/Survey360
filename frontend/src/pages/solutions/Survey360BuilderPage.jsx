@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, Reorder } from 'framer-motion';
 import {
@@ -22,7 +22,10 @@ import {
   MoreVertical,
   ExternalLink,
   Play,
-  GitBranch
+  GitBranch,
+  Upload,
+  Image,
+  X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
