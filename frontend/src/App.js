@@ -297,6 +297,7 @@ function App() {
             <Route path="surveys/new" element={<Survey360BuilderPage />} />
             <Route path="surveys/:id/edit" element={<Survey360BuilderPage />} />
             <Route path="responses" element={<Survey360ResponsesPage />} />
+            <Route path="billing" element={<Survey360BillingPage />} />
             <Route path="settings" element={<Survey360SettingsPage />} />
             <Route index element={<Navigate to="dashboard" replace />} />
           </Route>
