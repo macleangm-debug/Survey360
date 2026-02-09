@@ -13,6 +13,24 @@ router = APIRouter(prefix="/survey360", tags=["Survey360"])
 # JWT settings
 JWT_SECRET = os.environ.get("JWT_SECRET", "survey360-secret-key-change-in-production")
 
+# Helper function to check if survey is closed
+def check_survey_closed(survey: dict, response_count: int) -> bool:
+    """Check if survey is closed based on close_date or max_responses"""
+    # Check close date
+    if survey.get("close_date"):
+        try:
+            close_date = datetime.fromisoformat(survey["close_date"].replace("Z", "+00:00"))
+            if datetime.now(timezone.utc) > close_date:
+                return True
+        except:
+            pass
+    
+    # Check max responses
+    if survey.get("max_responses") and response_count >= survey["max_responses"]:
+        return True
+    
+    return False
+
 # Models
 class Survey360LoginRequest(BaseModel):
     email: EmailStr
