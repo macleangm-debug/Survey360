@@ -267,6 +267,10 @@ async def survey360_create_survey(data: Survey360SurveyCreate, user=Depends(get_
         "status": "draft",
         "org_id": data.org_id or user.get("org_id"),
         "questions": [q.dict() for q in data.questions],
+        "close_date": data.close_date,
+        "max_responses": data.max_responses,
+        "thank_you_message": data.thank_you_message,
+        "brand_color": data.brand_color,
         "created_at": now,
         "updated_at": now
     }
@@ -275,7 +279,8 @@ async def survey360_create_survey(data: Survey360SurveyCreate, user=Depends(get_
     return Survey360SurveyResponse(
         **survey,
         question_count=len(data.questions),
-        response_count=0
+        response_count=0,
+        is_closed=False
     )
 
 @router.put("/surveys/{survey_id}", response_model=Survey360SurveyResponse)
@@ -296,16 +301,28 @@ async def survey360_update_survey(survey_id: str, data: Survey360SurveyUpdate, u
         update_data["questions"] = [q.dict() for q in data.questions]
     if data.status is not None:
         update_data["status"] = data.status
+    if data.close_date is not None:
+        update_data["close_date"] = data.close_date
+    if data.max_responses is not None:
+        update_data["max_responses"] = data.max_responses
+    if data.thank_you_message is not None:
+        update_data["thank_you_message"] = data.thank_you_message
+    if data.brand_color is not None:
+        update_data["brand_color"] = data.brand_color
     
     await db.survey360_surveys.update_one({"id": survey_id}, {"$set": update_data})
     
     updated = await db.survey360_surveys.find_one({"id": survey_id}, {"_id": 0})
     response_count = await db.survey360_responses.count_documents({"survey_id": survey_id})
     
+    # Check if survey is closed
+    is_closed = check_survey_closed(updated, response_count)
+    
     return Survey360SurveyResponse(
         **updated,
         question_count=len(updated.get("questions", [])),
-        response_count=response_count
+        response_count=response_count,
+        is_closed=is_closed
     )
 
 @router.delete("/surveys/{survey_id}")
