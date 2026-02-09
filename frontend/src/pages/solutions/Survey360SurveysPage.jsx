@@ -205,6 +205,8 @@ export function Survey360SurveysPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newSurvey, setNewSurvey] = useState({ name: '', description: '' });
   const [creating, setCreating] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [selectedSurveyForShare, setSelectedSurveyForShare] = useState(null);
 
   useEffect(() => {
     loadSurveys();
@@ -293,11 +295,10 @@ export function Survey360SurveysPage() {
     }
   };
 
-  const copyPublicLink = (e, survey) => {
+  const openShareModal = (e, survey) => {
     e.stopPropagation();
-    const publicUrl = `${window.location.origin}/s/${survey.id}`;
-    navigator.clipboard.writeText(publicUrl);
-    toast.success('Public link copied to clipboard');
+    setSelectedSurveyForShare(survey);
+    setShareModalOpen(true);
   };
 
   const openPublicSurvey = (e, survey) => {
