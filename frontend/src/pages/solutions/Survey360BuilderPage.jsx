@@ -276,7 +276,7 @@ const QuestionCard = ({ question, index, onUpdate, onDelete, onDuplicate, isExpa
                       <SelectValue placeholder="Select question" />
                     </SelectTrigger>
                     <SelectContent className="bg-[#0f1d32] border-white/10">
-                      <SelectItem value="" className="text-gray-400">Always show</SelectItem>
+                      <SelectItem value="always_show" className="text-gray-400">Always show</SelectItem>
                       {skipLogicQuestions.map((q, i) => (
                         <SelectItem key={q.id} value={q.id} className="text-gray-300">
                           Q{allQuestions.indexOf(q) + 1}: {q.title?.slice(0, 20) || 'Untitled'}...
