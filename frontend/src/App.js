@@ -37,6 +37,7 @@ import { PWAInstallPrompt, NetworkStatus } from './components/PWAComponents';
 import { NetworkStatusBanner, SyncStatusPanel } from './components/OfflineSync';
 // Survey360 Solution Pages
 import { Survey360LandingPage } from './pages/solutions/Survey360LandingPage';
+import { Survey360PricingPage } from './pages/solutions/Survey360PricingPage';
 import { Survey360LoginPage, Survey360RegisterPage } from './pages/solutions/Survey360AuthPages';
 import { Survey360AppLayout } from './pages/solutions/Survey360AppLayout';
 import { Survey360DashboardPage } from './pages/solutions/Survey360DashboardPage';
