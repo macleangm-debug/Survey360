@@ -49,18 +49,30 @@ class Survey360QuestionModel(BaseModel):
     required: bool = False
     options: Optional[List[str]] = None
     maxRating: Optional[int] = None
+    # Simple skip logic: show this question only if condition is met
+    showIf: Optional[dict] = None  # {"questionId": "q1", "equals": "Yes"}
 
 class Survey360SurveyCreate(BaseModel):
     name: str
     description: Optional[str] = ""
     org_id: Optional[str] = None
     questions: List[Survey360QuestionModel] = []
+    # New settings
+    close_date: Optional[str] = None  # ISO date string
+    max_responses: Optional[int] = None
+    thank_you_message: Optional[str] = None
+    brand_color: Optional[str] = None  # Hex color like #14b8a6
 
 class Survey360SurveyUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     questions: Optional[List[Survey360QuestionModel]] = None
     status: Optional[str] = None
+    # New settings
+    close_date: Optional[str] = None
+    max_responses: Optional[int] = None
+    thank_you_message: Optional[str] = None
+    brand_color: Optional[str] = None
 
 class Survey360SurveyResponse(BaseModel):
     id: str
@@ -73,6 +85,12 @@ class Survey360SurveyResponse(BaseModel):
     questions: List[dict] = []
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
+    # New settings
+    close_date: Optional[str] = None
+    max_responses: Optional[int] = None
+    thank_you_message: Optional[str] = None
+    brand_color: Optional[str] = None
+    is_closed: bool = False  # Computed field
 
 class Survey360ResponseSubmit(BaseModel):
     respondent_email: Optional[str] = None
