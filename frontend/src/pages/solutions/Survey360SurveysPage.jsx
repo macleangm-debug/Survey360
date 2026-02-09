@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Plus, Search, MoreVertical, Play, Pause, Copy, Trash2, Edit3, BarChart3, ExternalLink, Link2 } from 'lucide-react';
+import { ClipboardList, Plus, Search, MoreVertical, Play, Pause, Copy, Trash2, Edit3, BarChart3, ExternalLink, Link2, Share2, QrCode, Code, Download, Check } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -11,9 +12,188 @@ import { Skeleton } from '../../components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { useOrgStore } from '../../store';
 import survey360Api from '../../lib/survey360Api';
 import { toast } from 'sonner';
+
+// Share Modal Component
+function ShareModal({ survey, open, onOpenChange }) {
+  const [copied, setCopied] = useState(null);
+  const qrRef = useRef(null);
+  
+  if (!survey) return null;
+  
+  const publicUrl = `${window.location.origin}/s/${survey.id}`;
+  
+  const embedCode = `<iframe 
+  src="${publicUrl}" 
+  width="100%" 
+  height="600" 
+  frameborder="0" 
+  style="border: none; border-radius: 8px;"
+  title="${survey.name}"
+></iframe>`;
+
+  const embedCodeMinimal = `<iframe src="${publicUrl}" width="100%" height="600" frameborder="0"></iframe>`;
+
+  const copyToClipboard = (text, type) => {
+    navigator.clipboard.writeText(text);
+    setCopied(type);
+    toast.success('Copied to clipboard');
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const downloadQR = () => {
+    const svg = qrRef.current?.querySelector('svg');
+    if (!svg) return;
+    
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      canvas.width = 300;
+      canvas.height = 300;
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, 300, 300);
+      ctx.drawImage(img, 0, 0, 300, 300);
+      
+      const pngUrl = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pngUrl;
+      downloadLink.download = `${survey.name.replace(/[^a-z0-9]/gi, '_')}_qr.png`;
+      downloadLink.click();
+    };
+    
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+    toast.success('QR code downloaded');
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#0f1d32] border-white/10 max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-white flex items-center gap-2">
+            <Share2 className="w-5 h-5 text-teal-400" />
+            Share Survey
+          </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            {survey.name}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <Tabs defaultValue="link" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 bg-white/5">
+            <TabsTrigger value="link" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400">
+              <Link2 className="w-4 h-4 mr-2" />Link
+            </TabsTrigger>
+            <TabsTrigger value="qr" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400">
+              <QrCode className="w-4 h-4 mr-2" />QR Code
+            </TabsTrigger>
+            <TabsTrigger value="embed" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400">
+              <Code className="w-4 h-4 mr-2" />Embed
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Link Tab */}
+          <TabsContent value="link" className="mt-4 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-gray-400 text-sm">Public Survey Link</Label>
+              <div className="flex gap-2">
+                <Input 
+                  value={publicUrl} 
+                  readOnly 
+                  className="bg-white/5 border-white/10 text-white font-mono text-sm"
+                />
+                <Button 
+                  onClick={() => copyToClipboard(publicUrl, 'link')}
+                  className="bg-teal-500 hover:bg-teal-600 text-white shrink-0"
+                >
+                  {copied === 'link' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500">
+              Share this link with anyone to collect responses. No login required for respondents.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => window.open(publicUrl, '_blank')}
+              className="w-full border-white/10 text-gray-300 hover:bg-white/5"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Open Survey in New Tab
+            </Button>
+          </TabsContent>
+          
+          {/* QR Code Tab */}
+          <TabsContent value="qr" className="mt-4 space-y-4">
+            <div className="flex flex-col items-center">
+              <div ref={qrRef} className="bg-white p-4 rounded-lg">
+                <QRCodeSVG 
+                  value={publicUrl} 
+                  size={200}
+                  level="H"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-3 text-center">
+                Scan this QR code to open the survey on any device
+              </p>
+            </div>
+            <Button 
+              onClick={downloadQR}
+              className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download QR Code (PNG)
+            </Button>
+          </TabsContent>
+          
+          {/* Embed Tab */}
+          <TabsContent value="embed" className="mt-4 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-gray-400 text-sm">Embed Code</Label>
+              <div className="relative">
+                <pre className="bg-white/5 border border-white/10 rounded-lg p-3 text-xs text-gray-300 font-mono overflow-x-auto whitespace-pre-wrap">
+                  {embedCode}
+                </pre>
+                <Button 
+                  size="sm"
+                  onClick={() => copyToClipboard(embedCode, 'embed')}
+                  className="absolute top-2 right-2 bg-teal-500 hover:bg-teal-600 text-white h-7 px-2"
+                >
+                  {copied === 'embed' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500">
+              Paste this code into your website's HTML to embed the survey directly on your page.
+            </p>
+            <div className="space-y-2">
+              <Label className="text-gray-400 text-sm">Minimal Version</Label>
+              <div className="flex gap-2">
+                <Input 
+                  value={embedCodeMinimal} 
+                  readOnly 
+                  className="bg-white/5 border-white/10 text-white font-mono text-xs"
+                />
+                <Button 
+                  onClick={() => copyToClipboard(embedCodeMinimal, 'minimal')}
+                  className="bg-teal-500 hover:bg-teal-600 text-white shrink-0"
+                >
+                  {copied === 'minimal' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export function Survey360SurveysPage() {
   const navigate = useNavigate();
