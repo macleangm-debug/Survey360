@@ -24,7 +24,19 @@ import {
   Clock,
   Target,
   Sparkles,
-  MousePointerClick
+  MousePointerClick,
+  Building2,
+  GraduationCap,
+  Heart,
+  ShoppingBag,
+  Home,
+  Briefcase,
+  HeartPulse,
+  Calendar,
+  Hotel,
+  Store,
+  Megaphone,
+  FlaskConical
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
