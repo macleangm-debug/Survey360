@@ -52,6 +52,23 @@ class Survey360AuthResponse(BaseModel):
     user: Survey360UserResponse
     access_token: str
 
+# Plan and Usage Models
+PLAN_LIMITS = {
+    'free': {'surveys': 3, 'responses_per_month': 100, 'users': 1},
+    'starter': {'surveys': -1, 'responses_per_month': 500, 'users': 1},
+    'professional': {'surveys': -1, 'responses_per_month': 2500, 'users': 3},
+    'business': {'surveys': -1, 'responses_per_month': 10000, 'users': -1},
+}
+
+class Survey360UsageResponse(BaseModel):
+    plan: str
+    surveys_used: int
+    surveys_limit: int  # -1 means unlimited
+    responses_used: int
+    responses_limit: int
+    period_start: str
+    period_end: str
+
 class Survey360OrgCreate(BaseModel):
     name: str
 
