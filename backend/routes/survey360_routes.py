@@ -534,7 +534,11 @@ async def public_get_survey(survey_id: str):
     if not survey:
         raise HTTPException(status_code=404, detail="Survey not found or not published")
     
-    return survey
+    # Check if survey is closed
+    response_count = await db.survey360_responses.count_documents({"survey_id": survey_id})
+    is_closed = check_survey_closed(survey, response_count)
+    
+    return {**survey, "is_closed": is_closed, "response_count": response_count}
 
 @router.post("/public/surveys/{survey_id}/responses")
 async def public_submit_response(survey_id: str, data: PublicResponseSubmit):
@@ -549,6 +553,11 @@ async def public_submit_response(survey_id: str, data: PublicResponseSubmit):
     )
     if not survey:
         raise HTTPException(status_code=404, detail="Survey not found or not published")
+    
+    # Check if survey is closed
+    response_count = await db.survey360_responses.count_documents({"survey_id": survey_id})
+    if check_survey_closed(survey, response_count):
+        raise HTTPException(status_code=400, detail="This survey is no longer accepting responses")
     
     response_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
@@ -565,5 +574,69 @@ async def public_submit_response(survey_id: str, data: PublicResponseSubmit):
     }
     await db.survey360_responses.insert_one(response)
     
-    return {"id": response_id, "message": "Response submitted successfully"}
+    return {
+        "id": response_id, 
+        "message": "Response submitted successfully",
+        "thank_you_message": survey.get("thank_you_message")
+    }
+
+# ============================================
+# ANALYTICS ENDPOINT
+# ============================================
+
+@router.get("/surveys/{survey_id}/analytics")
+async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_user)):
+    """Get basic analytics for a survey - pie/bar chart data"""
+    from server import app
+    db = app.state.db
+    
+    survey = await db.survey360_surveys.find_one({"id": survey_id}, {"_id": 0})
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+    
+    responses = await db.survey360_responses.find(
+        {"survey_id": survey_id},
+        {"_id": 0, "answers": 1}
+    ).to_list(10000)
+    
+    analytics = {}
+    questions = survey.get("questions", [])
+    
+    for question in questions:
+        q_id = question["id"]
+        q_type = question["type"]
+        
+        # Only generate analytics for certain question types
+        if q_type in ["single_choice", "multiple_choice", "dropdown", "rating"]:
+            answer_counts = {}
+            
+            for resp in responses:
+                answer = resp.get("answers", {}).get(q_id)
+                if answer is not None:
+                    if q_type == "multiple_choice" and isinstance(answer, list):
+                        for a in answer:
+                            answer_counts[a] = answer_counts.get(a, 0) + 1
+                    else:
+                        answer_counts[str(answer)] = answer_counts.get(str(answer), 0) + 1
+            
+            # Convert to chart data format
+            chart_data = [
+                {"name": k, "value": v, "percent": round(v / len(responses) * 100, 1) if responses else 0}
+                for k, v in sorted(answer_counts.items(), key=lambda x: -x[1])
+            ]
+            
+            analytics[q_id] = {
+                "question_id": q_id,
+                "question_title": question["title"],
+                "question_type": q_type,
+                "total_responses": len(responses),
+                "chart_data": chart_data,
+                "options": question.get("options", [])
+            }
+    
+    return {
+        "survey_id": survey_id,
+        "total_responses": len(responses),
+        "questions": analytics
+    }
 
