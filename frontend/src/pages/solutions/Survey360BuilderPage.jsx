@@ -698,6 +698,52 @@ export function Survey360BuilderPage() {
                     <p className="text-xs text-gray-500">Accent color for the public survey form</p>
                   </div>
                   
+                  {/* Logo Upload */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Logo</Label>
+                    <input 
+                      type="file" 
+                      ref={logoInputRef}
+                      onChange={handleLogoUpload}
+                      accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+                      className="hidden"
+                    />
+                    {survey.logo_url ? (
+                      <div className="relative inline-block">
+                        <img 
+                          src={survey.logo_url} 
+                          alt="Survey logo" 
+                          className="h-16 max-w-[200px] object-contain bg-white/5 rounded-lg p-2"
+                        />
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          className="absolute -top-2 -right-2 w-6 h-6"
+                          onClick={handleRemoveLogo}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        onClick={() => logoInputRef.current?.click()}
+                        disabled={uploading || !isEditing}
+                        className="w-full border-white/10 border-dashed text-gray-400 hover:bg-white/5 h-16"
+                      >
+                        {uploading ? (
+                          'Uploading...'
+                        ) : (
+                          <div className="flex flex-col items-center gap-1">
+                            <Upload className="w-5 h-5" />
+                            <span className="text-xs">{isEditing ? 'Upload Logo (500KB max)' : 'Save survey first'}</span>
+                          </div>
+                        )}
+                      </Button>
+                    )}
+                    <p className="text-xs text-gray-500">Displayed on the public survey form header</p>
+                  </div>
+                  
                   {isEditing && survey.status === 'published' && (
                     <>
                       <Separator className="bg-white/10" />
