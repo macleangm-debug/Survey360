@@ -119,6 +119,52 @@ const USE_CASES = [
   { title: 'Event Registration', icon: QrCode, description: 'Collect RSVPs with QR codes' }
 ];
 
+const INDUSTRIES = [
+  {
+    category: 'B2B & Enterprise',
+    color: 'from-blue-500 to-cyan-500',
+    industries: [
+      { icon: Building2, name: 'SaaS & Tech', useCases: 'Product feedback, NPS surveys, feature requests, onboarding' },
+      { icon: Briefcase, name: 'Consulting', useCases: 'Client intake, project feedback, 360° reviews' },
+      { icon: Users, name: 'HR & Recruiting', useCases: 'Employee engagement, exit interviews, pulse surveys' },
+      { icon: Megaphone, name: 'Marketing Agencies', useCases: 'Client briefs, campaign feedback, brand research' },
+    ]
+  },
+  {
+    category: 'Education & Research',
+    color: 'from-purple-500 to-pink-500',
+    industries: [
+      { icon: GraduationCap, name: 'Universities', useCases: 'Course evaluations, student feedback, research studies' },
+      { icon: FlaskConical, name: 'Market Research', useCases: 'Consumer insights, product testing, concept validation' },
+      { icon: Globe, name: 'NGOs & Think Tanks', useCases: 'Field surveys, impact assessments, needs analysis' },
+    ]
+  },
+  {
+    category: 'Healthcare & Wellness',
+    color: 'from-rose-500 to-red-500',
+    industries: [
+      { icon: HeartPulse, name: 'Healthcare', useCases: 'Patient satisfaction, appointment follow-ups, intake forms' },
+      { icon: Heart, name: 'Wellness & Fitness', useCases: 'Member feedback, class evaluations, progress tracking' },
+    ]
+  },
+  {
+    category: 'Hospitality & Events',
+    color: 'from-orange-500 to-amber-500',
+    industries: [
+      { icon: Hotel, name: 'Hotels & Restaurants', useCases: 'Guest feedback, dining experience, service quality' },
+      { icon: Calendar, name: 'Event Planners', useCases: 'Registration, post-event feedback, speaker ratings' },
+    ]
+  },
+  {
+    category: 'Retail & Real Estate',
+    color: 'from-green-500 to-emerald-500',
+    industries: [
+      { icon: Store, name: 'E-commerce & Retail', useCases: 'Post-purchase feedback, product reviews, cart abandonment' },
+      { icon: Home, name: 'Real Estate', useCases: 'Tenant satisfaction, buyer feedback, market research' },
+    ]
+  }
+];
+
 // Animated counter component
 const AnimatedCounter = ({ value, duration = 2000 }) => {
   const [count, setCount] = useState(0);
