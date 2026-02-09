@@ -473,7 +473,7 @@ export function Survey360BuilderPage() {
                   Settings
                 </Button>
               </SheetTrigger>
-              <SheetContent className="bg-[#0f1d32] border-white/10">
+              <SheetContent className="bg-[#0f1d32] border-white/10 overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle className="text-white">Survey Settings</SheetTitle>
                   <SheetDescription className="text-gray-400">Configure your survey options</SheetDescription>
@@ -496,28 +496,96 @@ export function Survey360BuilderPage() {
                       className="bg-white/5 border-white/10 text-white"
                     />
                   </div>
-                  {isEditing && survey.status === 'published' && (
-                    <div className="space-y-2">
-                      <Label className="text-gray-300">Public Survey Link</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          value={getPublicUrl()}
-                          readOnly
-                          className="bg-white/5 border-white/10 text-gray-300 text-sm"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            navigator.clipboard.writeText(getPublicUrl());
-                            toast.success('Link copied!');
-                          }}
-                          className="border-white/10 text-gray-300"
-                        >
-                          Copy
-                        </Button>
-                      </div>
+                  
+                  <Separator className="bg-white/10" />
+                  
+                  {/* Close Date */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Close Date (Optional)</Label>
+                    <Input
+                      type="datetime-local"
+                      value={survey.close_date ? survey.close_date.slice(0, 16) : ''}
+                      onChange={(e) => setSurvey({ ...survey, close_date: e.target.value ? new Date(e.target.value).toISOString() : null })}
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                    <p className="text-xs text-gray-500">Survey will automatically stop accepting responses after this date</p>
+                  </div>
+                  
+                  {/* Max Responses */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Max Responses (Optional)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={survey.max_responses || ''}
+                      onChange={(e) => setSurvey({ ...survey, max_responses: e.target.value ? parseInt(e.target.value) : null })}
+                      placeholder="Unlimited"
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                    <p className="text-xs text-gray-500">Survey will close after reaching this number of responses</p>
+                  </div>
+                  
+                  <Separator className="bg-white/10" />
+                  
+                  {/* Thank You Message */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Thank You Message</Label>
+                    <Textarea
+                      value={survey.thank_you_message || ''}
+                      onChange={(e) => setSurvey({ ...survey, thank_you_message: e.target.value })}
+                      rows={3}
+                      placeholder="Thank you for completing our survey!"
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                    <p className="text-xs text-gray-500">Shown to respondents after submitting</p>
+                  </div>
+                  
+                  {/* Brand Color */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Brand Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={survey.brand_color || '#14b8a6'}
+                        onChange={(e) => setSurvey({ ...survey, brand_color: e.target.value })}
+                        className="w-12 h-10 p-1 bg-white/5 border-white/10 cursor-pointer"
+                      />
+                      <Input
+                        type="text"
+                        value={survey.brand_color || '#14b8a6'}
+                        onChange={(e) => setSurvey({ ...survey, brand_color: e.target.value })}
+                        className="flex-1 bg-white/5 border-white/10 text-white font-mono"
+                        placeholder="#14b8a6"
+                      />
                     </div>
+                    <p className="text-xs text-gray-500">Accent color for the public survey form</p>
+                  </div>
+                  
+                  {isEditing && survey.status === 'published' && (
+                    <>
+                      <Separator className="bg-white/10" />
+                      <div className="space-y-2">
+                        <Label className="text-gray-300">Public Survey Link</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            value={getPublicUrl()}
+                            readOnly
+                            className="bg-white/5 border-white/10 text-gray-300 text-sm"
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              navigator.clipboard.writeText(getPublicUrl());
+                              toast.success('Link copied!');
+                            }}
+                            className="border-white/10 text-gray-300"
+                          >
+                            Copy
+                          </Button>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
               </SheetContent>
