@@ -45,6 +45,7 @@ import { Survey360SurveysPage } from './pages/solutions/Survey360SurveysPage';
 import { Survey360BuilderPage } from './pages/solutions/Survey360BuilderPage';
 import { Survey360ResponsesPage } from './pages/solutions/Survey360ResponsesPage';
 import { Survey360SettingsPage } from './pages/solutions/Survey360SettingsPage';
+import { Survey360BillingPage } from './pages/solutions/Survey360BillingPage';
 import { PublicSurveyPage } from './pages/solutions/PublicSurveyPage';
 import '@/App.css';
 
