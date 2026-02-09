@@ -149,12 +149,32 @@ export function Survey360ResponsesPage() {
     loadResponses();
   }, [selectedSurvey, page]);
 
+  useEffect(() => {
+    if (selectedSurvey !== 'all' && activeTab === 'analytics') {
+      loadAnalytics();
+    }
+  }, [selectedSurvey, activeTab]);
+
   const loadSurveys = async () => {
     try {
       const response = await survey360Api.get('/surveys');
       setSurveys(response.data);
     } catch (error) {
       console.error('Failed to load surveys:', error);
+    }
+  };
+
+  const loadAnalytics = async () => {
+    if (selectedSurvey === 'all') return;
+    setLoadingAnalytics(true);
+    try {
+      const response = await survey360Api.get(`/surveys/${selectedSurvey}/analytics`);
+      setAnalytics(response.data);
+    } catch (error) {
+      console.error('Failed to load analytics:', error);
+      toast.error('Failed to load analytics');
+    } finally {
+      setLoadingAnalytics(false);
     }
   };
 
