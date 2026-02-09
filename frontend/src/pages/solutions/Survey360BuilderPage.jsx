@@ -77,8 +77,13 @@ const QUESTION_TYPES = [
   { type: 'rating', label: 'Rating', icon: Star, description: 'Star rating scale' },
 ];
 
-const QuestionCard = ({ question, index, onUpdate, onDelete, onDuplicate, isExpanded, onToggleExpand }) => {
+const QuestionCard = ({ question, index, onUpdate, onDelete, onDuplicate, isExpanded, onToggleExpand, allQuestions }) => {
   const Icon = QUESTION_TYPES.find(t => t.type === question.type)?.icon || Type;
+  
+  // Get questions that can be used for skip logic (only previous questions with options)
+  const skipLogicQuestions = allQuestions
+    .slice(0, index)
+    .filter(q => ['single_choice', 'dropdown'].includes(q.type) && q.options?.length > 0);
 
   const updateOption = (idx, value) => {
     const newOptions = [...(question.options || [])];
@@ -95,6 +100,22 @@ const QuestionCard = ({ question, index, onUpdate, onDelete, onDuplicate, isExpa
     const newOptions = (question.options || []).filter((_, i) => i !== idx);
     onUpdate({ ...question, options: newOptions });
   };
+  
+  const updateShowIf = (field, value) => {
+    if (!value && field === 'questionId') {
+      onUpdate({ ...question, showIf: null });
+    } else {
+      onUpdate({ 
+        ...question, 
+        showIf: { 
+          ...(question.showIf || {}), 
+          [field]: value 
+        } 
+      });
+    }
+  };
+  
+  const selectedSkipQuestion = skipLogicQuestions.find(q => q.id === question.showIf?.questionId);
 
   return (
     <motion.div layout>
