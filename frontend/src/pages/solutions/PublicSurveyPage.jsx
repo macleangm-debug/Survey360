@@ -386,13 +386,21 @@ export function PublicSurveyPage() {
 
   return (
     <div className="min-h-screen bg-[#0a1628] py-8 px-4">
+      <style>{`
+        .brand-accent { color: ${brandColor}; }
+        .brand-bg { background-color: ${brandColor}; }
+        .brand-bg-light { background-color: ${brandColor}20; }
+      `}</style>
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6 text-center">
-          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center mx-auto mb-4">
+          <div 
+            className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
+            style={{ background: `linear-gradient(135deg, ${brandColor}, ${brandColor}cc)` }}
+          >
             <ClipboardList className="w-6 h-6 text-white" />
           </div>
-          <span className="text-sm text-teal-400 font-medium">Survey360</span>
+          <span className="text-sm font-medium" style={{ color: brandColor }}>Survey360</span>
         </div>
 
         {/* Progress */}
@@ -401,7 +409,12 @@ export function PublicSurveyPage() {
             <span>Progress</span>
             <span>{Math.round(progress)}%</span>
           </div>
-          <Progress value={progress} className="h-2 bg-white/10" />
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <div 
+              className="h-full transition-all duration-300 rounded-full"
+              style={{ width: `${progress}%`, backgroundColor: brandColor }}
+            />
+          </div>
         </div>
 
         {/* Survey Form */}
@@ -443,9 +456,9 @@ export function PublicSurveyPage() {
             </CardContent>
           </Card>
 
-          {/* Questions */}
+          {/* Questions - Only show visible ones based on skip logic */}
           <div className="space-y-6">
-            {survey.questions.map((question, idx) => (
+            {visibleQuestions.map((question, idx) => (
               <Card key={question.id} className="bg-white/5 border-white/10">
                 <CardContent className="p-6">
                   <QuestionRenderer
@@ -475,7 +488,8 @@ export function PublicSurveyPage() {
             <Button
               type="submit"
               disabled={submitting}
-              className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white border-0 px-8 py-3 h-auto text-lg"
+              className="text-white border-0 px-8 py-3 h-auto text-lg"
+              style={{ background: `linear-gradient(135deg, ${brandColor}, ${brandColor}cc)` }}
             >
               {submitting ? (
                 'Submitting...'
