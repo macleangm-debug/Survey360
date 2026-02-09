@@ -103,7 +103,8 @@ const QuestionCard = ({ question, index, onUpdate, onDelete, onDuplicate, isExpa
   };
   
   const updateShowIf = (field, value) => {
-    if (!value && field === 'questionId') {
+    // Handle "always_show" as clearing the skip logic
+    if ((value === 'always_show' || !value) && field === 'questionId') {
       onUpdate({ ...question, showIf: null });
     } else {
       onUpdate({ 
