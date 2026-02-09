@@ -670,6 +670,7 @@ async def create_survey360_demo_user(db):
         await db.survey360_orgs.insert_one({
             "id": demo_org_id,
             "name": "Demo Organization",
+            "plan": "professional",  # Give demo org a professional plan for testing
             "created_at": datetime.now(timezone.utc).isoformat()
         })
         print("Survey360 demo user created")
