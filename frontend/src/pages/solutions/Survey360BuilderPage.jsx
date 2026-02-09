@@ -365,6 +365,61 @@ export function Survey360BuilderPage() {
     }
   };
 
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Use PNG, JPEG, GIF, WebP, or SVG');
+      return;
+    }
+    
+    // Validate file size (500KB max)
+    if (file.size > 500 * 1024) {
+      toast.error('File too large. Maximum size is 500KB');
+      return;
+    }
+    
+    if (!isEditing) {
+      toast.error('Please save the survey first before uploading a logo');
+      return;
+    }
+    
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await survey360Api.post(`/surveys/${id}/logo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      setSurvey({ ...survey, logo_url: response.data.logo_url });
+      toast.success('Logo uploaded');
+    } catch (error) {
+      console.error('Failed to upload logo:', error);
+      toast.error(error.response?.data?.detail || 'Failed to upload logo');
+    } finally {
+      setUploading(false);
+      if (logoInputRef.current) logoInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!isEditing) return;
+    
+    try {
+      await survey360Api.delete(`/surveys/${id}/logo`);
+      setSurvey({ ...survey, logo_url: null });
+      toast.success('Logo removed');
+    } catch (error) {
+      console.error('Failed to remove logo:', error);
+      toast.error('Failed to remove logo');
+    }
+  };
+
   const handleSave = async () => {
     if (!survey.name.trim()) {
       toast.error('Survey name is required');
@@ -380,7 +435,8 @@ export function Survey360BuilderPage() {
         close_date: survey.close_date,
         max_responses: survey.max_responses,
         thank_you_message: survey.thank_you_message,
-        brand_color: survey.brand_color
+        brand_color: survey.brand_color,
+        logo_url: survey.logo_url
       };
       if (isEditing) {
         await survey360Api.put(`/surveys/${id}`, saveData);
