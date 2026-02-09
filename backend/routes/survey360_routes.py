@@ -332,6 +332,8 @@ async def survey360_update_survey(survey_id: str, data: Survey360SurveyUpdate, u
         update_data["thank_you_message"] = data.thank_you_message
     if data.brand_color is not None:
         update_data["brand_color"] = data.brand_color
+    if data.logo_url is not None:
+        update_data["logo_url"] = data.logo_url
     
     await db.survey360_surveys.update_one({"id": survey_id}, {"$set": update_data})
     
