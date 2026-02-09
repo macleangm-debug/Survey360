@@ -377,6 +377,12 @@ async def survey360_create_survey(data: Survey360SurveyCreate, user=Depends(get_
     from server import app
     db = app.state.db
     
+    # Check survey limits
+    org_id = data.org_id or user.get("org_id")
+    can_create, error_msg = await check_usage_limits(db, org_id, 'survey')
+    if not can_create:
+        raise HTTPException(status_code=403, detail=error_msg)
+    
     survey_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     
@@ -385,7 +391,7 @@ async def survey360_create_survey(data: Survey360SurveyCreate, user=Depends(get_
         "name": data.name,
         "description": data.description,
         "status": "draft",
-        "org_id": data.org_id or user.get("org_id"),
+        "org_id": org_id,
         "questions": [q.dict() for q in data.questions],
         "close_date": data.close_date,
         "max_responses": data.max_responses,
