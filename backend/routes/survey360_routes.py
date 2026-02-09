@@ -293,6 +293,7 @@ async def survey360_create_survey(data: Survey360SurveyCreate, user=Depends(get_
         "max_responses": data.max_responses,
         "thank_you_message": data.thank_you_message,
         "brand_color": data.brand_color,
+        "logo_url": data.logo_url,
         "created_at": now,
         "updated_at": now
     }
