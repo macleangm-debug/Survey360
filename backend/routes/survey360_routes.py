@@ -1,5 +1,5 @@
 """Survey360 - API Routes for the Survey360 Product"""
-from fastapi import APIRouter, HTTPException, Depends, Header
+from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile, File
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr
 from datetime import datetime, timezone
@@ -7,6 +7,7 @@ import uuid
 import hashlib
 import jwt
 import os
+import base64
 
 router = APIRouter(prefix="/survey360", tags=["Survey360"])
 
