@@ -728,6 +728,7 @@ export function Survey360BuilderPage() {
                     onDuplicate={duplicateQuestion}
                     isExpanded={expandedQuestion === question.id}
                     onToggleExpand={(id) => setExpandedQuestion(expandedQuestion === id ? null : id)}
+                    allQuestions={survey.questions}
                   />
                 </Reorder.Item>
               ))}
