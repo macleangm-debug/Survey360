@@ -12,13 +12,15 @@ import {
   ChevronRight,
   FileText,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  PieChart
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Badge } from '../../components/ui/badge';
 import { Skeleton } from '../../components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -45,6 +47,83 @@ import { useOrgStore } from '../../store';
 import survey360Api from '../../lib/survey360Api';
 import { toast } from 'sonner';
 
+// Simple Bar Chart Component
+const SimpleBarChart = ({ data, title }) => {
+  if (!data || data.length === 0) return null;
+  const maxValue = Math.max(...data.map(d => d.value));
+  
+  return (
+    <div className="space-y-3">
+      <h4 className="font-medium text-white text-sm">{title}</h4>
+      <div className="space-y-2">
+        {data.map((item, idx) => (
+          <div key={idx} className="space-y-1">
+            <div className="flex justify-between text-xs">
+              <span className="text-gray-400 truncate max-w-[200px]">{item.name}</span>
+              <span className="text-gray-500">{item.value} ({item.percent}%)</span>
+            </div>
+            <div className="h-6 bg-white/5 rounded overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded transition-all duration-500"
+                style={{ width: `${maxValue > 0 ? (item.value / maxValue) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Simple Pie Chart Component (CSS-based)
+const SimplePieChart = ({ data, title }) => {
+  if (!data || data.length === 0) return null;
+  
+  const colors = ['#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6', '#3b82f6', '#10b981', '#f97316', '#ec4899'];
+  let cumulativePercent = 0;
+  
+  const segments = data.map((item, idx) => {
+    const startPercent = cumulativePercent;
+    cumulativePercent += item.percent;
+    return {
+      ...item,
+      color: colors[idx % colors.length],
+      startPercent,
+      endPercent: cumulativePercent
+    };
+  });
+  
+  const gradientStops = segments.map(s => 
+    `${s.color} ${s.startPercent}% ${s.endPercent}%`
+  ).join(', ');
+  
+  return (
+    <div className="space-y-3">
+      <h4 className="font-medium text-white text-sm">{title}</h4>
+      <div className="flex items-center gap-6">
+        <div 
+          className="w-24 h-24 rounded-full"
+          style={{ 
+            background: `conic-gradient(${gradientStops})`,
+          }}
+        />
+        <div className="flex-1 space-y-1">
+          {segments.slice(0, 5).map((item, idx) => (
+            <div key={idx} className="flex items-center gap-2 text-xs">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }} />
+              <span className="text-gray-400 truncate">{item.name}</span>
+              <span className="text-gray-500 ml-auto">{item.percent}%</span>
+            </div>
+          ))}
+          {segments.length > 5 && (
+            <p className="text-xs text-gray-600">+{segments.length - 5} more</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export function Survey360ResponsesPage() {
   const navigate = useNavigate();
   const { currentOrg } = useOrgStore();
@@ -58,6 +137,9 @@ export function Survey360ResponsesPage() {
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [stats, setStats] = useState({ total: 0, completed: 0, avgTime: 0 });
+  const [analytics, setAnalytics] = useState(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+  const [activeTab, setActiveTab] = useState('responses');
 
   useEffect(() => {
     loadSurveys();
