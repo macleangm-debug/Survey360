@@ -390,7 +390,7 @@ Build a modern, secure, scalable data collection platform similar to SurveyCTO, 
 - **Password**: password123
 
 ## API Base URL
-- **Production**: https://survey-builder-20.preview.emergentagent.com
+- **Production**: https://response-collector.preview.emergentagent.com
 
 ## Backend Routes (35 modules)
 All routes under `/app/backend/routes/`:
@@ -1266,4 +1266,4 @@ Survey360 is now integrated into the main DataPulse application and accessible v
 - Password: Test123!
 
 ### Access URL
-https://survey-builder-20.preview.emergentagent.com/solutions/survey360
+https://response-collector.preview.emergentagent.com/solutions/survey360

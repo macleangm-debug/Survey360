@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 class DataPulseAPITester:
-    def __init__(self, base_url: str = "https://survey-builder-20.preview.emergentagent.com"):
+    def __init__(self, base_url: str = "https://response-collector.preview.emergentagent.com"):
         self.base_url = base_url
         self.session = requests.Session()
         self.session.headers.update({'Content-Type': 'application/json'})
