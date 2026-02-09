@@ -637,6 +637,88 @@ export function Survey360LandingPage() {
         </div>
       </section>
 
+      {/* Industries Section */}
+      <section id="industries" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 mb-4">Industries</Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Trusted across industries
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              From startups to enterprises, teams of all sizes use Survey360 to collect insights
+            </p>
+          </motion.div>
+
+          <div className="space-y-8">
+            {INDUSTRIES.map((category, catIdx) => (
+              <motion.div
+                key={catIdx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: catIdx * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`h-1 w-8 rounded-full bg-gradient-to-r ${category.color}`} />
+                  <h3 className="text-lg font-semibold text-white">{category.category}</h3>
+                </div>
+                
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {category.industries.map((industry, idx) => {
+                    const Icon = industry.icon;
+                    return (
+                      <motion.div
+                        key={idx}
+                        whileHover={{ y: -5, scale: 1.02 }}
+                        className="group"
+                      >
+                        <Card className="bg-white/5 border-white/10 hover:border-white/20 transition-all duration-300 h-full overflow-hidden">
+                          <CardContent className="p-5">
+                            <div className="flex items-start gap-3">
+                              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
+                                <Icon className="w-5 h-5 text-white" />
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="font-semibold text-white text-sm mb-1">{industry.name}</h4>
+                                <p className="text-xs text-gray-500 leading-relaxed">{industry.useCases}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Industry CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-12 text-center"
+          >
+            <p className="text-gray-400 mb-4">Don't see your industry? Survey360 works for any use case.</p>
+            <Button 
+              variant="outline"
+              className="border-white/20 text-gray-300 hover:bg-white/5"
+              onClick={() => navigate('/solutions/survey360/register')}
+            >
+              Get Started Free
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section id="testimonials" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-purple-500/5">
         <div className="max-w-7xl mx-auto">
