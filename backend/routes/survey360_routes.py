@@ -22,7 +22,7 @@ def check_survey_closed(survey: dict, response_count: int) -> bool:
             close_date = datetime.fromisoformat(survey["close_date"].replace("Z", "+00:00"))
             if datetime.now(timezone.utc) > close_date:
                 return True
-        except:
+        except (ValueError, TypeError):
             pass
     
     # Check max responses
