@@ -360,11 +360,16 @@ export function PublicSurveyPage() {
         >
           <Card className="bg-white/5 border-white/10 text-center">
             <CardContent className="p-8">
-              <div className="w-20 h-20 rounded-full bg-teal-500/10 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-10 h-10 text-teal-400" />
+              <div 
+                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ backgroundColor: `${brandColor}20` }}
+              >
+                <CheckCircle className="w-10 h-10" style={{ color: brandColor }} />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Thank You!</h2>
-              <p className="text-gray-400 mb-6">Your response has been recorded successfully.</p>
+              <p className="text-gray-400 mb-6">
+                {thankYouMessage || 'Your response has been recorded successfully.'}
+              </p>
               <Button
                 variant="outline"
                 onClick={() => window.close()}
