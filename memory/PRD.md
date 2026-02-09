@@ -1246,6 +1246,7 @@ Endpoints:
 - [ ] Add Excel export option (in addition to CSV)
 - [ ] Add response analytics charts in dashboard
 - [ ] Add survey scheduling (auto-publish/close dates)
+- [ ] Email invitation system for survey distribution
 
 ### P2 - StatsPro Product Extraction
 - Extract advanced statistics features into standalone product
