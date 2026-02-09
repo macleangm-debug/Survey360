@@ -35,8 +35,9 @@ const publicApi = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    if (!response.ok) throw new Error('Failed to submit');
-    return response.json();
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.detail || 'Failed to submit');
+    return result;
   }
 };
 
