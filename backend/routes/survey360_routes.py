@@ -111,6 +111,7 @@ class Survey360SurveyResponse(BaseModel):
     max_responses: Optional[int] = None
     thank_you_message: Optional[str] = None
     brand_color: Optional[str] = None
+    logo_url: Optional[str] = None
     is_closed: bool = False  # Computed field
 
 class Survey360ResponseSubmit(BaseModel):
