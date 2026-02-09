@@ -146,8 +146,10 @@ export function Survey360ResponsesPage() {
   }, [currentOrg]);
 
   useEffect(() => {
-    loadResponses();
-  }, [selectedSurvey, page]);
+    if (surveys.length > 0) {
+      loadResponses();
+    }
+  }, [selectedSurvey, surveys]);
 
   useEffect(() => {
     if (selectedSurvey !== 'all' && activeTab === 'analytics') {
