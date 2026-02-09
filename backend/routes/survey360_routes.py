@@ -81,6 +81,7 @@ class Survey360SurveyCreate(BaseModel):
     max_responses: Optional[int] = None
     thank_you_message: Optional[str] = None
     brand_color: Optional[str] = None  # Hex color like #14b8a6
+    logo_url: Optional[str] = None  # Base64 data URL or external URL
 
 class Survey360SurveyUpdate(BaseModel):
     name: Optional[str] = None
@@ -92,6 +93,7 @@ class Survey360SurveyUpdate(BaseModel):
     max_responses: Optional[int] = None
     thank_you_message: Optional[str] = None
     brand_color: Optional[str] = None
+    logo_url: Optional[str] = None
 
 class Survey360SurveyResponse(BaseModel):
     id: str
