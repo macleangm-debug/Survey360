@@ -360,6 +360,58 @@ async def survey360_delete_survey(survey_id: str, user=Depends(get_survey360_use
         raise HTTPException(status_code=404, detail="Survey not found")
     return {"message": "Survey deleted"}
 
+@router.post("/surveys/{survey_id}/logo")
+async def survey360_upload_logo(survey_id: str, file: UploadFile = File(...), user=Depends(get_survey360_user)):
+    """Upload a logo for a survey - stored as base64 data URL"""
+    from server import app
+    db = app.state.db
+    
+    # Verify survey exists
+    survey = await db.survey360_surveys.find_one({"id": survey_id}, {"_id": 0})
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+    
+    # Validate file type
+    allowed_types = ["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Invalid file type. Allowed: PNG, JPEG, GIF, WebP, SVG")
+    
+    # Read file and convert to base64
+    contents = await file.read()
+    
+    # Limit file size to 500KB
+    if len(contents) > 500 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 500KB")
+    
+    # Create data URL
+    base64_data = base64.b64encode(contents).decode('utf-8')
+    logo_url = f"data:{file.content_type};base64,{base64_data}"
+    
+    # Update survey with logo
+    await db.survey360_surveys.update_one(
+        {"id": survey_id},
+        {"$set": {"logo_url": logo_url, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"logo_url": logo_url, "message": "Logo uploaded successfully"}
+
+@router.delete("/surveys/{survey_id}/logo")
+async def survey360_delete_logo(survey_id: str, user=Depends(get_survey360_user)):
+    """Remove the logo from a survey"""
+    from server import app
+    db = app.state.db
+    
+    survey = await db.survey360_surveys.find_one({"id": survey_id}, {"_id": 0})
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+    
+    await db.survey360_surveys.update_one(
+        {"id": survey_id},
+        {"$set": {"logo_url": None, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Logo removed"}
+
 @router.post("/surveys/{survey_id}/publish", response_model=Survey360SurveyResponse)
 async def survey360_publish_survey(survey_id: str, user=Depends(get_survey360_user)):
     from server import app
