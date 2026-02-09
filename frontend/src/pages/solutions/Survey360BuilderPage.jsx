@@ -326,6 +326,7 @@ export function Survey360BuilderPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id && id !== 'new';
+  const logoInputRef = useRef(null);
   
   const [survey, setSurvey] = useState({
     name: '',
@@ -335,10 +336,12 @@ export function Survey360BuilderPage() {
     close_date: null,
     max_responses: null,
     thank_you_message: null,
-    brand_color: '#14b8a6'
+    brand_color: '#14b8a6',
+    logo_url: null
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [expandedQuestion, setExpandedQuestion] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
