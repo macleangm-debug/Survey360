@@ -1,38 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Plus, Search, MoreVertical, Play, Copy, Archive, Edit3, BarChart3, Calendar } from 'lucide-react';
+import { ClipboardList, Plus, Search, MoreVertical, Play, Pause, Copy, Trash2, Edit3, BarChart3, ExternalLink, Link2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Badge } from '../../components/ui/badge';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
+import { Skeleton } from '../../components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { useOrgStore } from '../../store';
+import survey360Api from '../../lib/survey360Api';
 import { toast } from 'sonner';
-
-const MOCK_SURVEYS = [
-  { id: '1', name: 'Customer Satisfaction Survey', description: 'Measure customer satisfaction', status: 'published', question_count: 15, response_count: 234, updated_at: new Date().toISOString() },
-  { id: '2', name: 'Employee Engagement Survey', description: 'Annual employee feedback', status: 'draft', question_count: 25, response_count: 0, updated_at: new Date(Date.now() - 86400000).toISOString() },
-];
 
 export function Survey360SurveysPage() {
   const navigate = useNavigate();
-  const [surveys, setSurveys] = useState(MOCK_SURVEYS);
+  const { currentOrg } = useOrgStore();
+  const [surveys, setSurveys] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newSurvey, setNewSurvey] = useState({ name: '', description: '' });
+  const [creating, setCreating] = useState(false);
 
-  const handleCreateSurvey = () => {
-    if (!newSurvey.name.trim()) { toast.error('Survey name is required'); return; }
-    const survey = { id: Date.now().toString(), ...newSurvey, status: 'draft', question_count: 0, response_count: 0, updated_at: new Date().toISOString() };
-    setSurveys([...surveys, survey]);
-    setCreateDialogOpen(false);
-    setNewSurvey({ name: '', description: '' });
-    toast.success('Survey created');
-    navigate(`/solutions/survey360/app/surveys/${survey.id}/edit`);
+  useEffect(() => {
+    loadSurveys();
+  }, [currentOrg]);
+
+  const loadSurveys = async () => {
+    setLoading(true);
+    try {
+      const response = await survey360Api.get('/surveys');
+      setSurveys(response.data);
+    } catch (error) {
+      console.error('Failed to load surveys:', error);
+      toast.error('Failed to load surveys');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateSurvey = async () => {
+    if (!newSurvey.name.trim()) { 
+      toast.error('Survey name is required'); 
+      return; 
+    }
+    setCreating(true);
+    try {
+      const response = await survey360Api.post('/surveys', {
+        name: newSurvey.name,
+        description: newSurvey.description,
+        questions: []
+      });
+      setSurveys([...surveys, response.data]);
+      setCreateDialogOpen(false);
+      setNewSurvey({ name: '', description: '' });
+      toast.success('Survey created');
+      navigate(`/solutions/survey360/app/surveys/${response.data.id}/edit`);
+    } catch (error) {
+      console.error('Failed to create survey:', error);
+      toast.error('Failed to create survey');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleTogglePublish = async (e, survey) => {
+    e.stopPropagation();
+    try {
+      if (survey.status === 'published') {
+        // Unpublish - update status to draft
+        await survey360Api.put(`/surveys/${survey.id}`, { status: 'draft' });
+        setSurveys(surveys.map(s => s.id === survey.id ? { ...s, status: 'draft' } : s));
+        toast.success('Survey unpublished');
+      } else {
+        // Publish
+        await survey360Api.post(`/surveys/${survey.id}/publish`);
+        setSurveys(surveys.map(s => s.id === survey.id ? { ...s, status: 'published' } : s));
+        toast.success('Survey published');
+      }
+    } catch (error) {
+      console.error('Failed to toggle publish:', error);
+      toast.error('Failed to update survey status');
+    }
+  };
+
+  const handleDuplicate = async (e, survey) => {
+    e.stopPropagation();
+    try {
+      const response = await survey360Api.post(`/surveys/${survey.id}/duplicate`);
+      setSurveys([...surveys, response.data]);
+      toast.success('Survey duplicated');
+    } catch (error) {
+      console.error('Failed to duplicate survey:', error);
+      toast.error('Failed to duplicate survey');
+    }
+  };
+
+  const handleDelete = async (e, survey) => {
+    e.stopPropagation();
+    if (!window.confirm(`Are you sure you want to delete "${survey.name}"?`)) return;
+    try {
+      await survey360Api.delete(`/surveys/${survey.id}`);
+      setSurveys(surveys.filter(s => s.id !== survey.id));
+      toast.success('Survey deleted');
+    } catch (error) {
+      console.error('Failed to delete survey:', error);
+      toast.error('Failed to delete survey');
+    }
+  };
+
+  const copyPublicLink = (e, survey) => {
+    e.stopPropagation();
+    const publicUrl = `${window.location.origin}/s/${survey.id}`;
+    navigator.clipboard.writeText(publicUrl);
+    toast.success('Public link copied to clipboard');
+  };
+
+  const openPublicSurvey = (e, survey) => {
+    e.stopPropagation();
+    window.open(`/s/${survey.id}`, '_blank');
   };
 
   const filteredSurveys = surveys.filter(s => {
