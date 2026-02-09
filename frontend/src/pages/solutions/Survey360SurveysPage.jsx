@@ -426,6 +426,13 @@ export function Survey360SurveysPage() {
           ))}
         </div>
       )}
+      
+      {/* Share Modal */}
+      <ShareModal 
+        survey={selectedSurveyForShare} 
+        open={shareModalOpen} 
+        onOpenChange={setShareModalOpen} 
+      />
     </div>
   );
 }
