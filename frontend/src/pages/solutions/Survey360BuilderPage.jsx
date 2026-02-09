@@ -253,7 +253,11 @@ export function Survey360BuilderPage() {
     name: '',
     description: '',
     status: 'draft',
-    questions: []
+    questions: [],
+    close_date: null,
+    max_responses: null,
+    thank_you_message: null,
+    brand_color: '#14b8a6'
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
