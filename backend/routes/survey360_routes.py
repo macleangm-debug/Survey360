@@ -722,6 +722,13 @@ async def public_submit_response(survey_id: str, data: PublicResponseSubmit):
     if check_survey_closed(survey, response_count):
         raise HTTPException(status_code=400, detail="This survey is no longer accepting responses")
     
+    # Check organization's response limits
+    org_id = survey.get("org_id")
+    if org_id:
+        can_submit, error_msg = await check_usage_limits(db, org_id, 'response')
+        if not can_submit:
+            raise HTTPException(status_code=403, detail="This survey has reached its monthly response limit. Please contact the survey owner.")
+    
     response_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     
