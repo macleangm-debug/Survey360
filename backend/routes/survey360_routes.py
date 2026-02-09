@@ -32,6 +32,49 @@ def check_survey_closed(survey: dict, response_count: int) -> bool:
     
     return False
 
+# Helper function to get current billing period
+def get_billing_period():
+    """Get the current billing period (month start and end)"""
+    now = datetime.now(timezone.utc)
+    period_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    # Get last day of month
+    if now.month == 12:
+        period_end = period_start.replace(year=now.year + 1, month=1) - timedelta(seconds=1)
+    else:
+        period_end = period_start.replace(month=now.month + 1) - timedelta(seconds=1)
+    return period_start, period_end
+
+# Helper function to check usage limits
+async def check_usage_limits(db, org_id: str, check_type: str = 'survey'):
+    """Check if organization has reached their plan limits"""
+    # Get organization's plan (default to free)
+    org = await db.survey360_orgs.find_one({"id": org_id}, {"_id": 0})
+    plan = org.get("plan", "free") if org else "free"
+    limits = PLAN_LIMITS.get(plan, PLAN_LIMITS['free'])
+    
+    if check_type == 'survey':
+        # Check survey count
+        if limits['surveys'] == -1:
+            return True, None  # Unlimited
+        survey_count = await db.survey360_surveys.count_documents({"org_id": org_id})
+        if survey_count >= limits['surveys']:
+            return False, f"Survey limit reached ({limits['surveys']} surveys). Please upgrade your plan."
+    
+    elif check_type == 'response':
+        # Check response count for current month
+        if limits['responses_per_month'] == -1:
+            return True, None  # Unlimited
+        period_start, _ = get_billing_period()
+        response_count = await db.survey360_responses.count_documents({
+            "submitted_at": {"$gte": period_start.isoformat()}
+        })
+        if response_count >= limits['responses_per_month']:
+            return False, f"Monthly response limit reached ({limits['responses_per_month']} responses). Please upgrade your plan."
+    
+    return True, None
+
+from datetime import timedelta
+
 # Models
 class Survey360LoginRequest(BaseModel):
     email: EmailStr
