@@ -1230,6 +1230,11 @@ Endpoints:
 7. **View Responses** - Dashboard and Responses page show real data
 8. **Export CSV** - Downloads properly formatted CSV file
 
+### Survey Distribution Methods (Feb 9, 2026) - NEW
+- **Public Link** - Copy shareable URL
+- **QR Code** - Generate and download PNG QR code
+- **Embed Code** - Copy iframe HTML to embed in websites
+
 ### Public Survey URL Format
 `https://response-collector.preview.emergentagent.com/s/{surveyId}`
 
