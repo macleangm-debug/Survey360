@@ -39,6 +39,7 @@ const NAVIGATION = [
   { id: 'home', label: 'Home', icon: Home, path: '/solutions/survey360/app/dashboard' },
   { id: 'surveys', label: 'Surveys', icon: ClipboardList, path: '/solutions/survey360/app/surveys' },
   { id: 'responses', label: 'Responses', icon: BarChart3, path: '/solutions/survey360/app/responses' },
+  { id: 'billing', label: 'Billing', icon: CreditCard, path: '/solutions/survey360/app/billing' },
   { id: 'settings', label: 'Settings', icon: Settings, path: '/solutions/survey360/app/settings' },
 ];
 
