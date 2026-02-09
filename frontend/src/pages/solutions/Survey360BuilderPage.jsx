@@ -291,20 +291,21 @@ export function Survey360BuilderPage() {
     }
     setSaving(true);
     try {
+      const saveData = {
+        name: survey.name,
+        description: survey.description,
+        questions: survey.questions,
+        status: survey.status,
+        close_date: survey.close_date,
+        max_responses: survey.max_responses,
+        thank_you_message: survey.thank_you_message,
+        brand_color: survey.brand_color
+      };
       if (isEditing) {
-        await survey360Api.put(`/surveys/${id}`, {
-          name: survey.name,
-          description: survey.description,
-          questions: survey.questions,
-          status: survey.status
-        });
+        await survey360Api.put(`/surveys/${id}`, saveData);
         toast.success('Survey saved');
       } else {
-        const response = await survey360Api.post('/surveys', {
-          name: survey.name,
-          description: survey.description,
-          questions: survey.questions
-        });
+        const response = await survey360Api.post('/surveys', saveData);
         toast.success('Survey created');
         navigate(`/solutions/survey360/app/surveys/${response.data.id}/edit`, { replace: true });
       }
