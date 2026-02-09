@@ -299,6 +299,44 @@ async def survey360_create_organization(data: Survey360OrgCreate, user=Depends(g
     
     return Survey360OrgResponse(**org)
 
+# Usage endpoint
+@router.get("/usage", response_model=Survey360UsageResponse)
+async def survey360_get_usage(user=Depends(get_survey360_user)):
+    """Get current usage and limits for the organization"""
+    from server import app
+    db = app.state.db
+    
+    org_id = user.get("org_id")
+    
+    # Get organization's plan
+    org = await db.survey360_orgs.find_one({"id": org_id}, {"_id": 0})
+    plan = org.get("plan", "free") if org else "free"
+    limits = PLAN_LIMITS.get(plan, PLAN_LIMITS['free'])
+    
+    # Count surveys
+    surveys_used = await db.survey360_surveys.count_documents({"org_id": org_id})
+    
+    # Count responses this month
+    period_start, period_end = get_billing_period()
+    
+    # Get all survey IDs for this org
+    survey_ids = [s["id"] async for s in db.survey360_surveys.find({"org_id": org_id}, {"id": 1})]
+    
+    responses_used = await db.survey360_responses.count_documents({
+        "survey_id": {"$in": survey_ids},
+        "submitted_at": {"$gte": period_start.isoformat()}
+    })
+    
+    return Survey360UsageResponse(
+        plan=plan,
+        surveys_used=surveys_used,
+        surveys_limit=limits['surveys'],
+        responses_used=responses_used,
+        responses_limit=limits['responses_per_month'],
+        period_start=period_start.isoformat(),
+        period_end=period_end.isoformat()
+    )
+
 # Survey routes
 @router.get("/surveys", response_model=List[Survey360SurveyResponse])
 async def survey360_list_surveys(org_id: Optional[str] = None, user=Depends(get_survey360_user)):
