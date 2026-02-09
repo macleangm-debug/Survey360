@@ -239,6 +239,7 @@ export function Survey360LandingPage() {
               <a href="#features" className="text-sm text-gray-400 hover:text-teal-400 transition-colors">Features</a>
               <a href="#how-it-works" className="text-sm text-gray-400 hover:text-teal-400 transition-colors">How It Works</a>
               <a href="#industries" className="text-sm text-gray-400 hover:text-teal-400 transition-colors">Industries</a>
+              <Link to="/solutions/survey360/pricing" className="text-sm text-gray-400 hover:text-teal-400 transition-colors">Pricing</Link>
               <a href="#testimonials" className="text-sm text-gray-400 hover:text-teal-400 transition-colors">Testimonials</a>
             </div>
 
