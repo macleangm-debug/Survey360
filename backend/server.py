@@ -1,4 +1,4 @@
-"""DataPulse - Main FastAPI Application"""
+"""DataPulse - Main FastAPI Application with High-Traffic Scalability"""
 from fastapi import FastAPI, APIRouter, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -12,6 +12,11 @@ from pathlib import Path
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Scalability imports
+from utils.cache import cache, CacheConfig
+from utils.background_jobs import init_job_manager, get_job_manager
+from utils.db_optimization import create_indexes, OptimizedQueries, ConnectionPoolMonitor
 
 # MongoDB connection with connection pooling
 mongo_url = os.environ['MONGO_URL']
