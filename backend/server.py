@@ -391,4 +391,11 @@ async def startup_db_client():
 async def shutdown_db_client():
     """Cleanup on shutdown"""
     logger.info("DataPulse API shutting down...")
+    
+    # Close cache connection
+    try:
+        await cache.close()
+    except Exception:
+        pass
+    
     client.close()
