@@ -346,17 +346,36 @@ async def survey360_list_surveys(org_id: Optional[str] = None, user=Depends(get_
     from server import app
     db = app.state.db
     
-    query = {"org_id": org_id or user.get("org_id")}
+    target_org_id = org_id or user.get("org_id")
+    cache_key = f"survey360:surveys_list:{target_org_id}"
+    
+    # Try cache (short TTL since list changes often)
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
+    query = {"org_id": target_org_id}
     surveys = await db.survey360_surveys.find(query, {"_id": 0}).to_list(100)
+    
+    # Batch fetch response counts for efficiency
+    survey_ids = [s["id"] for s in surveys]
+    pipeline = [
+        {"$match": {"survey_id": {"$in": survey_ids}}},
+        {"$group": {"_id": "$survey_id", "count": {"$sum": 1}}}
+    ]
+    counts = {r["_id"]: r["count"] async for r in db.survey360_responses.aggregate(pipeline)}
     
     result = []
     for s in surveys:
-        response_count = await db.survey360_responses.count_documents({"survey_id": s["id"]})
+        response_count = counts.get(s["id"], 0)
         result.append(Survey360SurveyResponse(
             **s,
             question_count=len(s.get("questions", [])),
             response_count=response_count
-        ))
+        ).model_dump())
+    
+    # Cache for 30 seconds
+    await cache.set(cache_key, result, 30)
     return result
 
 @router.get("/surveys/{survey_id}", response_model=Survey360SurveyResponse)
@@ -364,16 +383,27 @@ async def survey360_get_survey(survey_id: str, user=Depends(get_survey360_user))
     from server import app
     db = app.state.db
     
+    cache_key = f"survey360:survey:{survey_id}"
+    
+    # Try cache
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
     survey = await db.survey360_surveys.find_one({"id": survey_id}, {"_id": 0})
     if not survey:
         raise HTTPException(status_code=404, detail="Survey not found")
     
     response_count = await db.survey360_responses.count_documents({"survey_id": survey_id})
-    return Survey360SurveyResponse(
+    result = Survey360SurveyResponse(
         **survey,
         question_count=len(survey.get("questions", [])),
         response_count=response_count
-    )
+    ).model_dump()
+    
+    # Cache for 60 seconds
+    await cache.set(cache_key, result, 60)
+    return result
 
 @router.post("/surveys", response_model=Survey360SurveyResponse)
 async def survey360_create_survey(data: Survey360SurveyCreate, user=Depends(get_survey360_user)):
