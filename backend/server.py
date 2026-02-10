@@ -157,11 +157,23 @@ async def root():
 
 @api_router.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint with cache and job queue status"""
     try:
         # Test database connection
         await db.command("ping")
-        return {"status": "healthy", "database": "connected"}
+        
+        # Get cache status
+        cache_status = "connected" if cache._redis else "memory_fallback"
+        
+        # Get connection pool stats
+        pool_stats = await app.state.pool_monitor.get_pool_stats()
+        
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "cache": cache_status,
+            "connection_pool": pool_stats
+        }
     except Exception as e:
         return {"status": "unhealthy", "database": str(e)}
 
