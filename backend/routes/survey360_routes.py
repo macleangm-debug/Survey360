@@ -992,9 +992,15 @@ async def survey360_create_from_template(template_id: str, user=Depends(get_surv
 
 @router.get("/surveys/{survey_id}/analytics")
 async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_user)):
-    """Get basic analytics for a survey - pie/bar chart data"""
+    """Get basic analytics for a survey - pie/bar chart data (cached)"""
     from server import app
     db = app.state.db
+    
+    # Try cache first
+    cache_key = f"survey360:analytics:{survey_id}"
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
     
     survey = await db.survey360_surveys.find_one({"id": survey_id}, {"_id": 0})
     if not survey:
@@ -1040,9 +1046,14 @@ async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_use
                 "options": question.get("options", [])
             }
     
-    return {
+    result = {
         "survey_id": survey_id,
         "total_responses": len(responses),
         "questions": analytics
     }
+    
+    # Cache analytics for 1 minute (changes with each new response)
+    await cache.set(cache_key, result, CacheConfig.ANALYTICS_TTL)
+    
+    return result
 
