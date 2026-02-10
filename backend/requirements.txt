@@ -179,3 +179,7 @@ xlsxwriter==3.2.9
 yarl==1.22.0
 zipp==3.23.0
 zopfli==0.4.0
+aioredis==2.0.1
+celery==5.6.2
+fakeredis==2.33.0
+redis==7.1.0
