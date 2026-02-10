@@ -512,17 +512,28 @@ export function Survey360SurveysPage() {
     <div className="space-y-6" data-testid="surveys-page">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div><h1 className="text-2xl font-semibold text-white">Surveys</h1><p className="text-gray-400">Create and manage your surveys</p></div>
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogTrigger asChild><Button className="bg-gradient-to-r from-teal-500 to-teal-600 text-white border-0" data-testid="new-survey-btn"><Plus className="w-4 h-4 mr-2" />New Survey</Button></DialogTrigger>
-          <DialogContent className="bg-[#0f1d32] border-white/10">
-            <DialogHeader><DialogTitle className="text-white">Create Survey</DialogTitle><DialogDescription className="text-gray-400">Add a new survey</DialogDescription></DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2"><Label className="text-gray-300">Survey Name</Label><Input value={newSurvey.name} onChange={(e) => setNewSurvey({ ...newSurvey, name: e.target.value })} className="bg-white/5 border-white/10 text-white" placeholder="e.g., Customer Feedback" data-testid="survey-name-input" /></div>
-              <div className="space-y-2"><Label className="text-gray-300">Description</Label><Textarea value={newSurvey.description} onChange={(e) => setNewSurvey({ ...newSurvey, description: e.target.value })} className="bg-white/5 border-white/10 text-white" rows={3} data-testid="survey-desc-input" /></div>
-            </div>
-            <DialogFooter><Button variant="outline" onClick={() => setCreateDialogOpen(false)} className="border-white/10 text-gray-300">Cancel</Button><Button onClick={handleCreateSurvey} disabled={creating} className="bg-teal-500 text-white" data-testid="create-survey-btn">{creating ? 'Creating...' : 'Create'}</Button></DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-3">
+          <Button 
+            variant="outline" 
+            onClick={() => setTemplateLibraryOpen(true)} 
+            className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10"
+            data-testid="templates-btn"
+          >
+            <LayoutTemplate className="w-4 h-4 mr-2" />
+            Start from Template
+          </Button>
+          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+            <DialogTrigger asChild><Button className="bg-gradient-to-r from-teal-500 to-teal-600 text-white border-0" data-testid="new-survey-btn"><Plus className="w-4 h-4 mr-2" />New Survey</Button></DialogTrigger>
+            <DialogContent className="bg-[#0f1d32] border-white/10">
+              <DialogHeader><DialogTitle className="text-white">Create Survey</DialogTitle><DialogDescription className="text-gray-400">Add a new survey</DialogDescription></DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2"><Label className="text-gray-300">Survey Name</Label><Input value={newSurvey.name} onChange={(e) => setNewSurvey({ ...newSurvey, name: e.target.value })} className="bg-white/5 border-white/10 text-white" placeholder="e.g., Customer Feedback" data-testid="survey-name-input" /></div>
+                <div className="space-y-2"><Label className="text-gray-300">Description</Label><Textarea value={newSurvey.description} onChange={(e) => setNewSurvey({ ...newSurvey, description: e.target.value })} className="bg-white/5 border-white/10 text-white" rows={3} data-testid="survey-desc-input" /></div>
+              </div>
+              <DialogFooter><Button variant="outline" onClick={() => setCreateDialogOpen(false)} className="border-white/10 text-gray-300">Cancel</Button><Button onClick={handleCreateSurvey} disabled={creating} className="bg-teal-500 text-white" data-testid="create-survey-btn">{creating ? 'Creating...' : 'Create'}</Button></DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       <div className="flex gap-4">
         <div className="relative flex-1 max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" /><Input placeholder="Search surveys..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 bg-white/5 border-white/10 text-white" data-testid="search-surveys" /></div>
