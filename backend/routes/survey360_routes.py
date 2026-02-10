@@ -755,6 +755,182 @@ async def public_submit_response(survey_id: str, data: PublicResponseSubmit):
 # ANALYTICS ENDPOINT
 # ============================================
 
+# ============================================
+# SURVEY TEMPLATES
+# ============================================
+
+SURVEY_TEMPLATES = [
+    {
+        "id": "customer-satisfaction",
+        "name": "Customer Satisfaction",
+        "description": "Measure customer happiness with your product or service",
+        "category": "feedback",
+        "icon": "smile",
+        "color": "#14b8a6",
+        "questions": [
+            {"id": "q1", "type": "rating", "title": "Overall, how satisfied are you with our product/service?", "required": True, "maxRating": 5},
+            {"id": "q2", "type": "single_choice", "title": "How likely are you to recommend us to a friend or colleague?", "required": True, "options": ["Very Unlikely", "Unlikely", "Neutral", "Likely", "Very Likely"]},
+            {"id": "q3", "type": "single_choice", "title": "How would you rate the quality of our product/service?", "required": True, "options": ["Poor", "Fair", "Good", "Very Good", "Excellent"]},
+            {"id": "q4", "type": "single_choice", "title": "How would you rate our customer support?", "required": False, "options": ["Poor", "Fair", "Good", "Very Good", "Excellent"]},
+            {"id": "q5", "type": "multiple_choice", "title": "What do you like most about our product/service?", "required": False, "options": ["Quality", "Price", "Customer Service", "Ease of Use", "Features", "Reliability"]},
+            {"id": "q6", "type": "long_text", "title": "What could we do to improve your experience?", "required": False},
+            {"id": "q7", "type": "short_text", "title": "Any additional comments or suggestions?", "required": False}
+        ]
+    },
+    {
+        "id": "employee-feedback",
+        "name": "Employee Feedback",
+        "description": "Gather insights from your team about workplace satisfaction",
+        "category": "hr",
+        "icon": "users",
+        "color": "#8b5cf6",
+        "questions": [
+            {"id": "q1", "type": "dropdown", "title": "Which department do you work in?", "required": True, "options": ["Engineering", "Marketing", "Sales", "HR", "Finance", "Operations", "Other"]},
+            {"id": "q2", "type": "rating", "title": "How satisfied are you with your job overall?", "required": True, "maxRating": 5},
+            {"id": "q3", "type": "single_choice", "title": "Do you feel valued at work?", "required": True, "options": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]},
+            {"id": "q4", "type": "single_choice", "title": "How would you rate the work-life balance?", "required": True, "options": ["Very Poor", "Poor", "Average", "Good", "Excellent"]},
+            {"id": "q5", "type": "single_choice", "title": "Do you have the resources needed to do your job effectively?", "required": True, "options": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]},
+            {"id": "q6", "type": "multiple_choice", "title": "What benefits matter most to you?",  "required": False, "options": ["Health Insurance", "Flexible Hours", "Remote Work", "Professional Development", "Retirement Plans", "Paid Time Off"]},
+            {"id": "q7", "type": "single_choice", "title": "How likely are you to recommend this company as a place to work?", "required": True, "options": ["Very Unlikely", "Unlikely", "Neutral", "Likely", "Very Likely"]},
+            {"id": "q8", "type": "long_text", "title": "What suggestions do you have to improve the workplace?", "required": False}
+        ]
+    },
+    {
+        "id": "event-registration",
+        "name": "Event Registration",
+        "description": "Collect attendee information for your upcoming event",
+        "category": "events",
+        "icon": "calendar",
+        "color": "#f59e0b",
+        "questions": [
+            {"id": "q1", "type": "short_text", "title": "Full Name", "required": True},
+            {"id": "q2", "type": "email", "title": "Email Address", "required": True},
+            {"id": "q3", "type": "phone", "title": "Phone Number", "required": False},
+            {"id": "q4", "type": "short_text", "title": "Company/Organization", "required": False},
+            {"id": "q5", "type": "short_text", "title": "Job Title", "required": False},
+            {"id": "q6", "type": "single_choice", "title": "How did you hear about this event?", "required": True, "options": ["Email", "Social Media", "Website", "Word of Mouth", "Advertisement", "Other"]},
+            {"id": "q7", "type": "single_choice", "title": "Will you be attending in person or virtually?", "required": True, "options": ["In Person", "Virtual"]},
+            {"id": "q8", "type": "multiple_choice", "title": "Which sessions are you interested in?", "required": False, "options": ["Keynote Speech", "Workshop A", "Workshop B", "Networking Session", "Panel Discussion", "All Sessions"]},
+            {"id": "q9", "type": "single_choice", "title": "Do you have any dietary restrictions?", "required": False, "options": ["None", "Vegetarian", "Vegan", "Gluten-Free", "Halal", "Kosher", "Other"]},
+            {"id": "q10", "type": "long_text", "title": "Any special accommodations or questions?", "required": False}
+        ]
+    },
+    {
+        "id": "product-feedback",
+        "name": "Product Feedback",
+        "description": "Get user feedback on your product features and usability",
+        "category": "feedback",
+        "icon": "package",
+        "color": "#3b82f6",
+        "questions": [
+            {"id": "q1", "type": "single_choice", "title": "How long have you been using our product?", "required": True, "options": ["Less than 1 month", "1-6 months", "6-12 months", "1-2 years", "More than 2 years"]},
+            {"id": "q2", "type": "rating", "title": "How easy is our product to use?", "required": True, "maxRating": 5},
+            {"id": "q3", "type": "multiple_choice", "title": "Which features do you use most frequently?", "required": True, "options": ["Feature A", "Feature B", "Feature C", "Feature D", "Feature E"]},
+            {"id": "q4", "type": "single_choice", "title": "How well does our product meet your needs?", "required": True, "options": ["Not at all", "Slightly", "Moderately", "Very Well", "Completely"]},
+            {"id": "q5", "type": "rating", "title": "How would you rate the product's performance?", "required": True, "maxRating": 5},
+            {"id": "q6", "type": "long_text", "title": "What features would you like to see added?", "required": False},
+            {"id": "q7", "type": "long_text", "title": "What problems have you encountered while using the product?", "required": False}
+        ]
+    },
+    {
+        "id": "market-research",
+        "name": "Market Research",
+        "description": "Understand your target audience and market trends",
+        "category": "research",
+        "icon": "trending-up",
+        "color": "#ec4899",
+        "questions": [
+            {"id": "q1", "type": "single_choice", "title": "What is your age range?", "required": True, "options": ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"]},
+            {"id": "q2", "type": "single_choice", "title": "What is your gender?", "required": False, "options": ["Male", "Female", "Non-binary", "Prefer not to say"]},
+            {"id": "q3", "type": "dropdown", "title": "What is your household income?", "required": False, "options": ["Under $25,000", "$25,000-$50,000", "$50,000-$75,000", "$75,000-$100,000", "$100,000-$150,000", "Over $150,000", "Prefer not to say"]},
+            {"id": "q4", "type": "single_choice", "title": "How often do you purchase products in this category?", "required": True, "options": ["Never", "Rarely", "Sometimes", "Often", "Very Often"]},
+            {"id": "q5", "type": "multiple_choice", "title": "What factors influence your purchasing decisions?", "required": True, "options": ["Price", "Quality", "Brand", "Reviews", "Recommendations", "Convenience"]},
+            {"id": "q6", "type": "single_choice", "title": "Where do you typically shop for these products?", "required": True, "options": ["Online Only", "In-Store Only", "Both Online and In-Store"]},
+            {"id": "q7", "type": "rating", "title": "How important is brand reputation to you?", "required": True, "maxRating": 5},
+            {"id": "q8", "type": "long_text", "title": "What would make you switch to a different brand?", "required": False}
+        ]
+    },
+    {
+        "id": "website-feedback",
+        "name": "Website Feedback",
+        "description": "Improve your website based on user experience feedback",
+        "category": "feedback",
+        "icon": "globe",
+        "color": "#06b6d4",
+        "questions": [
+            {"id": "q1", "type": "single_choice", "title": "What was the purpose of your visit today?", "required": True, "options": ["Browse Products", "Make a Purchase", "Get Information", "Contact Support", "Other"]},
+            {"id": "q2", "type": "single_choice", "title": "Did you find what you were looking for?", "required": True, "options": ["Yes, easily", "Yes, with some difficulty", "No"]},
+            {"id": "q3", "type": "rating", "title": "How would you rate the overall design of our website?", "required": True, "maxRating": 5},
+            {"id": "q4", "type": "rating", "title": "How easy was it to navigate our website?", "required": True, "maxRating": 5},
+            {"id": "q5", "type": "single_choice", "title": "How fast did our website load?", "required": True, "options": ["Very Slow", "Slow", "Average", "Fast", "Very Fast"]},
+            {"id": "q6", "type": "multiple_choice", "title": "What improvements would you suggest?", "required": False, "options": ["Better Navigation", "Faster Loading", "More Information", "Better Design", "Mobile Optimization", "Search Function"]},
+            {"id": "q7", "type": "long_text", "title": "Any other feedback about your website experience?", "required": False}
+        ]
+    }
+]
+
+@router.get("/templates")
+async def survey360_get_templates(category: Optional[str] = None):
+    """Get available survey templates"""
+    templates = SURVEY_TEMPLATES
+    if category:
+        templates = [t for t in templates if t["category"] == category]
+    return templates
+
+@router.get("/templates/{template_id}")
+async def survey360_get_template(template_id: str):
+    """Get a specific survey template"""
+    for template in SURVEY_TEMPLATES:
+        if template["id"] == template_id:
+            return template
+    raise HTTPException(status_code=404, detail="Template not found")
+
+@router.post("/templates/{template_id}/create", response_model=Survey360SurveyResponse)
+async def survey360_create_from_template(template_id: str, user=Depends(get_survey360_user)):
+    """Create a new survey from a template"""
+    from server import app
+    db = app.state.db
+    
+    # Find the template
+    template = None
+    for t in SURVEY_TEMPLATES:
+        if t["id"] == template_id:
+            template = t
+            break
+    
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+    
+    # Check survey limits
+    org_id = user.get("org_id")
+    can_create, error_msg = await check_usage_limits(db, org_id, 'survey')
+    if not can_create:
+        raise HTTPException(status_code=403, detail=error_msg)
+    
+    survey_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Create survey from template
+    survey = {
+        "id": survey_id,
+        "name": template["name"],
+        "description": template["description"],
+        "status": "draft",
+        "org_id": org_id,
+        "questions": template["questions"],
+        "brand_color": template.get("color"),
+        "created_at": now,
+        "updated_at": now
+    }
+    await db.survey360_surveys.insert_one(survey)
+    
+    return Survey360SurveyResponse(
+        **survey,
+        question_count=len(template["questions"]),
+        response_count=0,
+        is_closed=False
+    )
+
 @router.get("/surveys/{survey_id}/analytics")
 async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_user)):
     """Get basic analytics for a survey - pie/bar chart data"""
