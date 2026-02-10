@@ -634,6 +634,13 @@ export function Survey360SurveysPage() {
         open={shareModalOpen} 
         onOpenChange={setShareModalOpen} 
       />
+
+      {/* Template Library Modal */}
+      <TemplateLibrary
+        open={templateLibraryOpen}
+        onOpenChange={setTemplateLibraryOpen}
+        onSelectTemplate={handleTemplateSelect}
+      />
     </div>
   );
 }
