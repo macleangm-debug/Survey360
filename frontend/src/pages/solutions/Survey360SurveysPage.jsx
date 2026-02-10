@@ -410,6 +410,11 @@ export function Survey360SurveysPage() {
     }
   };
 
+  const handleTemplateSelect = (survey) => {
+    setSurveys([...surveys, survey]);
+    navigate(`/solutions/survey360/app/surveys/${survey.id}/edit`);
+  };
+
   const handleCreateSurvey = async () => {
     if (!newSurvey.name.trim()) { 
       toast.error('Survey name is required'); 
