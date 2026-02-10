@@ -477,6 +477,10 @@ async def survey360_update_survey(survey_id: str, data: Survey360SurveyUpdate, u
     
     await db.survey360_surveys.update_one({"id": survey_id}, {"$set": update_data})
     
+    # Invalidate caches
+    await invalidate_survey_cache(survey_id)
+    await cache.delete(f"survey360:surveys_list:{survey.get('org_id')}")
+    
     updated = await db.survey360_surveys.find_one({"id": survey_id}, {"_id": 0})
     response_count = await db.survey360_responses.count_documents({"survey_id": survey_id})
     
