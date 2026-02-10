@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Plus, Search, MoreVertical, Play, Pause, Copy, Trash2, Edit3, BarChart3, ExternalLink, Link2, Share2, QrCode, Code, Download, Check } from 'lucide-react';
+import { ClipboardList, Plus, Search, MoreVertical, Play, Pause, Copy, Trash2, Edit3, BarChart3, ExternalLink, Link2, Share2, QrCode, Code, Download, Check, LayoutTemplate, Smile, Users, Calendar, Package, TrendingUp, Globe, Sparkles, ArrowRight, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
