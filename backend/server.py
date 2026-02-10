@@ -200,8 +200,42 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_db_client():
-    """Initialize database indexes on startup"""
-    logger.info("DataPulse API starting up...")
+    """Initialize database indexes, cache, and job queue on startup"""
+    logger.info("DataPulse API starting up with scalability features...")
+    
+    # Initialize Redis cache
+    try:
+        await cache.connect()
+        logger.info("Cache layer initialized")
+    except Exception as e:
+        logger.warning(f"Cache initialization failed (using memory fallback): {e}")
+    
+    # Initialize job manager
+    try:
+        job_mgr = init_job_manager(db)
+        app.state.job_manager = job_mgr
+        logger.info("Background job manager initialized")
+    except Exception as e:
+        logger.warning(f"Job manager initialization failed: {e}")
+    
+    # Create Survey360 optimized indexes
+    try:
+        from utils.db_optimization import SURVEY360_INDEXES
+        for idx_config in SURVEY360_INDEXES:
+            collection = db[idx_config["collection"]]
+            for idx in idx_config["indexes"]:
+                try:
+                    await collection.create_index(
+                        idx["keys"],
+                        name=idx.get("name"),
+                        unique=idx.get("unique", False),
+                        background=True
+                    )
+                except Exception:
+                    pass  # Index may already exist
+        logger.info("Survey360 indexes created")
+    except Exception as e:
+        logger.warning(f"Survey360 index creation warning: {e}")
     
     # Create indexes for better query performance
     try:
