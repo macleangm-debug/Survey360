@@ -391,6 +391,7 @@ export function Survey360SurveysPage() {
   const [creating, setCreating] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [selectedSurveyForShare, setSelectedSurveyForShare] = useState(null);
+  const [templateLibraryOpen, setTemplateLibraryOpen] = useState(false);
 
   useEffect(() => {
     loadSurveys();
