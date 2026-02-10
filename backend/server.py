@@ -38,6 +38,8 @@ app = FastAPI(
 
 # Store db in app state for route access
 app.state.db = db
+app.state.optimized_queries = OptimizedQueries(db)
+app.state.pool_monitor = ConnectionPoolMonitor(client)
 
 # Setup rate limiting
 from utils.rate_limiter import limiter, rate_limit_exceeded_handler
