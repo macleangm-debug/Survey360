@@ -436,6 +436,9 @@ async def survey360_create_survey(data: Survey360SurveyCreate, user=Depends(get_
     }
     await db.survey360_surveys.insert_one(survey)
     
+    # Invalidate user's survey list cache
+    await cache.delete(f"survey360:surveys_list:{org_id}")
+    
     return Survey360SurveyResponse(
         **survey,
         question_count=len(data.questions),
