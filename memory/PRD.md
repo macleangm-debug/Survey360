@@ -79,3 +79,26 @@ Added a template library with 6 pre-built survey templates to help users get sta
 - [ ] Add template preview feature
 - [ ] Add favorites/starred templates
 - [ ] Add custom template creation from existing surveys
+
+---
+
+## Survey360 Landing Page Redesign (Feb 10, 2026) - COMPLETE
+
+### Changes Made to Match FieldForce Layout:
+- Navigation: Pill-style nav buttons with Demo button
+- Hero: Centered layout with logo, floating icons, stats row  
+- How It Works: 4-step cards with mini UI mockups
+- Features: 4x2 grid with colored icon circles
+- Use Cases: 6 industry cards with example tags
+- Pricing: 3-tier section (Free/Pro/$99)
+- CTA: Clean bottom call-to-action
+
+### Files Modified:
+- `/app/frontend/src/pages/solutions/Survey360LandingPage.jsx` - Complete rewrite
+
+### Design Elements:
+- Dark theme (#0a1628)
+- Teal accent (#14b8a6)
+- Floating animated icons
+- Card-based layouts
+- Section badges
