@@ -17,6 +17,190 @@ import { useOrgStore } from '../../store';
 import survey360Api from '../../lib/survey360Api';
 import { toast } from 'sonner';
 
+// Template icons mapping
+const templateIcons = {
+  smile: Smile,
+  users: Users,
+  calendar: Calendar,
+  package: Package,
+  'trending-up': TrendingUp,
+  globe: Globe
+};
+
+// Template Library Component
+function TemplateLibrary({ open, onOpenChange, onSelectTemplate }) {
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [creating, setCreating] = useState(null);
+
+  useEffect(() => {
+    if (open) {
+      loadTemplates();
+    }
+  }, [open]);
+
+  const loadTemplates = async () => {
+    setLoading(true);
+    try {
+      const response = await survey360Api.get('/templates');
+      setTemplates(response.data);
+    } catch (error) {
+      console.error('Failed to load templates:', error);
+      toast.error('Failed to load templates');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateFromTemplate = async (templateId) => {
+    setCreating(templateId);
+    try {
+      const response = await survey360Api.post(`/templates/${templateId}/create`);
+      toast.success('Survey created from template!');
+      onSelectTemplate(response.data);
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Failed to create from template:', error);
+      toast.error(error.response?.data?.detail || 'Failed to create survey');
+    } finally {
+      setCreating(null);
+    }
+  };
+
+  const categories = [
+    { id: 'all', name: 'All Templates' },
+    { id: 'feedback', name: 'Feedback' },
+    { id: 'hr', name: 'HR & Team' },
+    { id: 'events', name: 'Events' },
+    { id: 'research', name: 'Research' }
+  ];
+
+  const filteredTemplates = selectedCategory === 'all' 
+    ? templates 
+    : templates.filter(t => t.category === selectedCategory);
+
+  if (!open) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#0a1628] border-white/10 max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="text-white flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-teal-400" />
+            Quick-Start Templates
+          </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Choose a template to get started quickly with pre-built questions
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Category Filter */}
+        <div className="flex gap-2 flex-wrap py-2">
+          {categories.map(cat => (
+            <Button
+              key={cat.id}
+              variant={selectedCategory === cat.id ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory(cat.id)}
+              className={selectedCategory === cat.id 
+                ? 'bg-teal-500 text-white border-0' 
+                : 'border-white/10 text-gray-400 hover:text-white hover:bg-white/5'
+              }
+            >
+              {cat.name}
+            </Button>
+          ))}
+        </div>
+
+        {/* Templates Grid */}
+        <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+              {Array(4).fill(0).map((_, i) => (
+                <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-5 animate-pulse">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-white/10" />
+                    <div className="flex-1">
+                      <div className="h-5 bg-white/10 rounded w-3/4 mb-2" />
+                      <div className="h-4 bg-white/10 rounded w-full" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredTemplates.length === 0 ? (
+            <div className="text-center py-12">
+              <LayoutTemplate className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-400">No templates found in this category</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+              {filteredTemplates.map(template => {
+                const IconComponent = templateIcons[template.icon] || ClipboardList;
+                return (
+                  <div 
+                    key={template.id}
+                    className="group bg-white/5 border border-white/10 rounded-xl p-5 hover:border-teal-500/50 transition-all cursor-pointer"
+                    onClick={() => handleCreateFromTemplate(template.id)}
+                    data-testid={`template-${template.id}`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div 
+                        className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${template.color}20` }}
+                      >
+                        <IconComponent className="w-6 h-6" style={{ color: template.color }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-semibold group-hover:text-teal-400 transition-colors">
+                          {template.name}
+                        </h3>
+                        <p className="text-gray-400 text-sm mt-1 line-clamp-2">
+                          {template.description}
+                        </p>
+                        <div className="flex items-center gap-3 mt-3">
+                          <span className="text-xs text-gray-500">
+                            {template.questions.length} questions
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-400 capitalize">
+                            {template.category}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="shrink-0">
+                        {creating === template.id ? (
+                          <div className="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center">
+                            <div className="w-4 h-4 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-white/5 group-hover:bg-teal-500 flex items-center justify-center transition-colors">
+                            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="border-t border-white/10 pt-4">
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            className="border-white/10 text-gray-300 hover:bg-white/5"
+          >
+            Cancel
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // Share Modal Component
 function ShareModal({ survey, open, onOpenChange }) {
   const [copied, setCopied] = useState(null);
