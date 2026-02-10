@@ -874,10 +874,20 @@ SURVEY_TEMPLATES = [
 
 @router.get("/templates")
 async def survey360_get_templates(category: Optional[str] = None):
-    """Get available survey templates"""
+    """Get available survey templates (cached)"""
+    cache_key = f"survey360:templates:{category or 'all'}"
+    
+    # Try cache first
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
     templates = SURVEY_TEMPLATES
     if category:
         templates = [t for t in templates if t["category"] == category]
+    
+    # Cache for 1 hour (templates rarely change)
+    await cache.set(cache_key, templates, CacheConfig.TEMPLATE_TTL)
     return templates
 
 @router.get("/templates/{template_id}")
