@@ -499,9 +499,18 @@ async def survey360_delete_survey(survey_id: str, user=Depends(get_survey360_use
     from server import app
     db = app.state.db
     
+    # Get org_id before delete for cache invalidation
+    survey = await db.survey360_surveys.find_one({"id": survey_id}, {"org_id": 1})
+    
     result = await db.survey360_surveys.delete_one({"id": survey_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Survey not found")
+    
+    # Invalidate caches
+    await invalidate_survey_cache(survey_id)
+    if survey:
+        await cache.delete(f"survey360:surveys_list:{survey.get('org_id')}")
+    
     return {"message": "Survey deleted"}
 
 @router.post("/surveys/{survey_id}/logo")
