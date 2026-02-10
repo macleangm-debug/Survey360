@@ -1057,3 +1057,169 @@ async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_use
     
     return result
 
+
+
+# ============================================
+# BACKGROUND JOBS API
+# ============================================
+
+class JobCreateRequest(BaseModel):
+    task_name: str
+    params: dict = {}
+    priority: str = "normal"
+    description: Optional[str] = None
+
+@router.post("/jobs")
+async def survey360_create_job(data: JobCreateRequest, user=Depends(get_survey360_user)):
+    """Create a background job for heavy operations"""
+    from server import app
+    from utils.background_jobs import get_job_manager, JobPriority
+    
+    job_manager = get_job_manager()
+    job_manager.db = app.state.db
+    
+    priority_map = {
+        "low": JobPriority.LOW,
+        "normal": JobPriority.NORMAL,
+        "high": JobPriority.HIGH,
+        "critical": JobPriority.CRITICAL
+    }
+    
+    job_id = await job_manager.create_job(
+        task_name=data.task_name,
+        params=data.params,
+        priority=priority_map.get(data.priority, JobPriority.NORMAL),
+        user_id=user.get("id"),
+        org_id=user.get("org_id"),
+        description=data.description
+    )
+    
+    return {"job_id": job_id, "status": "pending"}
+
+@router.get("/jobs")
+async def survey360_list_jobs(status: Optional[str] = None, user=Depends(get_survey360_user)):
+    """List user's background jobs"""
+    from utils.background_jobs import get_job_manager, JobStatus
+    
+    job_manager = get_job_manager()
+    
+    status_enum = None
+    if status:
+        try:
+            status_enum = JobStatus(status)
+        except ValueError:
+            pass
+    
+    jobs = await job_manager.get_user_jobs(
+        user_id=user.get("id"),
+        org_id=user.get("org_id"),
+        status=status_enum
+    )
+    
+    return {"jobs": jobs}
+
+@router.get("/jobs/{job_id}")
+async def survey360_get_job(job_id: str, user=Depends(get_survey360_user)):
+    """Get job status and progress"""
+    from utils.background_jobs import get_job_manager
+    
+    job_manager = get_job_manager()
+    job = await job_manager.get_job(job_id)
+    
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    return job
+
+@router.post("/jobs/{job_id}/cancel")
+async def survey360_cancel_job(job_id: str, user=Depends(get_survey360_user)):
+    """Cancel a pending or running job"""
+    from utils.background_jobs import get_job_manager
+    
+    job_manager = get_job_manager()
+    success = await job_manager.cancel_job(job_id)
+    
+    if not success:
+        raise HTTPException(status_code=400, detail="Cannot cancel job")
+    
+    return {"message": "Job cancelled"}
+
+@router.post("/surveys/{survey_id}/export-async")
+async def survey360_export_async(survey_id: str, format: str = "csv", user=Depends(get_survey360_user)):
+    """Start async export job for large response sets"""
+    from server import app
+    from utils.background_jobs import get_job_manager, JobPriority
+    
+    job_manager = get_job_manager()
+    job_manager.db = app.state.db
+    
+    job_id = await job_manager.create_job(
+        task_name="export_responses",
+        params={"survey_id": survey_id, "format": format},
+        priority=JobPriority.NORMAL,
+        user_id=user.get("id"),
+        org_id=user.get("org_id"),
+        description=f"Export responses for survey {survey_id}"
+    )
+    
+    return {"job_id": job_id, "message": "Export job started"}
+
+@router.post("/surveys/{survey_id}/analytics-async")
+async def survey360_analytics_async(survey_id: str, user=Depends(get_survey360_user)):
+    """Start async analytics generation for large surveys"""
+    from server import app
+    from utils.background_jobs import get_job_manager, JobPriority
+    
+    job_manager = get_job_manager()
+    job_manager.db = app.state.db
+    
+    job_id = await job_manager.create_job(
+        task_name="generate_analytics",
+        params={"survey_id": survey_id},
+        priority=JobPriority.HIGH,
+        user_id=user.get("id"),
+        org_id=user.get("org_id"),
+        description=f"Generate analytics for survey {survey_id}"
+    )
+    
+    return {"job_id": job_id, "message": "Analytics job started"}
+
+
+# ============================================
+# CACHE MANAGEMENT API
+# ============================================
+
+@router.get("/cache/stats")
+async def survey360_cache_stats(user=Depends(get_survey360_user)):
+    """Get cache statistics (admin only)"""
+    from utils.cache import cache, _memory_cache
+    
+    if cache._redis:
+        try:
+            info = await cache._redis.info("memory")
+            return {
+                "type": "redis",
+                "used_memory": info.get("used_memory_human"),
+                "connected_clients": info.get("connected_clients", 0),
+                "status": "connected"
+            }
+        except Exception as e:
+            return {"type": "redis", "status": "error", "error": str(e)}
+    else:
+        return {
+            "type": "memory",
+            "entries": len(_memory_cache),
+            "status": "active"
+        }
+
+@router.post("/cache/clear/{pattern}")
+async def survey360_clear_cache(pattern: str, user=Depends(get_survey360_user)):
+    """Clear cache entries matching pattern (admin only)"""
+    from utils.cache import cache
+    
+    # Only allow clearing survey360 related cache
+    if not pattern.startswith("survey360:"):
+        pattern = f"survey360:{pattern}"
+    
+    count = await cache.delete_pattern(f"{pattern}*")
+    return {"cleared": count, "pattern": pattern}
