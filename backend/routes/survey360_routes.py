@@ -1,13 +1,16 @@
-"""Survey360 - API Routes for the Survey360 Product"""
+"""Survey360 - API Routes for the Survey360 Product with High-Traffic Caching"""
 from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile, File
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import uuid
 import hashlib
 import jwt
 import os
 import base64
+
+# Import caching utilities
+from utils.cache import cache, CacheConfig, invalidate_survey_cache, invalidate_user_cache
 
 router = APIRouter(prefix="/survey360", tags=["Survey360"])
 
