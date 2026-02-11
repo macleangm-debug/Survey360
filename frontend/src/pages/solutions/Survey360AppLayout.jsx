@@ -174,33 +174,33 @@ export function Survey360AppLayout({ children }) {
           )}
 
           {/* User Profile */}
-          <div className="p-4 border-t border-white/5">
+          <div className={`p-4 border-t ${borderColor}`}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-full flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors">
+                <button className={`w-full flex items-center gap-3 px-2 py-2 rounded-lg ${hoverBg} transition-colors`}>
                   <Avatar className="w-9 h-9">
                     <AvatarImage src={user?.avatar} />
-                    <AvatarFallback className="bg-teal-500/20 text-teal-400">
+                    <AvatarFallback className="bg-teal-500/20 text-teal-500">
                       {user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-left min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    <p className={`text-sm font-medium ${textPrimary} truncate`}>{user?.name}</p>
+                    <p className={`text-xs ${textMuted} truncate`}>{user?.email}</p>
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 bg-[#0f1d32] border-white/10">
+              <DropdownMenuContent align="start" className={`w-56 ${bgSecondary} ${borderColor}`}>
                 <DropdownMenuItem 
                   onClick={() => navigate('/solutions/survey360/app/settings')}
-                  className="text-gray-300 hover:text-white hover:bg-white/10"
+                  className={`${textSecondary} hover:text-teal-500 ${hoverBg}`}
                 >
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={toggleTheme}
-                  className="text-gray-300 hover:text-white hover:bg-white/10"
+                  className={`${textSecondary} hover:text-teal-500 ${hoverBg}`}
                 >
                   {theme === 'dark' ? (
                     <Sun className="w-4 h-4 mr-2" />
@@ -209,8 +209,8 @@ export function Survey360AppLayout({ children }) {
                   )}
                   {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:text-red-300 hover:bg-white/10">
+                <DropdownMenuSeparator className={borderColor} />
+                <DropdownMenuItem onClick={handleLogout} className={`text-red-500 hover:text-red-400 ${hoverBg}`}>
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign out
                 </DropdownMenuItem>
@@ -222,11 +222,11 @@ export function Survey360AppLayout({ children }) {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top Header */}
-          <header className="h-14 bg-[#0f1d32] border-b border-white/5 flex items-center px-4 lg:px-6 gap-4">
+          <header className={`h-14 ${bgSecondary} border-b ${borderColor} flex items-center px-4 lg:px-6 gap-4 transition-colors duration-300`}>
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-lg hover:bg-white/5 text-gray-400"
+              className={`lg:hidden p-2 rounded-lg ${hoverBg} ${textSecondary}`}
             >
               <Menu className="w-5 h-5" />
             </button>
