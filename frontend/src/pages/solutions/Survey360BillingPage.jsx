@@ -30,6 +30,7 @@ import {
   DialogTitle,
 } from '../../components/ui/dialog';
 import survey360Api from '../../lib/survey360Api';
+import { useUIStore } from '../../store';
 import { toast } from 'sonner';
 
 const PLANS = [
