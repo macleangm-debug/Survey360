@@ -71,13 +71,25 @@ export function Survey360AppLayout({ children }) {
     return null;
   }
 
+  // Theme classes
+  const isDark = theme === 'dark';
+  const bgPrimary = isDark ? 'bg-[#0a1628]' : 'bg-gray-50';
+  const bgSecondary = isDark ? 'bg-[#0f1d32]' : 'bg-white';
+  const borderColor = isDark ? 'border-white/5' : 'border-gray-200';
+  const textPrimary = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
+  const textMuted = isDark ? 'text-gray-500' : 'text-gray-400';
+  const hoverBg = isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100';
+  const activeBg = isDark ? 'bg-teal-500/10' : 'bg-teal-50';
+  const inputBg = isDark ? 'bg-white/5' : 'bg-gray-100';
+
   return (
     <TooltipProvider>
-      <div className="flex h-screen bg-[#0a1628]">
+      <div className={`flex h-screen ${bgPrimary} transition-colors duration-300`}>
         {/* Sidebar */}
-        <aside className="hidden lg:flex flex-col w-64 bg-[#0f1d32] border-r border-white/5">
+        <aside className={`hidden lg:flex flex-col w-64 ${bgSecondary} border-r ${borderColor} transition-colors duration-300`}>
           {/* Logo */}
-          <div className="h-16 flex items-center px-6 border-b border-white/5">
+          <div className={`h-16 flex items-center px-6 border-b ${borderColor}`}>
             <Link to="/solutions/survey360" className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
                 <ClipboardList className="w-5 h-5 text-white" />
