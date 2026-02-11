@@ -224,3 +224,31 @@ Added a template library with 6 pre-built survey templates to help users get sta
 - AWS ElastiCache Multi-AZ
 - Redis Cluster mode
 - External Sentinel deployment
+
+---
+
+## Survey360 Demo & Sandbox Pages (Feb 11, 2026) - COMPLETE
+
+### Pages Added:
+1. **Demo Page** (`/solutions/survey360/demo`)
+   - Hero section with "Experience Survey360 Before You Sign Up"
+   - Stats: 6 tabs, 3 surveys, 2,847 responses, 47 users
+   - Feature cards grid
+   - Dashboard preview in browser frame
+
+2. **Interactive Sandbox** (`/solutions/survey360/demo/sandbox`)
+   - Full dashboard simulation
+   - 6 tabs: Dashboard, Surveys, Responses, Analytics, Team, Settings
+   - Browser frame with Live Demo badge
+   - Sample data: 3 surveys, recent activity feed
+   - Demo Mode card with CTA
+
+### Files Created:
+- `/app/frontend/src/pages/solutions/Survey360DemoPage.jsx`
+- `/app/frontend/src/pages/solutions/Survey360DemoSandbox.jsx`
+
+### Routes Added:
+- `/solutions/survey360/demo`
+- `/solutions/survey360/demo/sandbox`
+
+### Test Results: 100% (19/19 frontend tests)
