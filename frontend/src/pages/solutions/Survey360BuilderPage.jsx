@@ -326,6 +326,8 @@ const QuestionCard = ({ question, index, onUpdate, onDelete, onDuplicate, isExpa
 export function Survey360BuilderPage() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { theme } = useUIStore();
+  const isDark = theme === 'dark';
   const isEditing = !!id && id !== 'new';
   const logoInputRef = useRef(null);
   
