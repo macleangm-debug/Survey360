@@ -78,6 +78,8 @@ const PLANS = [
 ];
 
 export function Survey360BillingPage() {
+  const { theme } = useUIStore();
+  const isDark = theme === 'dark';
   const [usage, setUsage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false);
