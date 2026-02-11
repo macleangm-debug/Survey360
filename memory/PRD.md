@@ -188,3 +188,39 @@ Added a template library with 6 pre-built survey templates to help users get sta
 - [ ] Redis Sentinel for HA
 - [ ] Celery Flower monitoring
 - [ ] Auto-scaling workers
+
+---
+
+## Redis Persistence & HA Monitoring (Feb 11, 2026) - COMPLETE
+
+### Redis Persistence Configuration
+- **RDB Snapshots**: 
+  - save 900 1 (15 min if 1+ changes)
+  - save 300 10 (5 min if 10+ changes)
+  - save 60 10000 (1 min if 10K+ changes)
+- **AOF**: appendfsync everysec, auto-rewrite at 100%/64mb
+- **Auth**: requirepass survey360_redis_secret_2026
+
+### Celery Flower Dashboard
+- Port: 5555
+- Auth: admin:survey360flower2026
+- Persistent: /var/lib/redis/flower.db
+
+### Redis HA Monitoring API
+- GET /api/redis-ha/health
+- GET /api/redis-ha/replication
+- GET /api/redis-ha/slowlog
+- POST /api/redis-ha/force-persist
+- GET /api/redis-ha/metrics
+
+### Files Created
+- /app/backend/config/redis.conf
+- /app/backend/utils/redis_ha.py
+- /etc/supervisor/conf.d/survey360_workers.conf (updated)
+
+### Test Results: 100% (9/9 tests passed)
+
+### Production HA Options
+- AWS ElastiCache Multi-AZ
+- Redis Cluster mode
+- External Sentinel deployment
