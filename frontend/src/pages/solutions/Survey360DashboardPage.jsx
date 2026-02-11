@@ -56,6 +56,8 @@ const StatCard = ({ title, value, icon: Icon, description, onClick, isDark }) =>
 export function Survey360DashboardPage() {
   const navigate = useNavigate();
   const { currentOrg, setCurrentOrg, setOrganizations } = useOrgStore();
+  const { theme } = useUIStore();
+  const isDark = theme === 'dark';
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total_surveys: 0, total_responses: 0, active_surveys: 0, response_rate: 0 });
   const [activity, setActivity] = useState([]);
