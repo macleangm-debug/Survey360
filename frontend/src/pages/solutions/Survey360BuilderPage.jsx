@@ -65,6 +65,7 @@ import {
   DialogTitle,
 } from '../../components/ui/dialog';
 import survey360Api from '../../lib/survey360Api';
+import { useUIStore } from '../../store';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 
