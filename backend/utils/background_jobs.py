@@ -13,11 +13,16 @@ from enum import Enum
 import uuid
 import json
 
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
+
 logger = logging.getLogger(__name__)
 
 # Try to import Celery
 try:
     from celery import Celery
+    from celery.schedules import crontab
     CELERY_AVAILABLE = True
 except ImportError:
     CELERY_AVAILABLE = False
@@ -45,8 +50,8 @@ _job_store: Dict[str, Dict] = {}
 
 class JobConfig:
     """Job queue configuration"""
-    BROKER_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
-    RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://localhost:6379/1")
+    BROKER_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
+    RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
     TASK_TIMEOUT = 300  # 5 minutes
     RESULT_EXPIRES = 3600  # 1 hour
     MAX_RETRIES = 3
@@ -73,6 +78,23 @@ if CELERY_AVAILABLE:
         task_acks_late=True,
         task_reject_on_worker_lost=True,
         worker_prefetch_multiplier=1,
+        task_queues={
+            'default': {'exchange': 'default', 'routing_key': 'default'},
+            'high_priority': {'exchange': 'high_priority', 'routing_key': 'high_priority'},
+        },
+        task_default_queue='default',
+        task_routes={
+            'generate_analytics': {'queue': 'high_priority'},
+            'export_responses': {'queue': 'default'},
+            'bulk_send_invitations': {'queue': 'default'},
+        },
+        # Periodic tasks (Celery Beat)
+        beat_schedule={
+            'cleanup-old-jobs-daily': {
+                'task': 'cleanup_old_jobs',
+                'schedule': crontab(hour=2, minute=0),  # Run at 2 AM daily
+            },
+        },
     )
 
 
