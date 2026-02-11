@@ -611,7 +611,7 @@ function DashboardView({ surveys, activity }) {
       {/* Surveys + Activity */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Survey Cards */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4" data-tour="surveys-section">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-white">Active Surveys</h2>
             <Button variant="ghost" size="sm" className="text-teal-400 hover:text-teal-300">
