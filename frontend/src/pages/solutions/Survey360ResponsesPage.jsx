@@ -48,21 +48,21 @@ import survey360Api from '../../lib/survey360Api';
 import { toast } from 'sonner';
 
 // Simple Bar Chart Component
-const SimpleBarChart = ({ data, title }) => {
+const SimpleBarChart = ({ data, title, isDark }) => {
   if (!data || data.length === 0) return null;
   const maxValue = Math.max(...data.map(d => d.value));
   
   return (
     <div className="space-y-3">
-      <h4 className="font-medium text-white text-sm">{title}</h4>
+      <h4 className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{title}</h4>
       <div className="space-y-2">
         {data.map((item, idx) => (
           <div key={idx} className="space-y-1">
             <div className="flex justify-between text-xs">
-              <span className="text-gray-400 truncate max-w-[200px]">{item.name}</span>
-              <span className="text-gray-500">{item.value} ({item.percent}%)</span>
+              <span className={`truncate max-w-[200px] ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{item.name}</span>
+              <span className={isDark ? 'text-gray-500' : 'text-gray-500'}>{item.value} ({item.percent}%)</span>
             </div>
-            <div className="h-6 bg-white/5 rounded overflow-hidden">
+            <div className={`h-6 rounded overflow-hidden ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
               <div 
                 className="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded transition-all duration-500"
                 style={{ width: `${maxValue > 0 ? (item.value / maxValue) * 100 : 0}%` }}
@@ -76,7 +76,7 @@ const SimpleBarChart = ({ data, title }) => {
 };
 
 // Simple Pie Chart Component (CSS-based)
-const SimplePieChart = ({ data, title }) => {
+const SimplePieChart = ({ data, title, isDark }) => {
   if (!data || data.length === 0) return null;
   
   const colors = ['#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6', '#3b82f6', '#10b981', '#f97316', '#ec4899'];
@@ -99,7 +99,7 @@ const SimplePieChart = ({ data, title }) => {
   
   return (
     <div className="space-y-3">
-      <h4 className="font-medium text-white text-sm">{title}</h4>
+      <h4 className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{title}</h4>
       <div className="flex items-center gap-6">
         <div 
           className="w-24 h-24 rounded-full"
@@ -111,12 +111,12 @@ const SimplePieChart = ({ data, title }) => {
           {segments.slice(0, 5).map((item, idx) => (
             <div key={idx} className="flex items-center gap-2 text-xs">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }} />
-              <span className="text-gray-400 truncate">{item.name}</span>
-              <span className="text-gray-500 ml-auto">{item.percent}%</span>
+              <span className={`truncate ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{item.name}</span>
+              <span className={`ml-auto ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{item.percent}%</span>
             </div>
           ))}
           {segments.length > 5 && (
-            <p className="text-xs text-gray-600">+{segments.length - 5} more</p>
+            <p className={`text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>+{segments.length - 5} more</p>
           )}
         </div>
       </div>
@@ -127,6 +127,8 @@ const SimplePieChart = ({ data, title }) => {
 export function Survey360ResponsesPage() {
   const navigate = useNavigate();
   const { currentOrg } = useOrgStore();
+  const { theme } = useUIStore();
+  const isDark = theme === 'dark';
   const [responses, setResponses] = useState([]);
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(true);
