@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -32,11 +32,205 @@ import {
   Star,
   MessageSquare,
   Layers,
-  RefreshCw
+  RefreshCw,
+  X,
+  HelpCircle,
+  ChevronLeft,
+  MousePointer,
+  Zap,
+  Target,
+  Gift
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
+
+// Tour Steps Configuration
+const TOUR_STEPS = [
+  {
+    id: 'welcome',
+    title: 'Welcome to Survey360! 👋',
+    description: 'Let us show you around the dashboard. This quick tour will help you discover all the powerful features available.',
+    target: null,
+    position: 'center'
+  },
+  {
+    id: 'dashboard',
+    title: 'Dashboard Overview',
+    description: 'Your command center! See total responses, active surveys, completion rates, and items pending review at a glance.',
+    target: 'stats-cards',
+    position: 'bottom'
+  },
+  {
+    id: 'surveys',
+    title: 'Active Surveys',
+    description: 'Track all your surveys in one place. Monitor progress, response counts, and team assignments for each project.',
+    target: 'surveys-section',
+    position: 'right'
+  },
+  {
+    id: 'activity',
+    title: 'Recent Activity',
+    description: 'Stay informed with real-time updates. See who submitted responses and track survey engagement.',
+    target: 'activity-section',
+    position: 'left'
+  },
+  {
+    id: 'navigation',
+    title: 'Easy Navigation',
+    description: 'Access Surveys, Responses, Analytics, Team management, and Settings from the sidebar menu.',
+    target: 'sidebar-nav',
+    position: 'right'
+  },
+  {
+    id: 'analytics',
+    title: 'Powerful Analytics',
+    description: 'Click "Analytics" to explore response trends, satisfaction breakdowns, and detailed insights.',
+    target: 'nav-analytics',
+    position: 'right'
+  },
+  {
+    id: 'complete',
+    title: 'You\'re All Set! 🎉',
+    description: 'Explore freely! Remember, this is demo mode - start a free trial to unlock all features and create your own surveys.',
+    target: null,
+    position: 'center'
+  }
+];
+
+// Tour Component
+function GuidedTour({ isOpen, onClose, currentStep, setCurrentStep, onComplete }) {
+  const step = TOUR_STEPS[currentStep];
+  const isFirstStep = currentStep === 0;
+  const isLastStep = currentStep === TOUR_STEPS.length - 1;
+  const isCenterPosition = step?.position === 'center';
+
+  const handleNext = () => {
+    if (isLastStep) {
+      onComplete();
+    } else {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (!isFirstStep) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSkip = () => {
+    onComplete();
+  };
+
+  if (!isOpen || !step) return null;
+
+  return (
+    <>
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-black/60 z-[100]" onClick={handleSkip} />
+      
+      {/* Spotlight for targeted elements */}
+      {step.target && (
+        <style>{`
+          [data-tour="${step.target}"] {
+            position: relative;
+            z-index: 101;
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.5), 0 0 20px rgba(20, 184, 166, 0.3);
+            border-radius: 12px;
+          }
+        `}</style>
+      )}
+
+      {/* Tour Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className={`fixed z-[102] ${
+          isCenterPosition 
+            ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' 
+            : 'bottom-8 right-8'
+        }`}
+      >
+        <div className="bg-[#0f1d32] border border-teal-500/30 rounded-2xl p-6 shadow-2xl shadow-teal-500/20 max-w-md">
+          {/* Progress indicator */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-teal-400" />
+              </div>
+              <span className="text-xs text-gray-500">
+                Step {currentStep + 1} of {TOUR_STEPS.length}
+              </span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleSkip}
+              className="text-gray-400 hover:text-white -mr-2"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1 bg-white/10 rounded-full mb-4 overflow-hidden">
+            <motion.div 
+              className="h-full bg-gradient-to-r from-teal-500 to-cyan-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${((currentStep + 1) / TOUR_STEPS.length) * 100}%` }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+
+          {/* Content */}
+          <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
+          <p className="text-gray-400 mb-6">{step.description}</p>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between">
+            <Button 
+              variant="ghost" 
+              onClick={handleSkip}
+              className="text-gray-400 hover:text-white"
+            >
+              Skip Tour
+            </Button>
+            <div className="flex items-center gap-2">
+              {!isFirstStep && (
+                <Button 
+                  variant="outline" 
+                  onClick={handlePrev}
+                  className="border-white/10 text-gray-300"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  Back
+                </Button>
+              )}
+              <Button 
+                onClick={handleNext}
+                className="bg-teal-500 hover:bg-teal-400 text-white"
+              >
+                {isLastStep ? (
+                  <>
+                    Get Started
+                    <Gift className="w-4 h-4 ml-2" />
+                  </>
+                ) : (
+                  <>
+                    Next
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </>
+  );
+}
 
 // Sample data
 const SAMPLE_SURVEYS = [
