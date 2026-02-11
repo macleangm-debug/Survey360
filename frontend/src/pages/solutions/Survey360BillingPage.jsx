@@ -141,21 +141,21 @@ export function Survey360BillingPage() {
     <div className="space-y-8" data-testid="billing-page">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-white">Billing & Usage</h1>
-        <p className="text-gray-400">Manage your subscription and monitor usage</p>
+        <h1 className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Billing & Usage</h1>
+        <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Manage your subscription and monitor usage</p>
       </div>
 
       {loading ? (
         <div className="space-y-6">
-          <Skeleton className="h-48 w-full bg-white/10" />
-          <Skeleton className="h-64 w-full bg-white/10" />
+          <Skeleton className={`h-48 w-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+          <Skeleton className={`h-64 w-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
         </div>
       ) : (
         <>
           {/* Current Plan & Usage */}
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Current Plan Card */}
-            <Card className="bg-gradient-to-br from-teal-500/10 to-emerald-500/10 border-teal-500/30 lg:col-span-1">
+            <Card className={`bg-gradient-to-br from-teal-500/10 to-emerald-500/10 border-teal-500/30 lg:col-span-1 ${!isDark && 'shadow-sm'}`}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <Badge className="bg-teal-500/20 text-teal-400 border-0">Current Plan</Badge>
@@ -163,13 +163,13 @@ export function Survey360BillingPage() {
                     <currentPlan.icon className="w-5 h-5 text-white" />
                   </div>
                 </div>
-                <CardTitle className="text-2xl text-white mt-2">{currentPlan.name}</CardTitle>
-                <CardDescription className="text-gray-400">{currentPlan.description}</CardDescription>
+                <CardTitle className={`text-2xl ${isDark ? 'text-white' : 'text-gray-900'} mt-2`}>{currentPlan.name}</CardTitle>
+                <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>{currentPlan.description}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-4xl font-bold text-white">${currentPlan.monthlyPrice}</span>
-                  <span className="text-gray-500">/month</span>
+                  <span className={`text-4xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>${currentPlan.monthlyPrice}</span>
+                  <span className={isDark ? 'text-gray-500' : 'text-gray-500'}>/month</span>
                 </div>
                 {currentPlanIndex < PLANS.length - 1 && (
                   <Button 
