@@ -408,13 +408,24 @@ export function Survey360DemoSandbox() {
             </Badge>
           </div>
 
-          <Button 
-            className="bg-gradient-to-r from-teal-500 to-teal-600 text-white border-0"
-            onClick={() => navigate('/solutions/survey360/register')}
-          >
-            Start Free Trial
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={handleStartTour}
+              className="border-teal-500/30 text-teal-400 hover:bg-teal-500/10"
+            >
+              <HelpCircle className="w-4 h-4 mr-2" />
+              Take a Tour
+            </Button>
+            <Button 
+              className="bg-gradient-to-r from-teal-500 to-teal-600 text-white border-0"
+              onClick={() => navigate('/solutions/survey360/register')}
+            >
+              Start Free Trial
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </div>
       </nav>
 
