@@ -115,7 +115,7 @@ The application uses MongoDB, which is schema-less. However, the Pydantic models
 5.  : Can you share the link for Web preview
     *   **Status:** COMPLETED. The agent provided the link.
 6.  : Confirmed successful integration and provided a summary of the working features, stating readiness to finalize and update documentation.
-7.  : Now I want to place this solution within this page - https://response-collector.preview.emergentagent.com/solutions/survey360
+7.  : Now I want to place this solution within this page - https://theme-toggle-demo.preview.emergentagent.com/solutions/survey360
     *   **Status:** COMPLETED. The agent successfully integrated the app into the main frontend under the specified path.
 8.  : Announced the full end-to-end functionality of the initial standalone Survey360 app and readiness to finalize.
 9.  : PRoceed
