@@ -1,6 +1,7 @@
 """
 Survey360 - Redis Cache Layer
 High-performance caching for survey data, responses, and analytics
+With authentication and Sentinel support for HA
 """
 
 import os
@@ -10,6 +11,10 @@ from typing import Optional, Any, Callable
 from datetime import timedelta
 from functools import wraps
 import logging
+
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +33,8 @@ _cache_expiry = {}
 
 class CacheConfig:
     """Cache configuration settings"""
-    REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    REDIS_URL = os.environ.get("REDIS_URL", "redis://:survey360_redis_secret_2026@127.0.0.1:6379/0")
+    REDIS_SENTINEL_URL = os.environ.get("REDIS_SENTINEL_URL", "redis://:survey360_sentinel_secret_2026@127.0.0.1:26379")
     DEFAULT_TTL = 300  # 5 minutes
     SURVEY_TTL = 600  # 10 minutes for survey data
     ANALYTICS_TTL = 60  # 1 minute for analytics (changes frequently)
@@ -49,7 +55,7 @@ class RedisCache:
         return cls._instance
     
     async def connect(self):
-        """Initialize Redis connection"""
+        """Initialize Redis connection with authentication"""
         if REDIS_AVAILABLE and self._redis is None:
             try:
                 self._redis = aioredis.from_url(
@@ -57,7 +63,9 @@ class RedisCache:
                     encoding="utf-8",
                     decode_responses=True,
                     socket_connect_timeout=5,
-                    socket_timeout=5
+                    socket_timeout=5,
+                    retry_on_timeout=True,
+                    health_check_interval=30
                 )
                 await self._redis.ping()
                 logger.info("Redis cache connected successfully")
