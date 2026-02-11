@@ -341,18 +341,18 @@ export function Survey360ResponsesPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Responses</h1>
-          <p className="text-gray-400">View and analyze survey responses</p>
+          <h1 className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Responses</h1>
+          <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>View and analyze survey responses</p>
         </div>
         <div className="flex gap-2">
           <Select value={selectedSurvey} onValueChange={setSelectedSurvey}>
-            <SelectTrigger className="w-56 bg-white/5 border-white/10 text-gray-300">
+            <SelectTrigger className={`w-56 ${isDark ? 'bg-white/5 border-white/10 text-gray-300' : 'bg-white border-gray-300 text-gray-700'}`}>
               <SelectValue placeholder="Select survey" />
             </SelectTrigger>
-            <SelectContent className="bg-[#0f1d32] border-white/10">
-              <SelectItem value="all" className="text-gray-300">All Surveys</SelectItem>
+            <SelectContent className={isDark ? 'bg-[#0f1d32] border-white/10' : 'bg-white border-gray-200'}>
+              <SelectItem value="all" className={isDark ? 'text-gray-300' : 'text-gray-700'}>All Surveys</SelectItem>
               {surveys.map((survey) => (
-                <SelectItem key={survey.id} value={survey.id} className="text-gray-300">
+                <SelectItem key={survey.id} value={survey.id} className={isDark ? 'text-gray-300' : 'text-gray-700'}>
                   {survey.name}
                 </SelectItem>
               ))}
@@ -362,7 +362,7 @@ export function Survey360ResponsesPage() {
             variant="outline" 
             onClick={() => handleExport('csv')}
             disabled={selectedSurvey === 'all'}
-            className="border-white/10 text-gray-300 hover:bg-white/5"
+            className={isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
           >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
@@ -372,54 +372,54 @@ export function Survey360ResponsesPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white/5 border-white/10">
+        <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-teal-400" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-white">{stats.total}</p>
-                <p className="text-sm text-gray-400">Total Responses</p>
+                <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{stats.total}</p>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Total Responses</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white/5 border-white/10">
+        <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-500" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-white">{stats.completed}</p>
-                <p className="text-sm text-gray-400">Completed</p>
+                <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{stats.completed}</p>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Completed</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white/5 border-white/10">
+        <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
                 <Clock className="w-5 h-5 text-blue-500" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-white">{formatTime(stats.avgTime)}</p>
-                <p className="text-sm text-gray-400">Avg. Time</p>
+                <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{formatTime(stats.avgTime)}</p>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Avg. Time</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-white/5 border-white/10">
+        <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-purple-500" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-white">{surveys.length}</p>
-                <p className="text-sm text-gray-400">Surveys</p>
+                <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{surveys.length}</p>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Surveys</p>
               </div>
             </div>
           </CardContent>
@@ -428,7 +428,7 @@ export function Survey360ResponsesPage() {
 
       {/* Tabs for Responses and Analytics */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="bg-white/5 border border-white/10">
+        <TabsList className={isDark ? 'bg-white/5 border border-white/10' : 'bg-gray-100 border border-gray-200'}>
           <TabsTrigger 
             value="responses" 
             className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"
