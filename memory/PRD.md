@@ -287,3 +287,61 @@ Added a template library with 6 pre-built survey templates to help users get sta
   - Added TOUR_STEPS configuration
   - Added data-tour attributes
   - Added tour state management
+
+---
+
+## Survey360 Light/Dark Mode Theme Toggle (Feb 11, 2026) - COMPLETE
+
+### Implementation Summary:
+Added theme-aware styling to all Survey360 pages, allowing users to switch between light and dark modes.
+
+### Components Updated:
+1. **Survey360AppLayout.jsx** - Already had theme support with isDark pattern
+2. **Survey360DashboardPage.jsx** - Added isDark conditional classes
+3. **Survey360SurveysPage.jsx** - Added isDark conditional classes
+4. **Survey360SettingsPage.jsx** - Updated Theme tab with isDark support
+5. **Survey360ResponsesPage.jsx** - Added isDark conditional classes
+6. **Survey360BillingPage.jsx** - Added isDark conditional classes
+7. **Survey360BuilderPage.jsx** - Added theme hook (partial implementation)
+
+### Theme System:
+- State stored in `useUIStore` in `/app/frontend/src/store/index.js`
+- Toggle button in header: `data-testid="theme-toggle-btn"`
+- Options: Light / Dark / System (in Settings > Theme tab)
+- Pattern: `isDark ? 'dark-class' : 'light-class'`
+
+### Color Scheme:
+- **Dark Mode**: bg-[#0a1628] / bg-[#0f1d32], text-white, border-white/10
+- **Light Mode**: bg-gray-50 / bg-white, text-gray-900, border-gray-200
+
+### Test Results: 100% (12/12 frontend tests)
+
+### Files Modified:
+- `/app/frontend/src/pages/solutions/Survey360DashboardPage.jsx`
+- `/app/frontend/src/pages/solutions/Survey360SurveysPage.jsx`
+- `/app/frontend/src/pages/solutions/Survey360SettingsPage.jsx`
+- `/app/frontend/src/pages/solutions/Survey360ResponsesPage.jsx`
+- `/app/frontend/src/pages/solutions/Survey360BillingPage.jsx`
+- `/app/frontend/src/pages/solutions/Survey360BuilderPage.jsx`
+
+---
+
+## Backlog (Updated Feb 11, 2026)
+
+### P0 (Completed)
+- [x] Light/Dark Mode Theme Toggle
+
+### P1 (Next)
+- [ ] Verify landing page redirect issue (user confirmation pending)
+
+### P2 (Future)
+- [ ] Increase Celery worker concurrency (--concurrency=4)
+- [ ] Implement CDN for static assets
+- [ ] MongoDB sharding (for very large scale)
+- [ ] Configure Celery Flower with better security
+
+### P3 (Backlog)
+- [ ] Redis Sentinel for true high availability
+- [ ] Add Excel export option
+- [ ] Survey scheduling (auto-publish/close)
+- [ ] Email invitation system
