@@ -382,6 +382,8 @@ function ShareModal({ survey, open, onOpenChange }) {
 export function Survey360SurveysPage() {
   const navigate = useNavigate();
   const { currentOrg } = useOrgStore();
+  const { theme } = useUIStore();
+  const isDark = theme === 'dark';
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
