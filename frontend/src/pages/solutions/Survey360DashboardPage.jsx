@@ -23,7 +23,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { useOrgStore } from '../../store';
+import { useOrgStore, useUIStore } from '../../store';
 import survey360Api from '../../lib/survey360Api';
 
 const StatCard = ({ title, value, icon: Icon, description, onClick }) => (
