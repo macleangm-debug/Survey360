@@ -291,6 +291,8 @@ function App() {
           {/* Survey360 Solution Routes */}
           <Route path="/solutions/survey360" element={<Survey360LandingPage />} />
           <Route path="/solutions/survey360/pricing" element={<Survey360PricingPage />} />
+          <Route path="/solutions/survey360/demo" element={<Survey360DemoPage />} />
+          <Route path="/solutions/survey360/demo/sandbox" element={<Survey360DemoSandbox />} />
           <Route path="/solutions/survey360/login" element={<Survey360LoginPage />} />
           <Route path="/solutions/survey360/register" element={<Survey360RegisterPage />} />
           <Route path="/solutions/survey360/app" element={<Survey360AppLayout />}>
