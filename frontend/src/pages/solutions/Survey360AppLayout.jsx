@@ -289,17 +289,17 @@ export function Survey360AppLayout({ children }) {
                 animate={{ x: 0 }}
                 exit={{ x: -300 }}
                 transition={{ type: 'spring', damping: 25 }}
-                className="fixed left-0 top-0 bottom-0 w-[280px] bg-[#0f1d32] z-50 lg:hidden overflow-y-auto"
+                className={`fixed left-0 top-0 bottom-0 w-[280px] ${bgSecondary} z-50 lg:hidden overflow-y-auto`}
               >
-                <div className="p-4 border-b border-white/5 flex items-center justify-between">
+                <div className={`p-4 border-b ${borderColor} flex items-center justify-between`}>
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
                       <ClipboardList className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-white">Survey360</span>
+                    <span className={`font-bold ${textPrimary}`}>Survey360</span>
                   </div>
-                  <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-lg hover:bg-white/5">
-                    <X className="w-5 h-5 text-gray-400" />
+                  <button onClick={() => setMobileMenuOpen(false)} className={`p-2 rounded-lg ${hoverBg}`}>
+                    <X className={`w-5 h-5 ${textSecondary}`} />
                   </button>
                 </div>
 
@@ -326,8 +326,8 @@ export function Survey360AppLayout({ children }) {
                         className={cn(
                           "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                           isActive 
-                            ? "bg-teal-500/10 text-teal-400 font-medium" 
-                            : "text-gray-400 hover:bg-white/5 hover:text-white"
+                            ? `${activeBg} text-teal-500 font-medium` 
+                            : `${textSecondary} ${hoverBg} hover:text-teal-500`
                         )}
                       >
                         <Icon className="w-5 h-5" />
@@ -338,16 +338,16 @@ export function Survey360AppLayout({ children }) {
                 </nav>
 
                 {/* Mobile User */}
-                <div className="p-4 border-t border-white/5 mt-auto">
+                <div className={`p-4 border-t ${borderColor} mt-auto`}>
                   <div className="flex items-center gap-3 mb-4">
                     <Avatar>
                       <AvatarImage src={user?.avatar} />
-                      <AvatarFallback className="bg-teal-500/20 text-teal-400">
+                      <AvatarFallback className="bg-teal-500/20 text-teal-500">
                         {user?.name?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium text-sm text-white">{user?.name}</p>
+                      <p className={`font-medium text-sm ${textPrimary}`}>{user?.name}</p>
                       <p className="text-xs text-gray-500">{user?.email}</p>
                     </div>
                   </div>
