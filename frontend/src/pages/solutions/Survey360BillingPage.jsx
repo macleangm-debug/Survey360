@@ -372,9 +372,9 @@ export function Survey360BillingPage() {
 
       {/* Upgrade Dialog */}
       <Dialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen}>
-        <DialogContent className="bg-[#0f1d32] border-white/10">
+        <DialogContent className={isDark ? 'bg-[#0f1d32] border-white/10' : 'bg-white border-gray-200'}>
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               {selectedPlan && (
                 <>
                   <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${selectedPlan.color} flex items-center justify-center`}>
@@ -384,7 +384,7 @@ export function Survey360BillingPage() {
                 </>
               )}
             </DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>
               {selectedPlan && (
                 <>
                   ${selectedPlan.monthlyPrice}/month • {selectedPlan.limits.responses.toLocaleString()} responses/month
@@ -395,12 +395,12 @@ export function Survey360BillingPage() {
           
           {selectedPlan && (
             <div className="py-4">
-              <h4 className="text-sm font-medium text-gray-300 mb-3">What you'll get:</h4>
+              <h4 className={`text-sm font-medium mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>What you'll get:</h4>
               <div className="space-y-2">
                 {selectedPlan.features.map((feature, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-teal-400" />
-                    <span className="text-gray-300 text-sm">{feature}</span>
+                    <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{feature}</span>
                   </div>
                 ))}
               </div>
@@ -411,7 +411,7 @@ export function Survey360BillingPage() {
             <Button 
               variant="outline" 
               onClick={() => setUpgradeDialogOpen(false)}
-              className="border-white/10 text-gray-300"
+              className={isDark ? 'border-white/10 text-gray-300' : 'border-gray-200 text-gray-700'}
             >
               Cancel
             </Button>
