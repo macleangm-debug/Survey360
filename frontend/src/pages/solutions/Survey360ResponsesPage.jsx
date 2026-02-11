@@ -43,7 +43,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../components/ui/dialog';
-import { useOrgStore } from '../../store';
+import { useOrgStore, useUIStore } from '../../store';
 import survey360Api from '../../lib/survey360Api';
 import { toast } from 'sonner';
 
