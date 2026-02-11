@@ -327,11 +327,37 @@ export function Survey360DemoSandbox() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [showDemoToast, setShowDemoToast] = useState(true);
+  
+  // Tour state
+  const [showTour, setShowTour] = useState(false);
+  const [tourStep, setTourStep] = useState(0);
+  const [tourCompleted, setTourCompleted] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowDemoToast(false), 5000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Check if tour was already shown
+  useEffect(() => {
+    const tourShown = localStorage.getItem('survey360_tour_completed');
+    if (!tourShown) {
+      // Show tour after a short delay
+      const timer = setTimeout(() => setShowTour(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleTourComplete = () => {
+    setShowTour(false);
+    setTourCompleted(true);
+    localStorage.setItem('survey360_tour_completed', 'true');
+  };
+
+  const handleStartTour = () => {
+    setTourStep(0);
+    setShowTour(true);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
