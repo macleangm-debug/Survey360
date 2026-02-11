@@ -548,6 +548,15 @@ export function Survey360DemoSandbox() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Guided Tour */}
+      <GuidedTour
+        isOpen={showTour}
+        onClose={() => setShowTour(false)}
+        currentStep={tourStep}
+        setCurrentStep={setTourStep}
+        onComplete={handleTourComplete}
+      />
     </div>
   );
 }
