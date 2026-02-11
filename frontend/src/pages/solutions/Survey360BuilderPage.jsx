@@ -541,20 +541,20 @@ export function Survey360BuilderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a1628] p-8">
+      <div className={`min-h-screen p-8 ${isDark ? 'bg-[#0a1628]' : 'bg-gray-50'}`}>
         <div className="max-w-3xl mx-auto space-y-4">
-          <Skeleton className="h-12 w-1/2 bg-white/10" />
-          <Skeleton className="h-32 w-full bg-white/10" />
-          <Skeleton className="h-32 w-full bg-white/10" />
+          <Skeleton className={`h-12 w-1/2 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+          <Skeleton className={`h-32 w-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+          <Skeleton className={`h-32 w-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a1628]">
+    <div className={`min-h-screen ${isDark ? 'bg-[#0a1628]' : 'bg-gray-50'}`}>
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#0f1d32] border-b border-white/5">
+      <header className={`sticky top-0 z-40 ${isDark ? 'bg-[#0f1d32] border-white/5' : 'bg-white border-gray-200 shadow-sm'} border-b`}>
         <div className="flex items-center justify-between h-14 px-4 lg:px-6">
           <div className="flex items-center gap-4">
             <Button 
