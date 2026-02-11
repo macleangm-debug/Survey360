@@ -282,7 +282,7 @@ export function Survey360BillingPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
                   >
-                    <Card className={`h-full ${isCurrent ? 'bg-teal-500/10 border-teal-500/50' : 'bg-white/5 border-white/10'} ${plan.popular && !isCurrent ? 'ring-2 ring-teal-500/50' : ''} hover:border-white/20 transition-all relative`}>
+                    <Card className={`h-full ${isCurrent ? 'bg-teal-500/10 border-teal-500/50' : isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'} ${plan.popular && !isCurrent ? 'ring-2 ring-teal-500/50' : ''} ${isDark ? 'hover:border-white/20' : 'hover:border-gray-300'} transition-all relative`}>
                       {plan.popular && !isCurrent && (
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                           <Badge className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white border-0 text-xs">
@@ -303,28 +303,28 @@ export function Survey360BillingPage() {
                           <Icon className="w-5 h-5 text-white" />
                         </div>
                         
-                        <h3 className="font-semibold text-white">{plan.name}</h3>
-                        <p className="text-xs text-gray-500 mb-3">{plan.description}</p>
+                        <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
+                        <p className={`text-xs mb-3 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{plan.description}</p>
                         
                         <div className="flex items-baseline gap-1 mb-4">
-                          <span className="text-2xl font-bold text-white">${plan.monthlyPrice}</span>
-                          <span className="text-gray-500 text-sm">/mo</span>
+                          <span className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>${plan.monthlyPrice}</span>
+                          <span className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>/mo</span>
                         </div>
                         
                         <div className="space-y-2 mb-4">
                           {plan.features.slice(0, 3).map((feature, fIdx) => (
                             <div key={fIdx} className="flex items-center gap-2 text-xs">
                               <Check className="w-3 h-3 text-teal-400" />
-                              <span className="text-gray-400">{feature}</span>
+                              <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>{feature}</span>
                             </div>
                           ))}
                           {plan.features.length > 3 && (
-                            <p className="text-xs text-gray-600">+{plan.features.length - 3} more</p>
+                            <p className={`text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>+{plan.features.length - 3} more</p>
                           )}
                         </div>
                         
                         {isCurrent ? (
-                          <Button disabled className="w-full bg-white/10 text-gray-500 border-0" size="sm">
+                          <Button disabled className={`w-full ${isDark ? 'bg-white/10 text-gray-500' : 'bg-gray-100 text-gray-400'} border-0`} size="sm">
                             Current Plan
                           </Button>
                         ) : isUpgrade ? (
@@ -338,7 +338,7 @@ export function Survey360BillingPage() {
                         ) : (
                           <Button 
                             variant="outline" 
-                            className="w-full border-white/10 text-gray-400" 
+                            className={`w-full ${isDark ? 'border-white/10 text-gray-400' : 'border-gray-200 text-gray-500'}`} 
                             size="sm"
                             onClick={() => handleUpgradeClick(plan)}
                           >
@@ -354,16 +354,16 @@ export function Survey360BillingPage() {
           </div>
 
           {/* Billing History (Placeholder) */}
-          <Card className="bg-white/5 border-white/10">
+          <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
             <CardHeader>
-              <CardTitle className="text-white">Billing History</CardTitle>
-              <CardDescription className="text-gray-400">Your recent invoices and payments</CardDescription>
+              <CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Billing History</CardTitle>
+              <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>Your recent invoices and payments</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <CreditCard className="w-12 h-12 text-gray-600 mb-4" />
-                <p className="text-gray-400">No billing history yet</p>
-                <p className="text-sm text-gray-600">Your invoices will appear here after your first payment</p>
+                <CreditCard className={`w-12 h-12 ${isDark ? 'text-gray-600' : 'text-gray-400'} mb-4`} />
+                <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>No billing history yet</p>
+                <p className={`text-sm ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>Your invoices will appear here after your first payment</p>
               </div>
             </CardContent>
           </Card>
