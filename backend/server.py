@@ -183,7 +183,7 @@ app.include_router(api_router)
 
 # Include Redis HA monitoring routes
 from utils.redis_ha import ha_router
-api_router.include_router(ha_router)
+app.include_router(ha_router, prefix="/api")
 
 # CORS middleware
 app.add_middleware(
