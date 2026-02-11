@@ -348,10 +348,10 @@ export function Survey360AppLayout({ children }) {
                     </Avatar>
                     <div>
                       <p className={`font-medium text-sm ${textPrimary}`}>{user?.name}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
+                      <p className={`text-xs ${textMuted}`}>{user?.email}</p>
                     </div>
                   </div>
-                  <Button onClick={handleLogout} variant="outline" className="w-full border-white/10 text-gray-300 hover:bg-white/5">
+                  <Button onClick={handleLogout} variant="outline" className={`w-full ${borderColor} ${textSecondary} ${hoverBg}`}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign out
                   </Button>
