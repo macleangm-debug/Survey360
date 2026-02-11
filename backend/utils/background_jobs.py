@@ -496,3 +496,134 @@ def init_job_manager(db) -> JobManager:
     job_manager.register_task("bulk_send_invitations", task_bulk_send_invitations)
     
     return job_manager
+
+
+# ============================================
+# CELERY TASKS (Synchronous wrappers for workers)
+# ============================================
+
+if CELERY_AVAILABLE and celery_app:
+    
+    @celery_app.task(name='export_responses', bind=True, max_retries=3)
+    def celery_export_responses(self, job_id: str, params: dict):
+        """Celery task wrapper for export_responses"""
+        import asyncio
+        from motor.motor_asyncio import AsyncIOMotorClient
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            # Create temporary db connection for worker
+            mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+            db_name = os.environ.get("DB_NAME", "survey360")
+            client = AsyncIOMotorClient(mongo_url)
+            db = client[db_name]
+            
+            # Create job manager with db
+            worker_job_manager = JobManager(db)
+            
+            result = loop.run_until_complete(
+                task_export_responses(job_id, params, worker_job_manager)
+            )
+            
+            loop.run_until_complete(worker_job_manager.complete_job(job_id, result))
+            client.close()
+            return result
+            
+        except Exception as e:
+            logger.error(f"Celery task export_responses failed: {e}")
+            raise self.retry(exc=e, countdown=60)
+        finally:
+            loop.close()
+    
+    @celery_app.task(name='generate_analytics', bind=True, max_retries=3)
+    def celery_generate_analytics(self, job_id: str, params: dict):
+        """Celery task wrapper for generate_analytics"""
+        import asyncio
+        from motor.motor_asyncio import AsyncIOMotorClient
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+            db_name = os.environ.get("DB_NAME", "survey360")
+            client = AsyncIOMotorClient(mongo_url)
+            db = client[db_name]
+            
+            worker_job_manager = JobManager(db)
+            
+            result = loop.run_until_complete(
+                task_generate_analytics(job_id, params, worker_job_manager)
+            )
+            
+            loop.run_until_complete(worker_job_manager.complete_job(job_id, result))
+            client.close()
+            return result
+            
+        except Exception as e:
+            logger.error(f"Celery task generate_analytics failed: {e}")
+            raise self.retry(exc=e, countdown=60)
+        finally:
+            loop.close()
+    
+    @celery_app.task(name='bulk_send_invitations', bind=True, max_retries=3)
+    def celery_bulk_send_invitations(self, job_id: str, params: dict):
+        """Celery task wrapper for bulk_send_invitations"""
+        import asyncio
+        from motor.motor_asyncio import AsyncIOMotorClient
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+            db_name = os.environ.get("DB_NAME", "survey360")
+            client = AsyncIOMotorClient(mongo_url)
+            db = client[db_name]
+            
+            worker_job_manager = JobManager(db)
+            
+            result = loop.run_until_complete(
+                task_bulk_send_invitations(job_id, params, worker_job_manager)
+            )
+            
+            loop.run_until_complete(worker_job_manager.complete_job(job_id, result))
+            client.close()
+            return result
+            
+        except Exception as e:
+            logger.error(f"Celery task bulk_send_invitations failed: {e}")
+            raise self.retry(exc=e, countdown=60)
+        finally:
+            loop.close()
+    
+    @celery_app.task(name='cleanup_old_jobs')
+    def celery_cleanup_old_jobs():
+        """Periodic task to clean up old completed jobs"""
+        import asyncio
+        from motor.motor_asyncio import AsyncIOMotorClient
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+            db_name = os.environ.get("DB_NAME", "survey360")
+            client = AsyncIOMotorClient(mongo_url)
+            db = client[db_name]
+            
+            worker_job_manager = JobManager(db)
+            loop.run_until_complete(worker_job_manager.cleanup_old_jobs(days=7))
+            client.close()
+            
+            logger.info("Cleanup task completed")
+            return {"status": "completed"}
+            
+        except Exception as e:
+            logger.error(f"Cleanup task failed: {e}")
+            return {"status": "failed", "error": str(e)}
+        finally:
+            loop.close()
+
