@@ -147,3 +147,44 @@ Added a template library with 6 pre-built survey templates to help users get sta
 - [ ] Configure Celery workers
 - [ ] Set up monitoring dashboards
 - [ ] Configure Kubernetes auto-scaling
+
+---
+
+## Redis & Celery Production Deployment (Feb 11, 2026) - COMPLETE
+
+### Redis Server Configuration
+- Port: 6379 (localhost only)
+- Max Memory: 256MB
+- Eviction Policy: allkeys-lru
+- Supervisor managed
+
+### Celery Configuration
+- Broker: redis://127.0.0.1:6379/0
+- Backend: redis://127.0.0.1:6379/0
+- Workers: 2 concurrent
+- Queues: default, high_priority
+
+### Registered Tasks
+1. `export_responses` - Export survey responses to CSV
+2. `generate_analytics` - Generate comprehensive analytics
+3. `bulk_send_invitations` - Send bulk email invitations
+4. `cleanup_old_jobs` - Clean up jobs older than 7 days (daily at 2 AM)
+
+### Files Created/Modified
+- `/etc/supervisor/conf.d/survey360_workers.conf` - Supervisor config
+- `/app/backend/.env` - Added REDIS_URL
+- `/app/backend/utils/background_jobs.py` - Added Celery task wrappers
+
+### Test Results: 100% passed
+
+### Services Running
+- redis: RUNNING (port 6379)
+- celery-worker: RUNNING (2 concurrency)
+- celery-beat: RUNNING (scheduler)
+- backend: RUNNING (cache: connected)
+
+### Future Improvements
+- [ ] Redis persistence (RDB/AOF)
+- [ ] Redis Sentinel for HA
+- [ ] Celery Flower monitoring
+- [ ] Auto-scaling workers
