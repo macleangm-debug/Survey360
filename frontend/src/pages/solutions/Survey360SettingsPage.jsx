@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 export function Survey360SettingsPage() {
   const { user } = useAuthStore();
   const { theme, setTheme } = useUIStore();
+  const isDark = theme === 'dark';
   const [profile, setProfile] = useState({ name: user?.name || '', email: user?.email || '' });
   const [notifications, setNotifications] = useState({ email_responses: true, email_weekly: true });
 
@@ -20,33 +21,33 @@ export function Survey360SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div><h1 className="text-2xl font-semibold text-white">Settings</h1><p className="text-gray-400">Manage your account and preferences</p></div>
+      <div><h1 className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Settings</h1><p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Manage your account and preferences</p></div>
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-4 bg-white/5">
+        <TabsList className={`grid w-full max-w-md grid-cols-4 ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
           <TabsTrigger value="profile" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><User className="w-4 h-4 mr-2" />Profile</TabsTrigger>
           <TabsTrigger value="appearance" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><Palette className="w-4 h-4 mr-2" />Theme</TabsTrigger>
           <TabsTrigger value="notifications" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><Bell className="w-4 h-4 mr-2" />Alerts</TabsTrigger>
           <TabsTrigger value="security" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><Shield className="w-4 h-4 mr-2" />Security</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader><CardTitle className="text-white">Profile Information</CardTitle><CardDescription className="text-gray-400">Update your personal details</CardDescription></CardHeader>
+          <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+            <CardHeader><CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Profile Information</CardTitle><CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>Update your personal details</CardDescription></CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2"><Label className="text-gray-300">Full Name</Label><Input value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} className="bg-white/5 border-white/10 text-white" /></div>
-              <div className="space-y-2"><Label className="text-gray-300">Email</Label><Input value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} className="bg-white/5 border-white/10 text-white" /></div>
+              <div className="space-y-2"><Label className={isDark ? 'text-gray-300' : 'text-gray-700'}>Full Name</Label><Input value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} className={isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'} /></div>
+              <div className="space-y-2"><Label className={isDark ? 'text-gray-300' : 'text-gray-700'}>Email</Label><Input value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} className={isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'} /></div>
               <Button onClick={handleSave} className="bg-gradient-to-r from-teal-500 to-teal-600 text-white"><Save className="w-4 h-4 mr-2" />Save Changes</Button>
             </CardContent>
           </Card>
         </TabsContent>
         <TabsContent value="appearance">
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader><CardTitle className="text-white">Appearance</CardTitle><CardDescription className="text-gray-400">Customize how Survey360 looks</CardDescription></CardHeader>
+          <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+            <CardHeader><CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Appearance</CardTitle><CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>Customize how Survey360 looks</CardDescription></CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
                 {[{ value: 'light', label: 'Light', icon: Sun }, { value: 'dark', label: 'Dark', icon: Moon }, { value: 'system', label: 'System', icon: Monitor }].map(({ value, label, icon: Icon }) => (
-                  <button key={value} onClick={() => setTheme(value)} className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors ${theme === value ? 'border-teal-500 bg-teal-500/10' : 'border-white/10 hover:border-white/30'}`}>
-                    <Icon className={`w-6 h-6 ${theme === value ? 'text-teal-400' : 'text-gray-500'}`} />
-                    <span className={`text-sm ${theme === value ? 'text-teal-400 font-medium' : 'text-gray-500'}`}>{label}</span>
+                  <button key={value} onClick={() => setTheme(value)} className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors ${theme === value ? 'border-teal-500 bg-teal-500/10' : isDark ? 'border-white/10 hover:border-white/30' : 'border-gray-200 hover:border-gray-300'}`}>
+                    <Icon className={`w-6 h-6 ${theme === value ? 'text-teal-400' : isDark ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <span className={`text-sm ${theme === value ? 'text-teal-400 font-medium' : isDark ? 'text-gray-500' : 'text-gray-500'}`}>{label}</span>
                   </button>
                 ))}
               </div>
@@ -54,22 +55,22 @@ export function Survey360SettingsPage() {
           </Card>
         </TabsContent>
         <TabsContent value="notifications">
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader><CardTitle className="text-white">Notifications</CardTitle><CardDescription className="text-gray-400">Configure how you receive notifications</CardDescription></CardHeader>
+          <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+            <CardHeader><CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Notifications</CardTitle><CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>Configure how you receive notifications</CardDescription></CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between"><div><Label className="text-white">Response Notifications</Label><p className="text-sm text-gray-500">Get notified when someone submits a response</p></div><Switch checked={notifications.email_responses} onCheckedChange={(checked) => setNotifications({ ...notifications, email_responses: checked })} /></div>
-              <Separator className="bg-white/10" />
-              <div className="flex items-center justify-between"><div><Label className="text-white">Weekly Summary</Label><p className="text-sm text-gray-500">Receive a weekly summary of your survey activity</p></div><Switch checked={notifications.email_weekly} onCheckedChange={(checked) => setNotifications({ ...notifications, email_weekly: checked })} /></div>
+              <div className="flex items-center justify-between"><div><Label className={isDark ? 'text-white' : 'text-gray-900'}>Response Notifications</Label><p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Get notified when someone submits a response</p></div><Switch checked={notifications.email_responses} onCheckedChange={(checked) => setNotifications({ ...notifications, email_responses: checked })} /></div>
+              <Separator className={isDark ? 'bg-white/10' : 'bg-gray-200'} />
+              <div className="flex items-center justify-between"><div><Label className={isDark ? 'text-white' : 'text-gray-900'}>Weekly Summary</Label><p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Receive a weekly summary of your survey activity</p></div><Switch checked={notifications.email_weekly} onCheckedChange={(checked) => setNotifications({ ...notifications, email_weekly: checked })} /></div>
             </CardContent>
           </Card>
         </TabsContent>
         <TabsContent value="security">
-          <Card className="bg-white/5 border-white/10">
-            <CardHeader><CardTitle className="text-white">Change Password</CardTitle><CardDescription className="text-gray-400">Update your account password</CardDescription></CardHeader>
+          <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+            <CardHeader><CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Change Password</CardTitle><CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>Update your account password</CardDescription></CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2"><Label className="text-gray-300">Current Password</Label><Input type="password" className="bg-white/5 border-white/10 text-white" /></div>
-              <div className="space-y-2"><Label className="text-gray-300">New Password</Label><Input type="password" className="bg-white/5 border-white/10 text-white" /></div>
-              <div className="space-y-2"><Label className="text-gray-300">Confirm Password</Label><Input type="password" className="bg-white/5 border-white/10 text-white" /></div>
+              <div className="space-y-2"><Label className={isDark ? 'text-gray-300' : 'text-gray-700'}>Current Password</Label><Input type="password" className={isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'} /></div>
+              <div className="space-y-2"><Label className={isDark ? 'text-gray-300' : 'text-gray-700'}>New Password</Label><Input type="password" className={isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'} /></div>
+              <div className="space-y-2"><Label className={isDark ? 'text-gray-300' : 'text-gray-700'}>Confirm Password</Label><Input type="password" className={isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'} /></div>
               <Button onClick={handleSave}>Update Password</Button>
             </CardContent>
           </Card>
