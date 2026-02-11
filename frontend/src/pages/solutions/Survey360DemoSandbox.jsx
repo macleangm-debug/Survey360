@@ -582,7 +582,7 @@ function DashboardView({ surveys, activity }) {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="stats-cards">
         {[
           { label: 'Total Responses', value: '2,847', icon: FileText, change: '+12%', up: true, color: 'teal' },
           { label: 'Active Surveys', value: '3', icon: ClipboardList, change: '+1', up: true, color: 'blue' },
