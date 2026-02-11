@@ -672,6 +672,9 @@ function DashboardView({ surveys, activity }) {
         {/* Recent Activity */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-white">Recent Activity</h2>
+        {/* Recent Activity */}
+        <div className="space-y-4" data-tour="activity-section">
+          <h2 className="text-lg font-semibold text-white">Recent Activity</h2>
           <div className="bg-white/5 rounded-xl border border-white/10 divide-y divide-white/5">
             {activity.map((item, idx) => (
               <div key={idx} className="p-3 flex items-start gap-3">
