@@ -184,12 +184,12 @@ export function Survey360BillingPage() {
             </Card>
 
             {/* Usage Stats */}
-            <Card className="bg-white/5 border-white/10 lg:col-span-2">
+            <Card className={`lg:col-span-2 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-white">Usage This Period</CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Usage This Period</CardTitle>
+                    <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>
                       {formatDate(usage?.period_start)} - {formatDate(usage?.period_end)}
                     </CardDescription>
                   </div>
@@ -197,7 +197,7 @@ export function Survey360BillingPage() {
                     variant="ghost" 
                     size="icon" 
                     onClick={loadUsage}
-                    className="text-gray-400 hover:text-white"
+                    className={isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}
                   >
                     <RefreshCw className="w-4 h-4" />
                   </Button>
@@ -209,16 +209,16 @@ export function Survey360BillingPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ClipboardList className="w-4 h-4 text-blue-400" />
-                      <span className="text-gray-300">Surveys</span>
+                      <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>Surveys</span>
                     </div>
-                    <span className="text-white font-medium">
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {usage?.surveys_used} / {usage?.surveys_limit === -1 ? '∞' : usage?.surveys_limit}
                     </span>
                   </div>
                   {usage?.surveys_limit > 0 && (
                     <Progress 
                       value={surveyUsagePercent} 
-                      className="h-2 bg-white/10"
+                      className={`h-2 ${isDark ? 'bg-white/10' : 'bg-gray-100'}`}
                     />
                   )}
                   {usage?.surveys_limit > 0 && surveyUsagePercent >= 80 && (
@@ -234,16 +234,16 @@ export function Survey360BillingPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="w-4 h-4 text-purple-400" />
-                      <span className="text-gray-300">Responses</span>
+                      <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>Responses</span>
                     </div>
-                    <span className="text-white font-medium">
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {usage?.responses_used?.toLocaleString()} / {usage?.responses_limit === -1 ? '∞' : usage?.responses_limit?.toLocaleString()}
                     </span>
                   </div>
                   {usage?.responses_limit > 0 && (
                     <Progress 
                       value={responseUsagePercent} 
-                      className="h-2 bg-white/10"
+                      className={`h-2 ${isDark ? 'bg-white/10' : 'bg-gray-100'}`}
                     />
                   )}
                   {usage?.responses_limit > 0 && responseUsagePercent >= 80 && (
@@ -255,8 +255,8 @@ export function Survey360BillingPage() {
                 </div>
 
                 {/* Period Info */}
-                <div className="pt-4 border-t border-white/10">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className={`pt-4 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
+                  <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
                     <Calendar className="w-4 h-4" />
                     <span>Usage resets on {formatDate(usage?.period_end)}</span>
                   </div>
@@ -267,7 +267,7 @@ export function Survey360BillingPage() {
 
           {/* Available Plans */}
           <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Available Plans</h2>
+            <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Available Plans</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {PLANS.map((plan, idx) => {
                 const Icon = plan.icon;
