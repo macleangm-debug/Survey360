@@ -234,11 +234,11 @@ export function Survey360AppLayout({ children }) {
             {/* Search */}
             <div className="flex-1 max-w-md">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
                 <input
                   type="text"
                   placeholder="Search surveys..."
-                  className="w-full pl-9 pr-4 py-2 text-sm bg-white/5 border border-white/10 rounded-lg focus:bg-white/10 focus:ring-2 focus:ring-teal-500/20 transition-all text-white placeholder:text-gray-500"
+                  className={`w-full pl-9 pr-4 py-2 text-sm ${inputBg} border ${borderColor} rounded-lg focus:ring-2 focus:ring-teal-500/20 transition-all ${textPrimary} placeholder:${textMuted}`}
                 />
               </div>
             </div>
@@ -249,15 +249,16 @@ export function Survey360AppLayout({ children }) {
                 <TooltipTrigger asChild>
                   <button 
                     onClick={toggleTheme}
-                    className="p-2 rounded-lg hover:bg-white/5 text-gray-400"
+                    className={`p-2 rounded-lg ${hoverBg} ${textSecondary}`}
+                    data-testid="theme-toggle-btn"
                   >
                     {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Toggle theme</TooltipContent>
+                <TooltipContent>{theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</TooltipContent>
               </Tooltip>
               
-              <button className="p-2 rounded-lg hover:bg-white/5 text-gray-400 relative">
+              <button className={`p-2 rounded-lg ${hoverBg} ${textSecondary} relative`}>
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-teal-500 rounded-full" />
               </button>
@@ -265,7 +266,7 @@ export function Survey360AppLayout({ children }) {
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 overflow-y-auto bg-[#0a1628]">
+          <main className={`flex-1 overflow-y-auto ${bgPrimary} transition-colors duration-300`}>
             <div className="p-6 lg:p-8">
               {children || <Outlet />}
             </div>
