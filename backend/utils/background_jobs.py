@@ -50,8 +50,8 @@ _job_store: Dict[str, Dict] = {}
 
 class JobConfig:
     """Job queue configuration"""
-    BROKER_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
-    RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
+    BROKER_URL = os.environ.get("REDIS_URL", "redis://:survey360_redis_secret_2026@127.0.0.1:6379/0")
+    RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://:survey360_redis_secret_2026@127.0.0.1:6379/0")
     TASK_TIMEOUT = 300  # 5 minutes
     RESULT_EXPIRES = 3600  # 1 hour
     MAX_RETRIES = 3
