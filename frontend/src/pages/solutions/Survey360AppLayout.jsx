@@ -94,7 +94,7 @@ export function Survey360AppLayout({ children }) {
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
                 <ClipboardList className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-xl text-white">Survey360</span>
+              <span className={`font-bold text-xl ${textPrimary}`}>Survey360</span>
             </Link>
           </div>
 
@@ -123,8 +123,8 @@ export function Survey360AppLayout({ children }) {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                     isActive 
-                      ? "bg-teal-500/10 text-teal-400 font-medium" 
-                      : "text-gray-400 hover:bg-white/5 hover:text-white"
+                      ? `${activeBg} text-teal-500 font-medium` 
+                      : `${textSecondary} ${hoverBg} hover:text-teal-500`
                   )}
                 >
                   <Icon className="w-5 h-5" />
@@ -137,22 +137,22 @@ export function Survey360AppLayout({ children }) {
 
           {/* Organization Selector */}
           {organizations?.length > 0 && (
-            <div className="p-4 border-t border-white/5">
+            <div className={`p-4 border-t ${borderColor}`}>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-left">
-                    <div className="w-8 h-8 rounded-lg bg-teal-500/20 flex items-center justify-center text-teal-400 font-medium text-xs">
+                  <button className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg ${inputBg} ${hoverBg} transition-colors text-left`}>
+                    <div className="w-8 h-8 rounded-lg bg-teal-500/20 flex items-center justify-center text-teal-500 font-medium text-xs">
                       {currentOrg?.name?.charAt(0) || 'O'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">
+                      <p className={`text-sm font-medium ${textPrimary} truncate`}>
                         {currentOrg?.name || 'Select Org'}
                       </p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-gray-500" />
+                    <ChevronRight className={`w-4 h-4 ${textMuted}`} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 bg-[#0f1d32] border-white/10">
+                <DropdownMenuContent align="start" className={`w-56 ${bgSecondary} ${borderColor}`}>
                   {organizations.map((org) => (
                     <DropdownMenuItem
                       key={org.id}
