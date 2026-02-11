@@ -548,20 +548,20 @@ export function Survey360ResponsesPage() {
           ) : loadingAnalytics ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {Array(4).fill(0).map((_, i) => (
-                <Card key={i} className="bg-white/5 border-white/10">
+                <Card key={i} className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
                   <CardContent className="p-6">
-                    <Skeleton className="h-6 w-1/2 mb-4 bg-white/10" />
-                    <Skeleton className="h-32 w-full bg-white/10" />
+                    <Skeleton className={`h-6 w-1/2 mb-4 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                    <Skeleton className={`h-32 w-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : analytics && Object.keys(analytics.questions).length > 0 ? (
             <div className="space-y-6">
-              <Card className="bg-white/5 border-white/10">
+              <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
                 <CardHeader>
-                  <CardTitle className="text-white text-lg">Response Summary</CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardTitle className={`text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>Response Summary</CardTitle>
+                  <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>
                     {analytics.total_responses} total responses
                   </CardDescription>
                 </CardHeader>
@@ -569,12 +569,12 @@ export function Survey360ResponsesPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {Object.values(analytics.questions).map((q) => (
-                  <Card key={q.question_id} className="bg-white/5 border-white/10">
+                  <Card key={q.question_id} className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
                     <CardContent className="p-6">
                       {q.question_type === 'single_choice' || q.question_type === 'dropdown' ? (
-                        <SimplePieChart data={q.chart_data} title={q.question_title} />
+                        <SimplePieChart data={q.chart_data} title={q.question_title} isDark={isDark} />
                       ) : (
-                        <SimpleBarChart data={q.chart_data} title={q.question_title} />
+                        <SimpleBarChart data={q.chart_data} title={q.question_title} isDark={isDark} />
                       )}
                     </CardContent>
                   </Card>
@@ -582,11 +582,11 @@ export function Survey360ResponsesPage() {
               </div>
             </div>
           ) : (
-            <Card className="bg-white/5 border-white/10">
+            <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
               <CardContent className="py-16 text-center">
-                <BarChart3 className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">No Analytics Data</h3>
-                <p className="text-gray-500">This survey has no responses with analyzable questions yet</p>
+                <BarChart3 className={`w-12 h-12 ${isDark ? 'text-gray-600' : 'text-gray-400'} mx-auto mb-4`} />
+                <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>No Analytics Data</h3>
+                <p className={isDark ? 'text-gray-500' : 'text-gray-500'}>This survey has no responses with analyzable questions yet</p>
               </CardContent>
             </Card>
           )}
@@ -595,22 +595,22 @@ export function Survey360ResponsesPage() {
 
       {/* Response Detail Dialog */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-[#0f1d32] border-white/10">
+        <DialogContent className={`max-w-2xl max-h-[80vh] overflow-y-auto ${isDark ? 'bg-[#0f1d32] border-white/10' : 'bg-white border-gray-200'}`}>
           <DialogHeader>
-            <DialogTitle className="text-white">Response Details</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className={isDark ? 'text-white' : 'text-gray-900'}>Response Details</DialogTitle>
+            <DialogDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>
               {selectedResponse?.survey_name} • Submitted {formatRelativeTime(selectedResponse?.submitted_at)}
             </DialogDescription>
           </DialogHeader>
           {selectedResponse && (
             <div className="space-y-6 py-4">
-              <div className="flex items-center gap-4 p-4 bg-white/5 rounded-lg">
+              <div className={`flex items-center gap-4 p-4 rounded-lg ${isDark ? 'bg-white/5' : 'bg-gray-50'}`}>
                 <div className="w-12 h-12 rounded-full bg-teal-500/10 flex items-center justify-center">
                   <User className="w-6 h-6 text-teal-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-white">{selectedResponse.respondent_name || 'Anonymous'}</p>
-                  <p className="text-sm text-gray-400">{selectedResponse.respondent_email || 'No email'}</p>
+                  <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{selectedResponse.respondent_name || 'Anonymous'}</p>
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{selectedResponse.respondent_email || 'No email'}</p>
                 </div>
                 <Badge className="ml-auto bg-teal-500/20 text-teal-400 border-0">
                   {selectedResponse.status}
@@ -618,19 +618,19 @@ export function Survey360ResponsesPage() {
               </div>
 
               <div className="space-y-4">
-                <h4 className="font-medium text-white">Answers</h4>
+                <h4 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>Answers</h4>
                 {selectedResponse.survey?.questions?.length > 0 ? (
                   selectedResponse.survey.questions.map((question, idx) => {
                     const answer = selectedResponse.answers?.[question.id];
                     return (
-                      <div key={question.id} className="p-3 border border-white/10 rounded-lg">
-                        <p className="text-sm text-gray-400 mb-1">
+                      <div key={question.id} className={`p-3 border rounded-lg ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
+                        <p className={`text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                           {idx + 1}. {question.title}
                         </p>
-                        <p className="font-medium text-white">
+                        <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                           {Array.isArray(answer) 
                             ? answer.join(', ') 
-                            : answer || <span className="text-gray-500 italic">No answer</span>
+                            : answer || <span className={`italic ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>No answer</span>
                           }
                         </p>
                       </div>
@@ -638,11 +638,11 @@ export function Survey360ResponsesPage() {
                   })
                 ) : (
                   Object.entries(selectedResponse.answers || {}).map(([key, value]) => (
-                    <div key={key} className="p-3 border border-white/10 rounded-lg">
-                      <p className="text-sm text-gray-400 mb-1 capitalize">
+                    <div key={key} className={`p-3 border rounded-lg ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
+                      <p className={`text-sm mb-1 capitalize ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                         {key.replace(/_/g, ' ')}
                       </p>
-                      <p className="font-medium text-white">
+                      <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                         {Array.isArray(value) ? value.join(', ') : String(value)}
                       </p>
                     </div>
@@ -650,7 +650,7 @@ export function Survey360ResponsesPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-4 text-sm text-gray-400">
+              <div className={`flex items-center gap-4 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   Completion time: {formatTime(selectedResponse.completion_time)}
