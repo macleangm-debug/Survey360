@@ -130,8 +130,8 @@ export function Survey360DashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">Dashboard</h1>
-          <p className="text-gray-400">{currentOrg?.name || 'Survey360'} overview</p>
+          <h1 className={`text-2xl font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>Dashboard</h1>
+          <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>{currentOrg?.name || 'Survey360'} overview</p>
         </div>
         <Button 
           onClick={() => navigate('/solutions/survey360/app/surveys/new')} 
@@ -144,10 +144,10 @@ export function Survey360DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {loading ? (
           Array(4).fill(0).map((_, i) => (
-            <Card key={i} className="bg-white/5 border-white/10">
+            <Card key={i} className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}>
               <CardContent className="p-6">
-                <Skeleton className="h-4 w-24 mb-2 bg-white/10" />
-                <Skeleton className="h-8 w-16 bg-white/10" />
+                <Skeleton className={`h-4 w-24 mb-2 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                <Skeleton className={`h-8 w-16 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
               </CardContent>
             </Card>
           ))
@@ -157,39 +157,43 @@ export function Survey360DashboardPage() {
               title="Total Surveys" 
               value={stats.total_surveys} 
               icon={ClipboardList} 
-              onClick={() => navigate('/solutions/survey360/app/surveys')} 
+              onClick={() => navigate('/solutions/survey360/app/surveys')}
+              isDark={isDark}
             />
             <StatCard 
               title="Total Responses" 
               value={stats.total_responses} 
               icon={BarChart3} 
-              onClick={() => navigate('/solutions/survey360/app/responses')} 
+              onClick={() => navigate('/solutions/survey360/app/responses')}
+              isDark={isDark}
             />
             <StatCard 
               title="Active Surveys" 
               value={stats.active_surveys} 
               icon={TrendingUp} 
               onClick={() => navigate('/solutions/survey360/app/surveys')}
+              isDark={isDark}
             />
             <StatCard 
               title="Response Rate" 
               value={`${stats.response_rate}%`} 
               icon={Users} 
-              description="Average completion rate" 
+              description="Average completion rate"
+              isDark={isDark}
             />
           </>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 bg-white/5 border-white/10">
+        <Card className={`lg:col-span-2 ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
           <CardHeader>
-            <CardTitle className="text-white">Response Trends</CardTitle>
-            <CardDescription className="text-gray-400">Last 14 days</CardDescription>
+            <CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Response Trends</CardTitle>
+            <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>Last 14 days</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <Skeleton className="h-[250px] w-full bg-white/10" />
+              <Skeleton className={`h-[250px] w-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={chartData}>
@@ -199,20 +203,20 @@ export function Survey360DashboardPage() {
                       <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} />
                   <XAxis 
                     dataKey="date" 
-                    stroke="#6b7280" 
+                    stroke={isDark ? '#6b7280' : '#9ca3af'} 
                     fontSize={12} 
                     tickFormatter={(val) => new Date(val).toLocaleDateString('en', { day: 'numeric', month: 'short' })} 
                   />
-                  <YAxis stroke="#6b7280" fontSize={12} />
+                  <YAxis stroke={isDark ? '#6b7280' : '#9ca3af'} fontSize={12} />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#0f1d32', 
-                      border: '1px solid rgba(255,255,255,0.1)', 
+                      backgroundColor: isDark ? '#0f1d32' : '#ffffff', 
+                      border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)', 
                       borderRadius: '8px', 
-                      color: '#fff' 
+                      color: isDark ? '#fff' : '#111827' 
                     }} 
                   />
                   <Area type="monotone" dataKey="count" stroke="#14b8a6" strokeWidth={2} fillOpacity={1} fill="url(#colorResponses)" />
@@ -222,14 +226,14 @@ export function Survey360DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/5 border-white/10">
+        <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
           <CardHeader>
-            <CardTitle className="text-white">Quick Actions</CardTitle>
+            <CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <Button 
               variant="outline" 
-              className="w-full justify-start border-white/10 text-gray-300 hover:bg-white/5 hover:text-teal-400" 
+              className={`w-full justify-start ${isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-200 text-gray-700 hover:bg-gray-50'} hover:text-teal-400`} 
               onClick={() => navigate('/solutions/survey360/app/surveys/new')}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -237,7 +241,7 @@ export function Survey360DashboardPage() {
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start border-white/10 text-gray-300 hover:bg-white/5 hover:text-teal-400" 
+              className={`w-full justify-start ${isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-200 text-gray-700 hover:bg-gray-50'} hover:text-teal-400`} 
               onClick={() => navigate('/solutions/survey360/app/surveys')}
             >
               <ClipboardList className="w-4 h-4 mr-2" />
@@ -245,7 +249,7 @@ export function Survey360DashboardPage() {
             </Button>
             <Button 
               variant="outline" 
-              className="w-full justify-start border-white/10 text-gray-300 hover:bg-white/5 hover:text-teal-400" 
+              className={`w-full justify-start ${isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-200 text-gray-700 hover:bg-gray-50'} hover:text-teal-400`} 
               onClick={() => navigate('/solutions/survey360/app/responses')}
             >
               <BarChart3 className="w-4 h-4 mr-2" />
@@ -256,17 +260,17 @@ export function Survey360DashboardPage() {
       </div>
 
       {/* Recent Activity */}
-      <Card className="bg-white/5 border-white/10">
+      <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-white">Recent Activity</CardTitle>
-            <CardDescription className="text-gray-400">Latest survey responses</CardDescription>
+            <CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Recent Activity</CardTitle>
+            <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>Latest survey responses</CardDescription>
           </div>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => navigate('/solutions/survey360/app/responses')} 
-            className="text-gray-400 hover:text-white"
+            className={isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}
           >
             View all
             <ArrowUpRight className="w-4 h-4 ml-1" />
@@ -277,10 +281,10 @@ export function Survey360DashboardPage() {
             <div className="space-y-4">
               {Array(3).fill(0).map((_, i) => (
                 <div key={i} className="flex gap-3">
-                  <Skeleton className="w-8 h-8 rounded-full bg-white/10" />
+                  <Skeleton className={`w-8 h-8 rounded-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
                   <div className="flex-1">
-                    <Skeleton className="h-4 w-3/4 mb-2 bg-white/10" />
-                    <Skeleton className="h-3 w-1/2 bg-white/10" />
+                    <Skeleton className={`h-4 w-3/4 mb-2 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
+                    <Skeleton className={`h-3 w-1/2 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
                   </div>
                 </div>
               ))}
@@ -288,12 +292,12 @@ export function Survey360DashboardPage() {
           ) : activity.length > 0 ? (
             <div className="space-y-1">
               {activity.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 py-3 border-b border-white/5 last:border-0">
+                <div key={idx} className={`flex items-start gap-3 py-3 border-b ${isDark ? 'border-white/5' : 'border-gray-100'} last:border-0`}>
                   <div className="w-8 h-8 rounded-full bg-teal-500/10 flex items-center justify-center mt-0.5">
                     <FileText className="w-4 h-4 text-teal-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white">
+                    <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       <span className="font-medium">{item.user_name || 'Someone'}</span>
                       {' submitted a response to '}
                       <span className="font-medium">{item.survey_name || 'a survey'}</span>
@@ -302,7 +306,7 @@ export function Survey360DashboardPage() {
                       <Badge className="text-xs bg-teal-500/10 text-teal-400 border-0">
                         {item.status || 'completed'}
                       </Badge>
-                      <span className="text-xs text-gray-500">
+                      <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                         {formatRelativeTime(item.timestamp)}
                       </span>
                     </div>
@@ -312,9 +316,9 @@ export function Survey360DashboardPage() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <FileText className="w-12 h-12 text-gray-600 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">No recent activity</p>
-              <p className="text-xs text-gray-600 mt-1">Responses will appear here when people submit your surveys</p>
+              <FileText className={`w-12 h-12 ${isDark ? 'text-gray-600' : 'text-gray-300'} mx-auto mb-2`} />
+              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>No recent activity</p>
+              <p className={`text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'} mt-1`}>Responses will appear here when people submit your surveys</p>
             </div>
           )}
         </CardContent>
