@@ -26,7 +26,7 @@ import {
 import { useOrgStore, useUIStore } from '../../store';
 import survey360Api from '../../lib/survey360Api';
 
-const StatCard = ({ title, value, icon: Icon, description, onClick }) => (
+const StatCard = ({ title, value, icon: Icon, description, onClick, isDark }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -34,15 +34,15 @@ const StatCard = ({ title, value, icon: Icon, description, onClick }) => (
     transition={{ duration: 0.2 }}
   >
     <Card 
-      className="bg-white/5 border-white/10 hover:border-teal-500/50 transition-all cursor-pointer h-full"
+      className={`${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'} hover:border-teal-500/50 transition-all cursor-pointer h-full`}
       onClick={onClick}
     >
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm text-gray-400 mb-1">{title}</p>
-            <p className="text-3xl font-semibold tracking-tight text-white">{value}</p>
-            {description && <p className="text-xs text-gray-500 mt-2">{description}</p>}
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-1`}>{title}</p>
+            <p className={`text-3xl font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>{value}</p>
+            {description && <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'} mt-2`}>{description}</p>}
           </div>
           <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center">
             <Icon className="w-5 h-5 text-teal-400" />
