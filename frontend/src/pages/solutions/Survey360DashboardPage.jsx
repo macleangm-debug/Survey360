@@ -64,6 +64,9 @@ export function Survey360DashboardPage() {
   const [stats, setStats] = useState({ total_surveys: 0, total_responses: 0, active_surveys: 0, response_rate: 0 });
   const [activity, setActivity] = useState([]);
   const [chartData, setChartData] = useState([]);
+  
+  // Onboarding wizard
+  const { showOnboarding, closeOnboarding, resetOnboarding } = useOnboarding();
 
   useEffect(() => {
     loadData();
