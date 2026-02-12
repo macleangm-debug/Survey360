@@ -22,7 +22,13 @@ import {
   MoreVertical,
   ExternalLink,
   Play,
-  GitBranch
+  GitBranch,
+  Share2,
+  Link2,
+  QrCode,
+  Code,
+  Download,
+  Check
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
