@@ -513,6 +513,165 @@ export function Survey360ResponsesPage() {
     }
   };
 
+  // Export Analytics as Image/PDF
+  const handleExportAnalytics = async (format) => {
+    if (!analyticsRef.current) {
+      toast.error('Analytics not loaded');
+      return;
+    }
+
+    try {
+      toast.loading('Generating export...');
+      
+      // Use html2canvas approach via canvas
+      const element = analyticsRef.current;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Get element dimensions
+      const rect = element.getBoundingClientRect();
+      const scale = 2; // Higher quality
+      canvas.width = rect.width * scale;
+      canvas.height = rect.height * scale;
+      
+      // Draw background
+      ctx.fillStyle = isDark ? '#0a1628' : '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Use foreignObject to render HTML to canvas
+      const data = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${rect.width}" height="${rect.height}">
+          <foreignObject width="100%" height="100%">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              ${element.innerHTML}
+            </div>
+          </foreignObject>
+        </svg>
+      `;
+      
+      // Alternative: Create a simple summary image
+      const surveyName = analytics?.survey_name || 'Survey';
+      const totalResponses = analytics?.total_responses || 0;
+      const completionRate = analytics?.overall_completion_rate || 0;
+      const avgTime = analytics?.avg_completion_time || 0;
+      
+      // Create summary text
+      const summaryText = `
+Survey Analytics Report
+=======================
+Survey: ${surveyName}
+Generated: ${new Date().toLocaleString()}
+
+SUMMARY
+-------
+Total Responses: ${totalResponses}
+Completion Rate: ${completionRate}%
+Avg Completion Time: ${Math.floor(avgTime / 60)}m ${avgTime % 60}s
+
+RESPONSE TRENDS (Last 14 Days)
+------------------------------
+${analytics?.response_trends?.map(t => `${t.date}: ${t.responses} responses`).join('\n') || 'No data'}
+
+COMPLETION RATE TRENDS
+----------------------
+${analytics?.completion_rate_trends?.map(t => `${t.date}: ${t.rate}% (${t.completed}/${t.total})`).join('\n') || 'No data'}
+
+QUESTION ANALYTICS
+------------------
+${Object.values(analytics?.questions || {}).map(q => 
+  `${q.question_title}:\n${q.chart_data?.map(d => `  - ${d.name}: ${d.value} (${d.percent}%)`).join('\n') || '  No data'}`
+).join('\n\n') || 'No data'}
+
+AVG TIME PER QUESTION
+---------------------
+${analytics?.question_times?.map((q, i) => `Q${i+1}: ${q.question_title} - ${q.avg_time_seconds}s`).join('\n') || 'No data'}
+      `.trim();
+      
+      if (format === 'txt') {
+        // Export as text file
+        const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${surveyName}_analytics.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.dismiss();
+        toast.success('Analytics exported as text file');
+      } else if (format === 'json') {
+        // Export as JSON
+        const blob = new Blob([JSON.stringify(analytics, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${surveyName}_analytics.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.dismiss();
+        toast.success('Analytics exported as JSON');
+      } else {
+        // Export as image (PNG) - simplified approach
+        canvas.width = 800;
+        canvas.height = 600;
+        ctx.fillStyle = isDark ? '#0a1628' : '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw header
+        ctx.fillStyle = '#14b8a6';
+        ctx.fillRect(0, 0, 800, 60);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px Arial';
+        ctx.fillText(`📊 ${surveyName} - Analytics Report`, 20, 40);
+        
+        // Draw stats
+        ctx.fillStyle = isDark ? '#ffffff' : '#1f2937';
+        ctx.font = '16px Arial';
+        let y = 100;
+        
+        ctx.fillText(`Total Responses: ${totalResponses}`, 20, y);
+        ctx.fillText(`Completion Rate: ${completionRate}%`, 250, y);
+        ctx.fillText(`Avg Time: ${Math.floor(avgTime / 60)}m ${avgTime % 60}s`, 480, y);
+        
+        y += 50;
+        ctx.font = 'bold 18px Arial';
+        ctx.fillText('Response Trends (Last 14 Days)', 20, y);
+        
+        y += 30;
+        ctx.font = '14px Arial';
+        ctx.fillStyle = isDark ? '#9ca3af' : '#6b7280';
+        
+        // Draw mini chart
+        const trends = analytics?.response_trends || [];
+        const maxResp = Math.max(...trends.map(t => t.responses), 1);
+        trends.forEach((t, i) => {
+          const barHeight = (t.responses / maxResp) * 100;
+          const x = 20 + i * 55;
+          ctx.fillStyle = '#14b8a6';
+          ctx.fillRect(x, y + 120 - barHeight, 45, barHeight);
+          ctx.fillStyle = isDark ? '#9ca3af' : '#6b7280';
+          ctx.font = '10px Arial';
+          ctx.fillText(t.date.slice(0, 6), x, y + 135);
+        });
+        
+        // Convert to blob and download
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${surveyName}_analytics.png`;
+          a.click();
+          URL.revokeObjectURL(url);
+          toast.dismiss();
+          toast.success('Analytics exported as image');
+        }, 'image/png');
+      }
+    } catch (error) {
+      console.error('Export analytics failed:', error);
+      toast.dismiss();
+      toast.error('Export failed');
+    }
+  };
+
   const viewResponse = async (response) => {
     // Load full survey to get question titles
     try {
