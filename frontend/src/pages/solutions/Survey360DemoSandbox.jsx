@@ -245,7 +245,12 @@ const SAMPLE_SURVEYS = [
     forms: 3,
     team: 24,
     lastActivity: '2 hours ago',
-    trend: '+12%'
+    trend: '+12%',
+    questions: [
+      { id: 'q1', type: 'rating', title: 'How satisfied are you with our service?', required: true },
+      { id: 'q2', type: 'single_choice', title: 'How likely are you to recommend us?', options: ['Very likely', 'Likely', 'Neutral', 'Unlikely', 'Very unlikely'], required: true },
+      { id: 'q3', type: 'long_text', title: 'What could we improve?', required: false },
+    ]
   },
   {
     id: 'product-feedback',
@@ -258,7 +263,11 @@ const SAMPLE_SURVEYS = [
     forms: 2,
     team: 15,
     lastActivity: '30 mins ago',
-    trend: '+8%'
+    trend: '+8%',
+    questions: [
+      { id: 'q1', type: 'rating', title: 'Rate the new dashboard design', required: true },
+      { id: 'q2', type: 'multiple_choice', title: 'Which features do you use most?', options: ['Analytics', 'Reports', 'Sharing', 'Team Management'], required: true },
+    ]
   },
   {
     id: 'event-reg',
@@ -271,7 +280,12 @@ const SAMPLE_SURVEYS = [
     forms: 1,
     team: 8,
     lastActivity: '3 days ago',
-    trend: '0%'
+    trend: '0%',
+    questions: [
+      { id: 'q1', type: 'short_text', title: 'Full Name', required: true },
+      { id: 'q2', type: 'email', title: 'Email Address', required: true },
+      { id: 'q3', type: 'single_choice', title: 'Select your track', options: ['Technical', 'Business', 'Design'], required: true },
+    ]
   }
 ];
 
