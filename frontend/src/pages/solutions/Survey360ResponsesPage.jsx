@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart3,
@@ -13,7 +13,13 @@ import {
   FileText,
   CheckCircle,
   AlertCircle,
-  PieChart
+  PieChart,
+  TrendingUp,
+  Timer,
+  Image,
+  FileDown,
+  Activity,
+  Percent
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
