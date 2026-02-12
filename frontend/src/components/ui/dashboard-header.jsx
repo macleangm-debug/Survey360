@@ -83,15 +83,12 @@ export function DashboardHeader({
   onNotificationClick,
   onClearNotifications,
   helpLinks = [],
-  languages = LANGUAGES,
-  currentLanguage = 'en',
-  onLanguageChange,
   className,
 }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
   
   const isDark = theme === 'dark';
   
@@ -105,7 +102,6 @@ export function DashboardHeader({
   const inputBg = isDark ? 'bg-white/5' : 'bg-gray-100';
 
   const unreadCount = notifications.filter(n => !n.read).length;
-  const currentLang = languages.find(l => l.code === selectedLanguage) || languages[0];
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -113,11 +109,6 @@ export function DashboardHeader({
       onSearch(searchQuery);
     }
   };
-
-  const handleLanguageSelect = (langCode) => {
-    setSelectedLanguage(langCode);
-    if (onLanguageChange) {
-      onLanguageChange(langCode);
     }
   };
 
