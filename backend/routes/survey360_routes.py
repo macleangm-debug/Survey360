@@ -1123,7 +1123,8 @@ async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_use
         answered_count = sum(1 for r in responses if r.get("answers", {}).get(q_id) is not None)
         
         # Adjust time based on options count for choice questions
-        options_count = len(question.get("options", []))
+        options = question.get("options") or []
+        options_count = len(options)
         base_time = base_times.get(q_type, 10)
         
         if q_type in ["single_choice", "multiple_choice", "dropdown"] and options_count > 4:
