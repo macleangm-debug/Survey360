@@ -634,7 +634,7 @@ export function Survey360DemoSandbox() {
 }
 
 // Dashboard View Component
-function DashboardView({ surveys, activity }) {
+function DashboardView({ surveys, activity, responseCount }) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -656,14 +656,19 @@ function DashboardView({ surveys, activity }) {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="stats-cards">
         {[
-          { label: 'Total Responses', value: '2,847', icon: FileText, change: '+12%', up: true, color: 'teal' },
+          { label: 'Total Responses', value: responseCount.toLocaleString(), icon: FileText, change: '+12%', up: true, color: 'teal' },
           { label: 'Active Surveys', value: '3', icon: ClipboardList, change: '+1', up: true, color: 'blue' },
           { label: 'Completion Rate', value: '94%', icon: CheckCircle, change: '+3%', up: true, color: 'green' },
           { label: 'Pending Review', value: '127', icon: Clock, change: '-8%', up: false, color: 'orange' },
         ].map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <div key={idx} className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <motion.div 
+              key={idx} 
+              className="bg-white/5 rounded-xl p-4 border border-white/10 cursor-pointer hover:border-teal-500/30 transition-all"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="flex items-start justify-between mb-3">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${stat.color}-500/10`}>
                   <Icon className={`w-5 h-5 text-${stat.color}-400`} style={{ color: stat.color === 'teal' ? '#14b8a6' : stat.color === 'blue' ? '#3b82f6' : stat.color === 'green' ? '#10b981' : '#f59e0b' }} />
@@ -675,7 +680,7 @@ function DashboardView({ surveys, activity }) {
               </div>
               <p className="text-2xl font-bold text-white">{stat.value}</p>
               <p className="text-sm text-gray-500">{stat.label}</p>
-            </div>
+            </motion.div>
           );
         })}
       </div>
