@@ -1131,12 +1131,25 @@ export function Survey360SurveysPage() {
                           <DropdownMenuItem onClick={(e) => openShareModal(e, survey)} className={`${isDark ? 'text-gray-300' : 'text-gray-700'} cursor-pointer`}>
                             <Share2 className="w-4 h-4 mr-2" />Share (Link, QR, Embed)
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedSurveyForEmail(survey); setEmailModalOpen(true); }} className={`${isDark ? 'text-gray-300' : 'text-gray-700'} cursor-pointer`}>
+                            <Mail className="w-4 h-4 mr-2" />Send Invitations
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => openPublicSurvey(e, survey)} className={`${isDark ? 'text-gray-300' : 'text-gray-700'} cursor-pointer`}>
                             <ExternalLink className="w-4 h-4 mr-2" />Open Public Form
                           </DropdownMenuItem>
                         </>
                       )}
                       <DropdownMenuSeparator className={isDark ? 'bg-white/10' : 'bg-gray-200'} />
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setSelectedSurveyForSchedule(survey); setScheduleModalOpen(true); }} className={`${isDark ? 'text-gray-300' : 'text-gray-700'} cursor-pointer`}>
+                        <Clock className="w-4 h-4 mr-2" />Schedule
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => handleExportExcel(e, survey)} disabled={exporting === survey.id} className={`${isDark ? 'text-gray-300' : 'text-gray-700'} cursor-pointer`}>
+                        {exporting === survey.id ? (
+                          <><RefreshCw className="w-4 h-4 mr-2 animate-spin" />Exporting...</>
+                        ) : (
+                          <><FileSpreadsheet className="w-4 h-4 mr-2" />Export Excel</>
+                        )}
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={(e) => handleDuplicate(e, survey)} className={`${isDark ? 'text-gray-300' : 'text-gray-700'} cursor-pointer`}>
                         <Copy className="w-4 h-4 mr-2" />Duplicate
                       </DropdownMenuItem>
