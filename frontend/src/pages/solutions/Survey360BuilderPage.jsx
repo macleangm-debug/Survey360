@@ -79,7 +79,7 @@ const QUESTION_TYPES = [
   { type: 'single_choice', label: 'Single Choice', icon: List, description: 'Radio buttons' },
   { type: 'multiple_choice', label: 'Multiple Choice', icon: CheckSquare, description: 'Checkboxes' },
   { type: 'dropdown', label: 'Dropdown', icon: List, description: 'Select from list' },
-  { type: 'date', label: 'Date', icon: Calendar, description: 'Date picker' },
+  { type: 'date', label: 'Date', icon: CalendarIcon, description: 'Date picker' },
   { type: 'number', label: 'Number', icon: Hash, description: 'Numeric input' },
   { type: 'email', label: 'Email', icon: Mail, description: 'Email address' },
   { type: 'phone', label: 'Phone', icon: Phone, description: 'Phone number' },
