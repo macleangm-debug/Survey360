@@ -345,6 +345,11 @@ export function Survey360BuilderPage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [expandedQuestion, setExpandedQuestion] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shortenedLinks, setShortenedLinks] = useState({});
+  const [shorteningUrl, setShorteningUrl] = useState(null);
+  const [copied, setCopied] = useState(null);
+  const qrRef = useRef(null);
 
   useEffect(() => {
     if (isEditing) {
