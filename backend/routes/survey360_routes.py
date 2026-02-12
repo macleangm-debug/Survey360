@@ -1331,3 +1331,50 @@ async def survey360_clear_cache(pattern: str, user=Depends(get_survey360_user)):
     
     count = await cache.delete_pattern(f"{pattern}*")
     return {"cleared": count, "pattern": pattern}
+
+
+# URL Shortener Models
+class ShortenURLRequest(BaseModel):
+    """Request to shorten a URL"""
+    url: str
+
+
+class ShortenURLResponse(BaseModel):
+    """Response with shortened URL"""
+    original_url: str
+    short_url: Optional[str]
+    success: bool
+    error: Optional[str] = None
+
+
+@router.post("/shorten-url", response_model=ShortenURLResponse)
+async def survey360_shorten_url(data: ShortenURLRequest, user=Depends(get_survey360_user)):
+    """
+    Shorten a URL using TinyURL.
+    Useful for sharing survey links via SMS or limited-character platforms.
+    """
+    from utils.url_shortener import shorten_url
+    
+    original_url = data.url.strip()
+    
+    if not original_url.startswith(("http://", "https://")):
+        raise HTTPException(
+            status_code=400,
+            detail="URL must start with http:// or https://"
+        )
+    
+    short_url = await shorten_url(original_url)
+    
+    if short_url:
+        return ShortenURLResponse(
+            original_url=original_url,
+            short_url=short_url,
+            success=True
+        )
+    else:
+        return ShortenURLResponse(
+            original_url=original_url,
+            short_url=None,
+            success=False,
+            error="Failed to shorten URL. Service may be temporarily unavailable."
+        )
