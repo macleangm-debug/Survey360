@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Plus, Search, MoreVertical, Play, Pause, Copy, Trash2, Edit3, BarChart3, ExternalLink, Link2, Share2, QrCode, Code, Download, Check, LayoutTemplate, Smile, Users, Calendar, Package, TrendingUp, Globe, Sparkles, ArrowRight, X } from 'lucide-react';
+import { ClipboardList, Plus, Search, MoreVertical, Play, Pause, Copy, Trash2, Edit3, BarChart3, ExternalLink, Link2, Share2, QrCode, Code, Download, Check, LayoutTemplate, Smile, Users, Calendar, Package, TrendingUp, Globe, Sparkles, ArrowRight, X, Clock, Mail, Send, FileSpreadsheet, RefreshCw, AlertCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Switch } from '../../components/ui/switch';
 import { useOrgStore, useUIStore } from '../../store';
 import survey360Api from '../../lib/survey360Api';
 import { toast } from 'sonner';
