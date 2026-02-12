@@ -1182,6 +1182,21 @@ export function Survey360SurveysPage() {
         onOpenChange={setShareModalOpen} 
       />
 
+      {/* Schedule Modal */}
+      <ScheduleModal
+        survey={selectedSurveyForSchedule}
+        open={scheduleModalOpen}
+        onOpenChange={setScheduleModalOpen}
+        onScheduleUpdated={loadSurveys}
+      />
+
+      {/* Email Invitation Modal */}
+      <EmailInvitationModal
+        survey={selectedSurveyForEmail}
+        open={emailModalOpen}
+        onOpenChange={setEmailModalOpen}
+      />
+
       {/* Template Library Modal */}
       <TemplateLibrary
         open={templateLibraryOpen}
