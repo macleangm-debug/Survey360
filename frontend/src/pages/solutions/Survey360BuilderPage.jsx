@@ -60,6 +60,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { QRCodeSVG } from 'qrcode.react';
 import survey360Api from '../../lib/survey360Api';
 import { useUIStore } from '../../store';
 import { toast } from 'sonner';
