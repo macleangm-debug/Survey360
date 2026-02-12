@@ -36,7 +36,7 @@ import { useAuthStore, useOrgStore, useUIStore } from '../../store';
 import { cn } from '../../lib/utils';
 
 const NAVIGATION = [
-  { id: 'home', label: 'Home', icon: Home, path: '/solutions/survey360/app/dashboard' },
+  { id: 'dashboard', label: 'Home', icon: Home, path: '/solutions/survey360/app/dashboard' },
   { id: 'surveys', label: 'Surveys', icon: ClipboardList, path: '/solutions/survey360/app/surveys' },
   { id: 'responses', label: 'Responses', icon: BarChart3, path: '/solutions/survey360/app/responses' },
   { id: 'billing', label: 'Billing', icon: CreditCard, path: '/solutions/survey360/app/billing' },
