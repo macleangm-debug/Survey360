@@ -457,6 +457,423 @@ function ShareModal({ survey, open, onOpenChange }) {
   );
 }
 
+// Schedule Modal Component
+function ScheduleModal({ survey, open, onOpenChange, onScheduleUpdated }) {
+  const [loading, setLoading] = useState(false);
+  const [schedule, setSchedule] = useState({
+    enabled: false,
+    publish_at: '',
+    close_at: '',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+    recurring: false,
+    recurrence_type: 'weekly',
+    recurrence_interval: 1,
+    recurrence_end_date: '',
+    max_occurrences: null
+  });
+
+  useEffect(() => {
+    if (open && survey) {
+      loadSchedule();
+    }
+  }, [open, survey]);
+
+  const loadSchedule = async () => {
+    try {
+      const response = await survey360Api.get(`/surveys/${survey.id}/schedule`);
+      if (response.data.schedule) {
+        setSchedule(prev => ({ ...prev, ...response.data.schedule }));
+      }
+    } catch (error) {
+      console.error('Failed to load schedule:', error);
+    }
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      await survey360Api.post(`/surveys/${survey.id}/schedule`, schedule);
+      toast.success('Schedule saved successfully');
+      onScheduleUpdated?.();
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Failed to save schedule:', error);
+      toast.error(error.response?.data?.detail || 'Failed to save schedule');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveSchedule = async () => {
+    setLoading(true);
+    try {
+      await survey360Api.delete(`/surveys/${survey.id}/schedule`);
+      toast.success('Schedule removed');
+      setSchedule({
+        enabled: false,
+        publish_at: '',
+        close_at: '',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+        recurring: false,
+        recurrence_type: 'weekly',
+        recurrence_interval: 1,
+        recurrence_end_date: '',
+        max_occurrences: null
+      });
+      onScheduleUpdated?.();
+      onOpenChange(false);
+    } catch (error) {
+      toast.error('Failed to remove schedule');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!survey) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#0f1d32] border-white/10 max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-white flex items-center gap-2">
+            <Clock className="w-5 h-5 text-teal-400" />
+            Schedule Survey
+          </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            {survey.name}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {/* Enable Schedule */}
+          <div className="flex items-center justify-between">
+            <Label className="text-white">Enable Schedule</Label>
+            <Switch
+              checked={schedule.enabled}
+              onCheckedChange={(checked) => setSchedule({ ...schedule, enabled: checked })}
+            />
+          </div>
+
+          {schedule.enabled && (
+            <>
+              {/* Timezone */}
+              <div className="space-y-2">
+                <Label className="text-gray-400 text-sm">Timezone</Label>
+                <Select
+                  value={schedule.timezone}
+                  onValueChange={(value) => setSchedule({ ...schedule, timezone: value })}
+                >
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0f1d32] border-white/10">
+                    {['UTC', 'America/New_York', 'America/Los_Angeles', 'America/Chicago', 'Europe/London', 'Europe/Paris', 'Asia/Tokyo', 'Asia/Singapore', 'Australia/Sydney'].map(tz => (
+                      <SelectItem key={tz} value={tz} className="text-white hover:bg-white/5">{tz}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Publish Date */}
+              <div className="space-y-2">
+                <Label className="text-gray-400 text-sm">Publish Date & Time</Label>
+                <Input
+                  type="datetime-local"
+                  value={schedule.publish_at ? schedule.publish_at.slice(0, 16) : ''}
+                  onChange={(e) => setSchedule({ ...schedule, publish_at: e.target.value ? new Date(e.target.value).toISOString() : '' })}
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+
+              {/* Close Date */}
+              <div className="space-y-2">
+                <Label className="text-gray-400 text-sm">Close Date & Time</Label>
+                <Input
+                  type="datetime-local"
+                  value={schedule.close_at ? schedule.close_at.slice(0, 16) : ''}
+                  onChange={(e) => setSchedule({ ...schedule, close_at: e.target.value ? new Date(e.target.value).toISOString() : '' })}
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+
+              {/* Recurring Toggle */}
+              <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                <div>
+                  <Label className="text-white">Recurring Survey</Label>
+                  <p className="text-xs text-gray-500">Automatically create new surveys on a schedule</p>
+                </div>
+                <Switch
+                  checked={schedule.recurring}
+                  onCheckedChange={(checked) => setSchedule({ ...schedule, recurring: checked })}
+                />
+              </div>
+
+              {schedule.recurring && (
+                <div className="space-y-4 pl-4 border-l-2 border-teal-500/30">
+                  {/* Recurrence Type */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-400 text-sm">Repeat Every</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="12"
+                        value={schedule.recurrence_interval}
+                        onChange={(e) => setSchedule({ ...schedule, recurrence_interval: parseInt(e.target.value) || 1 })}
+                        className="w-20 bg-white/5 border-white/10 text-white"
+                      />
+                      <Select
+                        value={schedule.recurrence_type}
+                        onValueChange={(value) => setSchedule({ ...schedule, recurrence_type: value })}
+                      >
+                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#0f1d32] border-white/10">
+                          <SelectItem value="daily" className="text-white hover:bg-white/5">Day(s)</SelectItem>
+                          <SelectItem value="weekly" className="text-white hover:bg-white/5">Week(s)</SelectItem>
+                          <SelectItem value="monthly" className="text-white hover:bg-white/5">Month(s)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* End Date */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-400 text-sm">End Recurrence</Label>
+                    <Input
+                      type="date"
+                      value={schedule.recurrence_end_date ? schedule.recurrence_end_date.slice(0, 10) : ''}
+                      onChange={(e) => setSchedule({ ...schedule, recurrence_end_date: e.target.value })}
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                  </div>
+
+                  {/* Max Occurrences */}
+                  <div className="space-y-2">
+                    <Label className="text-gray-400 text-sm">Max Occurrences (optional)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="No limit"
+                      value={schedule.max_occurrences || ''}
+                      onChange={(e) => setSchedule({ ...schedule, max_occurrences: e.target.value ? parseInt(e.target.value) : null })}
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <DialogFooter className="gap-2">
+          {schedule.enabled && (
+            <Button
+              variant="ghost"
+              onClick={handleRemoveSchedule}
+              disabled={loading}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+            >
+              Remove Schedule
+            </Button>
+          )}
+          <Button
+            onClick={handleSave}
+            disabled={loading}
+            className="bg-teal-500 hover:bg-teal-600 text-white"
+          >
+            {loading ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Save Schedule
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Email Invitation Modal Component
+function EmailInvitationModal({ survey, open, onOpenChange }) {
+  const [loading, setLoading] = useState(false);
+  const [emails, setEmails] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [sendReminder, setSendReminder] = useState(false);
+  const [reminderDays, setReminderDays] = useState(3);
+  const [sentCount, setSentCount] = useState(0);
+
+  const handleSend = async () => {
+    const emailList = emails.split(/[\n,;]/).map(e => e.trim()).filter(e => e && e.includes('@'));
+    
+    if (emailList.length === 0) {
+      toast.error('Please enter at least one valid email address');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const recipients = emailList.map(email => ({
+        email,
+        name: email.split('@')[0]
+      }));
+
+      const response = await survey360Api.post(`/surveys/${survey.id}/invite`, {
+        survey_id: survey.id,
+        recipients,
+        subject: subject || undefined,
+        message: message || undefined,
+        send_reminder: sendReminder,
+        reminder_days: reminderDays
+      });
+
+      if (response.data.success) {
+        toast.success(`${response.data.sent} invitation(s) sent successfully`);
+        setSentCount(prev => prev + response.data.sent);
+        setEmails('');
+      } else {
+        toast.warning(`Sent: ${response.data.sent}, Failed: ${response.data.failed}`);
+      }
+    } catch (error) {
+      console.error('Failed to send invitations:', error);
+      toast.error('Failed to send invitations');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!survey) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#0f1d32] border-white/10 max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-white flex items-center gap-2">
+            <Mail className="w-5 h-5 text-teal-400" />
+            Send Invitations
+          </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            {survey.name}
+          </DialogDescription>
+        </DialogHeader>
+
+        {survey.status !== 'published' && (
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-4 py-3 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="text-yellow-400 font-medium">Survey Not Published</p>
+              <p className="text-yellow-400/70">Publish your survey first before sending invitations.</p>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-4 py-4">
+          {/* Email Addresses */}
+          <div className="space-y-2">
+            <Label className="text-gray-400 text-sm">Email Addresses</Label>
+            <Textarea
+              value={emails}
+              onChange={(e) => setEmails(e.target.value)}
+              placeholder="Enter email addresses (one per line, or comma/semicolon separated)"
+              rows={4}
+              className="bg-white/5 border-white/10 text-white"
+            />
+            <p className="text-xs text-gray-500">
+              {emails.split(/[\n,;]/).filter(e => e.trim() && e.includes('@')).length} email(s) detected
+            </p>
+          </div>
+
+          {/* Custom Subject */}
+          <div className="space-y-2">
+            <Label className="text-gray-400 text-sm">Custom Subject (optional)</Label>
+            <Input
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder={`You're invited to take: ${survey.name}`}
+              className="bg-white/5 border-white/10 text-white"
+            />
+          </div>
+
+          {/* Custom Message */}
+          <div className="space-y-2">
+            <Label className="text-gray-400 text-sm">Custom Message (optional)</Label>
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Add a personalized message to your invitation..."
+              rows={3}
+              className="bg-white/5 border-white/10 text-white"
+            />
+          </div>
+
+          {/* Reminder Toggle */}
+          <div className="flex items-center justify-between pt-2 border-t border-white/10">
+            <div>
+              <Label className="text-white">Send Reminder</Label>
+              <p className="text-xs text-gray-500">Automatically remind non-responders</p>
+            </div>
+            <Switch
+              checked={sendReminder}
+              onCheckedChange={setSendReminder}
+            />
+          </div>
+
+          {sendReminder && (
+            <div className="space-y-2">
+              <Label className="text-gray-400 text-sm">Remind after (days)</Label>
+              <Input
+                type="number"
+                min="1"
+                max="30"
+                value={reminderDays}
+                onChange={(e) => setReminderDays(parseInt(e.target.value) || 3)}
+                className="w-24 bg-white/5 border-white/10 text-white"
+              />
+            </div>
+          )}
+
+          {sentCount > 0 && (
+            <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg px-4 py-2">
+              <p className="text-sm text-teal-400">
+                <Check className="w-4 h-4 inline mr-1" />
+                {sentCount} invitation(s) sent in this session
+              </p>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button
+            onClick={handleSend}
+            disabled={loading || survey.status !== 'published' || !emails.trim()}
+            className="bg-teal-500 hover:bg-teal-600 text-white"
+          >
+            {loading ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4 mr-2" />
+                Send Invitations
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function Survey360SurveysPage() {
   const navigate = useNavigate();
   const { currentOrg } = useOrgStore();
