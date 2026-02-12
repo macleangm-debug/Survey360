@@ -889,6 +889,11 @@ export function Survey360SurveysPage() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [selectedSurveyForShare, setSelectedSurveyForShare] = useState(null);
   const [templateLibraryOpen, setTemplateLibraryOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [selectedSurveyForSchedule, setSelectedSurveyForSchedule] = useState(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [selectedSurveyForEmail, setSelectedSurveyForEmail] = useState(null);
+  const [exporting, setExporting] = useState(null);
 
   useEffect(() => {
     loadSurveys();
