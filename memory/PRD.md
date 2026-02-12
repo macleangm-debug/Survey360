@@ -532,10 +532,10 @@ Added theme-aware styling to all Survey360 pages, allowing users to switch betwe
 - [x] Link Shortener Integration (Surveys List + Builder)
 - [x] Interactive Demo Screen
 
-### P1 (Next)
-- [ ] Excel export for survey responses
-- [ ] Survey scheduling (auto-publish/close)
-- [ ] Email invitations using Resend
+### P1 (Completed - Feb 12, 2026)
+- [x] Excel export for survey responses
+- [x] Survey scheduling (advanced with recurring, timezone support)
+- [x] Email invitations using Resend (placeholder key)
 
 ### P2 (Future)
 - [ ] PDF export with styled charts
@@ -545,3 +545,68 @@ Added theme-aware styling to all Survey360 pages, allowing users to switch betwe
 - [ ] Third-party integrations (Zapier, Mailchimp)
 - [ ] Redis Sentinel for true high availability
 - [ ] Comparison analytics (vs previous period)
+
+---
+
+## Excel Export Feature (Feb 12, 2026) - COMPLETE
+
+### Implementation:
+- Backend endpoint: `GET /api/survey360/surveys/{survey_id}/export/excel`
+- Generates .xlsx file with two sheets:
+  - Summary: Survey metadata (name, description, status, response count)
+  - Responses: All response data with question headers
+- Styled headers with teal color theme
+- Auto-width columns
+
+### Files Updated:
+- `/app/backend/routes/survey360_routes.py` (added export endpoint)
+- `/app/frontend/src/pages/solutions/Survey360SurveysPage.jsx` (added Export Excel menu item)
+
+---
+
+## Survey Scheduling Feature (Feb 12, 2026) - COMPLETE
+
+### Implementation:
+- Backend endpoints:
+  - `POST /api/survey360/surveys/{survey_id}/schedule` - Set schedule
+  - `GET /api/survey360/surveys/{survey_id}/schedule` - Get schedule
+  - `DELETE /api/survey360/surveys/{survey_id}/schedule` - Remove schedule
+  - `POST /api/survey360/schedules/process` - Process scheduled surveys (cron)
+
+### Features:
+- Timezone support (UTC, US, Europe, Asia, Australia)
+- Publish date/time
+- Close date/time
+- Recurring surveys:
+  - Daily, Weekly, Monthly intervals
+  - End date or max occurrences
+  - Auto-creates new survey copies
+
+### Files Updated:
+- `/app/backend/routes/survey360_routes.py`
+- `/app/frontend/src/pages/solutions/Survey360SurveysPage.jsx` (ScheduleModal component)
+
+---
+
+## Email Invitations Feature (Feb 12, 2026) - COMPLETE
+
+### Implementation:
+- Backend endpoints:
+  - `POST /api/survey360/surveys/{survey_id}/invite` - Send invitations
+  - `GET /api/survey360/surveys/{survey_id}/invitations` - Get sent invitations
+  - `POST /api/survey360/invitations/send-reminders` - Send reminders (cron)
+
+### Features:
+- Bulk email sending
+- Custom subject and message
+- Beautiful HTML email template
+- Reminder scheduling
+- Invitation tracking
+
+### Integration:
+- Resend API (placeholder key: `re_placeholder_key`)
+- Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` env vars for production
+
+### Files Updated:
+- `/app/backend/routes/survey360_routes.py`
+- `/app/frontend/src/pages/solutions/Survey360SurveysPage.jsx` (EmailInvitationModal component)
