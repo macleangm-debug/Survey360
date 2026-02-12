@@ -357,10 +357,51 @@ export function Survey360DemoSandbox() {
   const [tourStep, setTourStep] = useState(0);
   const [tourCompleted, setTourCompleted] = useState(false);
 
+  // Live response simulation state
+  const [liveResponses, setLiveResponses] = useState(SAMPLE_RESPONSES);
+  const [responseCount, setResponseCount] = useState(2847);
+  const [isSimulating, setIsSimulating] = useState(true);
+
   useEffect(() => {
     const timer = setTimeout(() => setShowDemoToast(false), 5000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Live response simulation
+  useEffect(() => {
+    if (!isSimulating) return;
+    
+    const names = ['Alex Rivera', 'Jordan Lee', 'Casey Morgan', 'Taylor Swift', 'Jamie Fox', 'Sam Wilson', 'Chris Evans', 'Morgan Freeman'];
+    const surveys = ['Customer Satisfaction', 'Product Feedback', 'Event Registration'];
+    const domains = ['gmail.com', 'company.com', 'org.net', 'business.io', 'startup.co'];
+    
+    const interval = setInterval(() => {
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      const randomSurvey = surveys[Math.floor(Math.random() * surveys.length)];
+      const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+      const email = `${randomName.toLowerCase().replace(' ', '.')}@${randomDomain}`;
+      
+      const newResponse = {
+        id: Date.now(),
+        respondent: email,
+        survey: randomSurvey,
+        submitted: 'Just now',
+        rating: Math.floor(Math.random() * 3) + 3, // 3-5 stars
+        status: 'completed'
+      };
+      
+      setLiveResponses(prev => [newResponse, ...prev.slice(0, 9)]);
+      setResponseCount(prev => prev + 1);
+      
+      // Show toast for new response
+      toast.success(`New response from ${randomName}`, {
+        description: randomSurvey,
+        duration: 3000,
+      });
+    }, 8000); // New response every 8 seconds
+    
+    return () => clearInterval(interval);
+  }, [isSimulating]);
 
   // Check if tour was already shown
   useEffect(() => {
@@ -386,19 +427,21 @@ export function Survey360DemoSandbox() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardView surveys={SAMPLE_SURVEYS} activity={RECENT_ACTIVITY} />;
+        return <DashboardView surveys={SAMPLE_SURVEYS} activity={RECENT_ACTIVITY} responseCount={responseCount} />;
       case 'surveys':
         return <SurveysView surveys={SAMPLE_SURVEYS} onSelect={setSelectedSurvey} />;
       case 'responses':
-        return <ResponsesView responses={SAMPLE_RESPONSES} />;
+        return <ResponsesView responses={liveResponses} isSimulating={isSimulating} setIsSimulating={setIsSimulating} />;
       case 'analytics':
-        return <AnalyticsView data={ANALYTICS_DATA} />;
+        return <AnalyticsView data={ANALYTICS_DATA} responseCount={responseCount} />;
+      case 'try-survey':
+        return <TrySurveyView surveys={SAMPLE_SURVEYS} />;
       case 'team':
         return <TeamView />;
       case 'settings':
         return <SettingsView />;
       default:
-        return <DashboardView surveys={SAMPLE_SURVEYS} activity={RECENT_ACTIVITY} />;
+        return <DashboardView surveys={SAMPLE_SURVEYS} activity={RECENT_ACTIVITY} responseCount={responseCount} />;
     }
   };
 
