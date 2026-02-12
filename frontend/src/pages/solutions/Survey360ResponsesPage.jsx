@@ -130,6 +130,220 @@ const SimplePieChart = ({ data, title, isDark }) => {
   );
 };
 
+// Line/Area Chart Component for Trends
+const TrendChart = ({ data, title, dataKey, color = '#14b8a6', isDark, showArea = true }) => {
+  if (!data || data.length === 0) return null;
+  
+  const maxValue = Math.max(...data.map(d => d[dataKey] || 0), 1);
+  const chartHeight = 120;
+  const chartWidth = 100; // percentage
+  
+  // Generate SVG path for the line
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * 100;
+    const y = chartHeight - ((d[dataKey] || 0) / maxValue) * chartHeight;
+    return `${x},${y}`;
+  });
+  
+  const linePath = `M ${points.join(' L ')}`;
+  const areaPath = `M 0,${chartHeight} L ${points.join(' L ')} L 100,${chartHeight} Z`;
+  
+  return (
+    <div className="space-y-3">
+      <h4 className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{title}</h4>
+      <div className="relative">
+        <svg viewBox={`0 0 100 ${chartHeight}`} className="w-full h-32" preserveAspectRatio="none">
+          {showArea && (
+            <path
+              d={areaPath}
+              fill={`${color}20`}
+              className="transition-all duration-500"
+            />
+          )}
+          <path
+            d={linePath}
+            fill="none"
+            stroke={color}
+            strokeWidth="2"
+            vectorEffect="non-scaling-stroke"
+            className="transition-all duration-500"
+          />
+          {/* Data points */}
+          {data.map((d, i) => {
+            const x = (i / (data.length - 1)) * 100;
+            const y = chartHeight - ((d[dataKey] || 0) / maxValue) * chartHeight;
+            return (
+              <circle
+                key={i}
+                cx={x}
+                cy={y}
+                r="3"
+                fill={color}
+                className="transition-all duration-500"
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          })}
+        </svg>
+        {/* X-axis labels */}
+        <div className="flex justify-between mt-2">
+          {data.filter((_, i) => i % Math.ceil(data.length / 5) === 0 || i === data.length - 1).map((d, i) => (
+            <span key={i} className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              {d.date}
+            </span>
+          ))}
+        </div>
+      </div>
+      {/* Summary stats */}
+      <div className="flex gap-4 text-xs">
+        <div>
+          <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Total: </span>
+          <span className={isDark ? 'text-white' : 'text-gray-900'}>
+            {data.reduce((sum, d) => sum + (d[dataKey] || 0), 0)}
+          </span>
+        </div>
+        <div>
+          <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Avg: </span>
+          <span className={isDark ? 'text-white' : 'text-gray-900'}>
+            {(data.reduce((sum, d) => sum + (d[dataKey] || 0), 0) / data.length).toFixed(1)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Completion Rate Chart Component
+const CompletionRateChart = ({ data, isDark }) => {
+  if (!data || data.length === 0) return null;
+  
+  const chartHeight = 100;
+  
+  return (
+    <div className="space-y-3">
+      <h4 className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>Completion Rate Over Time</h4>
+      <div className="relative">
+        <svg viewBox={`0 0 100 ${chartHeight}`} className="w-full h-28" preserveAspectRatio="none">
+          {/* Background grid lines */}
+          {[0, 25, 50, 75, 100].map(y => (
+            <line
+              key={y}
+              x1="0"
+              y1={chartHeight - (y / 100) * chartHeight}
+              x2="100"
+              y2={chartHeight - (y / 100) * chartHeight}
+              stroke={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
+              strokeWidth="0.5"
+              vectorEffect="non-scaling-stroke"
+            />
+          ))}
+          {/* Bars */}
+          {data.map((d, i) => {
+            const barWidth = 80 / data.length;
+            const x = (i / data.length) * 100 + barWidth * 0.1;
+            const barHeight = (d.rate / 100) * chartHeight;
+            const y = chartHeight - barHeight;
+            const barColor = d.rate >= 70 ? '#10b981' : d.rate >= 40 ? '#f59e0b' : '#ef4444';
+            
+            return (
+              <rect
+                key={i}
+                x={x}
+                y={y}
+                width={barWidth * 0.8}
+                height={barHeight}
+                fill={barColor}
+                rx="1"
+                className="transition-all duration-500"
+              />
+            );
+          })}
+        </svg>
+        {/* X-axis labels */}
+        <div className="flex justify-between mt-2">
+          {data.filter((_, i) => i % Math.ceil(data.length / 5) === 0 || i === data.length - 1).map((d, i) => (
+            <span key={i} className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              {d.date}
+            </span>
+          ))}
+        </div>
+        {/* Y-axis labels */}
+        <div className="absolute left-0 top-0 h-28 flex flex-col justify-between text-xs">
+          {['100%', '50%', '0%'].map((label, i) => (
+            <span key={i} className={`${isDark ? 'text-gray-500' : 'text-gray-400'} -ml-8`}>
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+      {/* Legend */}
+      <div className="flex gap-4 text-xs">
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-green-500" />
+          <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>≥70%</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-yellow-500" />
+          <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>40-69%</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-red-500" />
+          <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>&lt;40%</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Question Time Chart Component
+const QuestionTimeChart = ({ data, isDark }) => {
+  if (!data || data.length === 0) return null;
+  
+  const maxTime = Math.max(...data.map(d => d.avg_time_seconds || 0), 1);
+  
+  return (
+    <div className="space-y-3">
+      <h4 className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        Average Time per Question
+      </h4>
+      <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
+        {data.map((q, idx) => (
+          <div key={q.question_id} className="space-y-1">
+            <div className="flex justify-between text-xs">
+              <span className={`truncate max-w-[180px] ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                Q{idx + 1}: {q.question_title}
+              </span>
+              <span className={isDark ? 'text-gray-500' : 'text-gray-500'}>
+                {q.avg_time_seconds}s
+              </span>
+            </div>
+            <div className={`h-5 rounded overflow-hidden ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
+              <div 
+                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded transition-all duration-500 flex items-center justify-end pr-2"
+                style={{ width: `${(q.avg_time_seconds / maxTime) * 100}%` }}
+              >
+                <span className="text-xs text-white font-medium">
+                  {q.answered_count} answers
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Total time */}
+      <div className={`pt-2 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
+        <div className="flex justify-between text-sm">
+          <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>Estimated Total Time</span>
+          <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            {Math.round(data.reduce((sum, q) => sum + q.avg_time_seconds, 0) / 60)}m {data.reduce((sum, q) => sum + q.avg_time_seconds, 0) % 60}s
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+};
+
 export function Survey360ResponsesPage() {
   const navigate = useNavigate();
   const { currentOrg } = useOrgStore();
