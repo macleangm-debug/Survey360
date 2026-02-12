@@ -39,11 +39,20 @@ import {
   MousePointer,
   Zap,
   Target,
-  Gift
+  Gift,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+  Copy,
+  ExternalLink,
+  Pause
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';
+import { Textarea } from '../../components/ui/textarea';
+import { Label } from '../../components/ui/label';
+import { toast } from 'sonner';
 
 // Tour Steps Configuration
 const TOUR_STEPS = [
