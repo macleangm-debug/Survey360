@@ -644,50 +644,14 @@ export function Survey360BuilderPage() {
                   {/* Close Date */}
                   <div className="space-y-2">
                     <Label className="text-gray-300">Close Date (Optional)</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal bg-white/5 border-white/10 text-white hover:bg-white/10",
-                            !survey.close_date && "text-gray-500"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {survey.close_date ? (
-                            new Date(survey.close_date).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-gray-900 border-white/10" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={survey.close_date ? new Date(survey.close_date) : undefined}
-                          onSelect={(date) => setSurvey({ ...survey, close_date: date ? date.toISOString() : null })}
-                          disabled={(date) => date < new Date()}
-                          initialFocus
-                          className="text-white"
-                        />
-                        {survey.close_date && (
-                          <div className="p-3 border-t border-white/10">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setSurvey({ ...survey, close_date: null })}
-                              className="w-full text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                            >
-                              Clear date
-                            </Button>
-                          </div>
-                        )}
-                      </PopoverContent>
-                    </Popover>
+                    <DatePicker
+                      value={survey.close_date ? new Date(survey.close_date) : null}
+                      onChange={(date) => setSurvey({ ...survey, close_date: date ? date.toISOString() : null })}
+                      placeholder="Pick a date"
+                      minDate={new Date()}
+                      clearable={true}
+                      isDark={true}
+                    />
                     <p className="text-xs text-gray-500">Survey will automatically stop accepting responses after this date</p>
                   </div>
                   
