@@ -477,13 +477,78 @@ export function Survey360BuilderPage() {
       // Then publish
       await survey360Api.post(`/surveys/${id}/publish`);
       setSurvey({ ...survey, status: 'published' });
-      toast.success('Survey published! Share the link with respondents.');
+      toast.success('Survey published!');
+      // Open share dialog after publishing
+      setShareDialogOpen(true);
     } catch (error) {
       console.error('Failed to publish:', error);
       toast.error('Failed to publish survey');
     } finally {
       setSaving(false);
     }
+  };
+
+  // Copy to clipboard
+  const copyToClipboard = (text, type) => {
+    navigator.clipboard.writeText(text);
+    setCopied(type);
+    toast.success('Copied to clipboard');
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  // Shorten link function
+  const shortenLink = async (url) => {
+    if (shortenedLinks[url]) {
+      navigator.clipboard.writeText(shortenedLinks[url]);
+      toast.success('Short link copied to clipboard!');
+      return;
+    }
+
+    setShorteningUrl(url);
+    try {
+      const res = await survey360Api.post('/shorten-url', { url });
+      
+      if (res.data.success && res.data.short_url) {
+        setShortenedLinks(prev => ({ ...prev, [url]: res.data.short_url }));
+        navigator.clipboard.writeText(res.data.short_url);
+        toast.success('Short link copied to clipboard!');
+      } else {
+        toast.error(res.data.error || 'Failed to shorten link');
+      }
+    } catch (error) {
+      console.error('Shortening error:', error);
+      toast.error('Failed to shorten link');
+    } finally {
+      setShorteningUrl(null);
+    }
+  };
+
+  // Download QR code
+  const downloadQR = () => {
+    const svg = qrRef.current?.querySelector('svg');
+    if (!svg) return;
+    
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      canvas.width = 300;
+      canvas.height = 300;
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, 300, 300);
+      ctx.drawImage(img, 0, 0, 300, 300);
+      
+      const pngUrl = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pngUrl;
+      downloadLink.download = `${survey.name.replace(/[^a-z0-9]/gi, '_')}_qr.png`;
+      downloadLink.click();
+    };
+    
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+    toast.success('QR code downloaded');
   };
 
   const addQuestion = (type) => {
