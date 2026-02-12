@@ -9,12 +9,8 @@ import {
   LogOut,
   Menu,
   X,
-  Search,
-  Bell,
   ChevronRight,
   Plus,
-  Moon,
-  Sun,
   CreditCard
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
@@ -27,11 +23,9 @@ import {
   DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu';
 import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
 } from '../../components/ui/tooltip';
+import { DashboardHeader } from '../../components/ui/dashboard-header';
 import { useAuthStore, useOrgStore, useUIStore } from '../../store';
 import { cn } from '../../lib/utils';
 
