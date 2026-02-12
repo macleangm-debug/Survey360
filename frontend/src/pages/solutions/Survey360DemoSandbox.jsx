@@ -966,13 +966,6 @@ function ResponsesView({ responses, isSimulating, setIsSimulating }) {
     </div>
   );
 }
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
 
 // Analytics View Component
 function AnalyticsView({ data, responseCount }) {
