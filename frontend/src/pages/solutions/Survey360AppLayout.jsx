@@ -217,49 +217,17 @@ export function Survey360AppLayout({ children }) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Top Header */}
-          <header className={`h-14 ${bgSecondary} border-b ${borderColor} flex items-center px-4 lg:px-6 gap-4 transition-colors duration-300`}>
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className={`lg:hidden p-2 rounded-lg ${hoverBg} ${textSecondary}`}
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-
-            {/* Search */}
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
-                <input
-                  type="text"
-                  placeholder="Search surveys..."
-                  className={`w-full pl-9 pr-4 py-2 text-sm ${inputBg} border ${borderColor} rounded-lg focus:ring-2 focus:ring-teal-500/20 transition-all ${textPrimary} placeholder:${textMuted}`}
-                />
-              </div>
-            </div>
-
-            {/* Right side actions */}
-            <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button 
-                    onClick={toggleTheme}
-                    className={`p-2 rounded-lg ${hoverBg} ${textSecondary}`}
-                    data-testid="theme-toggle-btn"
-                  >
-                    {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>{theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</TooltipContent>
-              </Tooltip>
-              
-              <button className={`p-2 rounded-lg ${hoverBg} ${textSecondary} relative`}>
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-teal-500 rounded-full" />
-              </button>
-            </div>
-          </header>
+          {/* Top Header - Using Reusable DashboardHeader */}
+          <DashboardHeader
+            user={user}
+            theme={theme}
+            onThemeToggle={toggleTheme}
+            onLogout={handleLogout}
+            onMenuClick={() => setMobileMenuOpen(true)}
+            showMobileMenu={true}
+            searchPlaceholder="Search surveys..."
+            onSearch={(query) => console.log('Search:', query)}
+          />
 
           {/* Main Content */}
           <main className={`flex-1 overflow-y-auto ${bgPrimary} transition-colors duration-300`}>
