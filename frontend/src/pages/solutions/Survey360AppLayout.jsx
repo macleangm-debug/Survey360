@@ -103,6 +103,7 @@ export function Survey360AppLayout({ children }) {
             <Button 
               onClick={() => navigate('/solutions/survey360/app/surveys/new')}
               className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white border-0"
+              data-tour="new-survey"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Survey
@@ -120,6 +121,7 @@ export function Survey360AppLayout({ children }) {
                 <Link
                   key={item.id}
                   to={item.path}
+                  data-tour={item.id}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
                     isActive 
