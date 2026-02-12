@@ -328,6 +328,24 @@ export function Survey360DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Help Button - Restart Tour */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <Button
+          onClick={resetOnboarding}
+          className="rounded-full w-12 h-12 p-0 bg-blue-500 hover:bg-blue-600 text-white shadow-lg"
+          title="Take a tour"
+        >
+          <HelpCircle className="w-5 h-5" />
+        </Button>
+      </div>
+
+      {/* Onboarding Wizard */}
+      <OnboardingWizard
+        isOpen={showOnboarding}
+        onClose={closeOnboarding}
+        onComplete={() => console.log('Onboarding complete!')}
+      />
     </div>
   );
 }
