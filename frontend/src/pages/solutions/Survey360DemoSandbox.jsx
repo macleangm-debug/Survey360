@@ -975,8 +975,10 @@ function ResponsesView({ responses, isSimulating, setIsSimulating }) {
 }
 
 // Analytics View Component
-function AnalyticsView({ data }) {
+function AnalyticsView({ data, responseCount }) {
   const maxCount = Math.max(...data.responsesByDay.map(d => d.count));
+  const [hoveredBar, setHoveredBar] = useState(null);
+  const [hoveredRating, setHoveredRating] = useState(null);
 
   return (
     <div className="space-y-6">
@@ -991,19 +993,74 @@ function AnalyticsView({ data }) {
             Last 7 days
             <ChevronDown className="w-4 h-4 ml-2" />
           </Button>
+          <Button variant="outline" className="border-white/10 text-gray-300">
+            <Download className="w-4 h-4 mr-2" />
+            Export
+            <Lock className="w-3 h-3 ml-2 opacity-50" />
+          </Button>
         </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-3 gap-4">
+        <motion.div 
+          className="bg-white/5 rounded-xl p-4 border border-white/10"
+          whileHover={{ scale: 1.02 }}
+        >
+          <p className="text-sm text-gray-500 mb-1">Total Responses</p>
+          <p className="text-3xl font-bold text-white">{responseCount.toLocaleString()}</p>
+          <p className="text-xs text-green-400 mt-1">+12% from last week</p>
+        </motion.div>
+        <motion.div 
+          className="bg-white/5 rounded-xl p-4 border border-white/10"
+          whileHover={{ scale: 1.02 }}
+        >
+          <p className="text-sm text-gray-500 mb-1">Avg. Satisfaction</p>
+          <p className="text-3xl font-bold text-white">4.2</p>
+          <div className="flex items-center gap-0.5 mt-1">
+            {[1,2,3,4].map(i => <Star key={i} className="w-3 h-3 text-yellow-400 fill-yellow-400" />)}
+            <Star className="w-3 h-3 text-yellow-400" />
+          </div>
+        </motion.div>
+        <motion.div 
+          className="bg-white/5 rounded-xl p-4 border border-white/10"
+          whileHover={{ scale: 1.02 }}
+        >
+          <p className="text-sm text-gray-500 mb-1">Completion Rate</p>
+          <p className="text-3xl font-bold text-white">94%</p>
+          <p className="text-xs text-green-400 mt-1">+3% from last week</p>
+        </motion.div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Responses Chart */}
         <div className="bg-white/5 rounded-xl p-5 border border-white/10">
           <h3 className="font-semibold text-white mb-4">Responses This Week</h3>
-          <div className="flex items-end justify-between gap-2 h-48">
+          <div className="flex items-end justify-between gap-2 h-48 relative">
             {data.responsesByDay.map((day, idx) => (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-2">
-                <div 
-                  className="w-full bg-gradient-to-t from-teal-500 to-cyan-500 rounded-t-lg transition-all hover:opacity-80"
+              <div 
+                key={idx} 
+                className="flex-1 flex flex-col items-center gap-2 relative"
+                onMouseEnter={() => setHoveredBar(idx)}
+                onMouseLeave={() => setHoveredBar(null)}
+              >
+                {hoveredBar === idx && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute -top-8 bg-[#0f1d32] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white shadow-xl z-10"
+                  >
+                    <span className="font-semibold">{day.count}</span> responses
+                  </motion.div>
+                )}
+                <motion.div 
+                  className={`w-full rounded-t-lg transition-all cursor-pointer ${
+                    hoveredBar === idx 
+                      ? 'bg-gradient-to-t from-teal-400 to-cyan-400' 
+                      : 'bg-gradient-to-t from-teal-500 to-cyan-500'
+                  }`}
                   style={{ height: `${(day.count / maxCount) * 100}%` }}
+                  whileHover={{ scale: 1.05 }}
                 />
                 <span className="text-xs text-gray-500">{day.day}</span>
               </div>
@@ -1016,18 +1073,35 @@ function AnalyticsView({ data }) {
           <h3 className="font-semibold text-white mb-4">Satisfaction Breakdown</h3>
           <div className="space-y-3">
             {data.satisfactionBreakdown.map((item, idx) => (
-              <div key={idx}>
+              <motion.div 
+                key={idx}
+                className="cursor-pointer"
+                onHoverStart={() => setHoveredRating(idx)}
+                onHoverEnd={() => setHoveredRating(null)}
+                whileHover={{ x: 4 }}
+              >
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-gray-400">{item.rating}</span>
-                  <span className="text-white">{item.percent}%</span>
+                  <span className={`${hoveredRating === idx ? 'text-teal-400' : 'text-gray-400'} transition-colors`}>
+                    {item.rating}
+                  </span>
+                  <span className="text-white">
+                    {item.percent}% 
+                    <span className="text-gray-500 text-xs ml-1">({item.count})</span>
+                  </span>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full"
-                    style={{ width: `${item.percent}%` }}
+                  <motion.div 
+                    className={`h-full rounded-full ${
+                      hoveredRating === idx 
+                        ? 'bg-gradient-to-r from-teal-400 to-cyan-400' 
+                        : 'bg-gradient-to-r from-teal-500 to-cyan-500'
+                    }`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${item.percent}%` }}
+                    transition={{ duration: 0.5, delay: idx * 0.1 }}
                   />
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
