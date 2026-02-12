@@ -596,172 +596,30 @@ export function Survey360BuilderPage() {
               Preview
             </Button>
             
-            <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="border-white/10 text-gray-300 hover:bg-white/5">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="bg-[#0f1d32] border-white/10 overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle className="text-white">Survey Settings</SheetTitle>
-                  <SheetDescription className="text-gray-400">Configure your survey options</SheetDescription>
-                </SheetHeader>
-                <div className="space-y-6 py-6">
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Survey Name</Label>
-                    <Input
-                      value={survey.name}
-                      onChange={(e) => setSurvey({ ...survey, name: e.target.value })}
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Description</Label>
-                    <Textarea
-                      value={survey.description}
-                      onChange={(e) => setSurvey({ ...survey, description: e.target.value })}
-                      rows={3}
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                  </div>
-                  
-                  <Separator className="bg-white/10" />
-                  
-                  {/* Close Date */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Close Date (Optional)</Label>
-                    <DatePicker
-                      value={survey.close_date ? new Date(survey.close_date) : null}
-                      onChange={(date) => setSurvey({ ...survey, close_date: date ? date.toISOString() : null })}
-                      placeholder="Pick a date"
-                      minDate={new Date()}
-                      clearable={true}
-                      isDark={true}
-                    />
-                    <p className="text-xs text-gray-500">Survey will automatically stop accepting responses after this date</p>
-                  </div>
-                  
-                  {/* Max Responses */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Max Responses (Optional)</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={survey.max_responses || ''}
-                      onChange={(e) => setSurvey({ ...survey, max_responses: e.target.value ? parseInt(e.target.value) : null })}
-                      placeholder="Unlimited"
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                    <p className="text-xs text-gray-500">Survey will close after reaching this number of responses</p>
-                  </div>
-                  
-                  <Separator className="bg-white/10" />
-                  
-                  {/* Thank You Message */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Thank You Message</Label>
-                    <Textarea
-                      value={survey.thank_you_message || ''}
-                      onChange={(e) => setSurvey({ ...survey, thank_you_message: e.target.value })}
-                      rows={3}
-                      placeholder="Thank you for completing our survey!"
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                    <p className="text-xs text-gray-500">Shown to respondents after submitting</p>
-                  </div>
-                  
-                  {/* Brand Color */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Brand Color</Label>
-                    <ColorPicker
-                      value={survey.brand_color || '#14b8a6'}
-                      onChange={(color) => setSurvey({ ...survey, brand_color: color })}
-                      showPresets={true}
-                      showCustom={true}
-                      showPreview={true}
-                      previewText="Submit Survey"
-                      isDark={true}
-                    />
-                    <p className="text-xs text-gray-500">Accent color for the public survey form</p>
-                  </div>
-                  
-                  {/* Logo Upload */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Logo</Label>
-                    <input 
-                      type="file" 
-                      ref={logoInputRef}
-                      onChange={handleLogoUpload}
-                      accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
-                      className="hidden"
-                    />
-                    {survey.logo_url ? (
-                      <div className="relative inline-block">
-                        <img 
-                          src={survey.logo_url} 
-                          alt="Survey logo" 
-                          className="h-16 max-w-[200px] object-contain bg-white/5 rounded-lg p-2"
-                        />
-                        <Button
-                          size="icon"
-                          variant="destructive"
-                          className="absolute -top-2 -right-2 w-6 h-6"
-                          onClick={handleRemoveLogo}
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        onClick={() => logoInputRef.current?.click()}
-                        disabled={uploading || !isEditing}
-                        className="w-full border-white/10 border-dashed text-gray-400 hover:bg-white/5 h-16"
-                      >
-                        {uploading ? (
-                          'Uploading...'
-                        ) : (
-                          <div className="flex flex-col items-center gap-1">
-                            <Upload className="w-5 h-5" />
-                            <span className="text-xs">{isEditing ? 'Upload Logo (500KB max)' : 'Save survey first'}</span>
-                          </div>
-                        )}
-                      </Button>
-                    )}
-                    <p className="text-xs text-gray-500">Displayed on the public survey form header</p>
-                  </div>
-                  
-                  {isEditing && survey.status === 'published' && (
-                    <>
-                      <Separator className="bg-white/10" />
-                      <div className="space-y-2">
-                        <Label className="text-gray-300">Public Survey Link</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            value={getPublicUrl()}
-                            readOnly
-                            className="bg-white/5 border-white/10 text-gray-300 text-sm"
-                          />
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              navigator.clipboard.writeText(getPublicUrl());
-                              toast.success('Link copied!');
-                            }}
-                            className="border-white/10 text-gray-300"
-                          >
-                            Copy
-                          </Button>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
+            {/* Settings Button */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="border-white/10 text-gray-300 hover:bg-white/5"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
+
+            {/* Settings Sidebar */}
+            <SurveySettingsSidebar
+              isOpen={settingsOpen}
+              onClose={() => setSettingsOpen(false)}
+              settings={survey}
+              onSettingsChange={(newSettings) => setSurvey({ ...survey, ...newSettings })}
+              isPublished={isEditing && survey.status === 'published'}
+              publicUrl={getPublicUrl()}
+              onLogoUpload={handleLogoUpload}
+              onLogoRemove={handleRemoveLogo}
+              uploading={uploading}
+              isDark={true}
+            />
 
             <Button 
               onClick={handleSave} 
