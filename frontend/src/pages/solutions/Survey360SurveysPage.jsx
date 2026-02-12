@@ -969,6 +969,38 @@ export function Survey360SurveysPage() {
       setSurveys([...surveys, response.data]);
       toast.success('Survey duplicated');
     } catch (error) {
+      console.error('Failed to duplicate:', error);
+      toast.error('Failed to duplicate survey');
+    }
+  };
+
+  const handleExportExcel = async (e, survey) => {
+    e.stopPropagation();
+    setExporting(survey.id);
+    try {
+      const response = await survey360Api.get(`/surveys/${survey.id}/export/excel`, {
+        responseType: 'blob'
+      });
+      
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${survey.name.replace(/[^a-z0-9]/gi, '_')}_responses.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Excel file downloaded');
+    } catch (error) {
+      console.error('Failed to export:', error);
+      toast.error('Failed to export responses');
+    } finally {
+      setExporting(null);
+    }
+  };
+    } catch (error) {
       console.error('Failed to duplicate survey:', error);
       toast.error('Failed to duplicate survey');
     }
