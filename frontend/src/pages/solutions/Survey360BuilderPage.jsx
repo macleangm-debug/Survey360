@@ -718,6 +718,16 @@ export function Survey360BuilderPage() {
                 Publish
               </Button>
             )}
+
+            {isEditing && survey.status === 'published' && (
+              <Button 
+                onClick={() => setShareDialogOpen(true)}
+                className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white border-0"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </Button>
+            )}
           </div>
         </div>
       </header>
