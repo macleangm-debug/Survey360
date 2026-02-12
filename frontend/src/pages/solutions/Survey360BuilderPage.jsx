@@ -319,7 +319,6 @@ export function Survey360BuilderPage() {
   const { theme } = useUIStore();
   const isDark = theme === 'dark';
   const isEditing = !!id && id !== 'new';
-  const logoInputRef = useRef(null);
   
   const [survey, setSurvey] = useState({
     name: '',
