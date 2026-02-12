@@ -109,8 +109,6 @@ export function DashboardHeader({
       onSearch(searchQuery);
     }
   };
-    }
-  };
 
   const defaultHelpLinks = [
     { icon: Book, label: 'Documentation', href: '#docs' },
