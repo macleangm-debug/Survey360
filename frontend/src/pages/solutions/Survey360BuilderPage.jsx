@@ -358,8 +358,9 @@ export function Survey360BuilderPage() {
     }
   };
 
-  const handleLogoUpload = async (e) => {
-    const file = e.target.files?.[0];
+  const handleLogoUpload = async (fileOrEvent) => {
+    // Handle both file directly or event from input
+    const file = fileOrEvent?.target?.files?.[0] || fileOrEvent;
     if (!file) return;
     
     // Validate file type
@@ -396,7 +397,6 @@ export function Survey360BuilderPage() {
       toast.error(error.response?.data?.detail || 'Failed to upload logo');
     } finally {
       setUploading(false);
-      if (logoInputRef.current) logoInputRef.current.value = '';
     }
   };
 
