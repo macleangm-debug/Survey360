@@ -1000,11 +1000,6 @@ export function Survey360SurveysPage() {
       setExporting(null);
     }
   };
-    } catch (error) {
-      console.error('Failed to duplicate survey:', error);
-      toast.error('Failed to duplicate survey');
-    }
-  };
 
   const handleDelete = async (e, survey) => {
     e.stopPropagation();
