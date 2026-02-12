@@ -687,86 +687,15 @@ export function Survey360BuilderPage() {
                   {/* Brand Color */}
                   <div className="space-y-2">
                     <Label className="text-gray-300">Brand Color</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal bg-white/5 border-white/10 text-white hover:bg-white/10"
-                        >
-                          <div 
-                            className="w-5 h-5 rounded mr-2 border border-white/20" 
-                            style={{ backgroundColor: survey.brand_color || '#14b8a6' }}
-                          />
-                          <span className="font-mono">{survey.brand_color || '#14b8a6'}</span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-64 bg-gray-900 border-white/10" align="start">
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label className="text-gray-300 text-sm">Select Color</Label>
-                            {/* Color Presets */}
-                            <div className="grid grid-cols-6 gap-2">
-                              {[
-                                '#14b8a6', '#10b981', '#22c55e', '#84cc16',
-                                '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7',
-                                '#ec4899', '#f43f5e', '#ef4444', '#f97316',
-                                '#f59e0b', '#eab308', '#78716c', '#64748b'
-                              ].map((color) => (
-                                <button
-                                  key={color}
-                                  type="button"
-                                  className={cn(
-                                    "w-8 h-8 rounded-lg border-2 transition-all hover:scale-110",
-                                    survey.brand_color === color ? "border-white ring-2 ring-white/30" : "border-transparent"
-                                  )}
-                                  style={{ backgroundColor: color }}
-                                  onClick={() => setSurvey({ ...survey, brand_color: color })}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                          
-                          {/* Custom Color Input */}
-                          <div className="space-y-2">
-                            <Label className="text-gray-300 text-sm">Custom Color</Label>
-                            <div className="flex gap-2">
-                              <div className="relative">
-                                <input
-                                  type="color"
-                                  value={survey.brand_color || '#14b8a6'}
-                                  onChange={(e) => setSurvey({ ...survey, brand_color: e.target.value })}
-                                  className="w-10 h-10 rounded-lg cursor-pointer border-0 p-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-lg [&::-webkit-color-swatch]:border-2 [&::-webkit-color-swatch]:border-white/20"
-                                />
-                              </div>
-                              <Input
-                                type="text"
-                                value={survey.brand_color || '#14b8a6'}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  if (/^#[0-9A-Fa-f]{0,6}$/.test(val) || val === '') {
-                                    setSurvey({ ...survey, brand_color: val || '#14b8a6' });
-                                  }
-                                }}
-                                className="flex-1 bg-white/5 border-white/10 text-white font-mono uppercase"
-                                placeholder="#14b8a6"
-                                maxLength={7}
-                              />
-                            </div>
-                          </div>
-                          
-                          {/* Preview */}
-                          <div className="space-y-2">
-                            <Label className="text-gray-300 text-sm">Preview</Label>
-                            <div 
-                              className="h-10 rounded-lg flex items-center justify-center text-white font-medium"
-                              style={{ backgroundColor: survey.brand_color || '#14b8a6' }}
-                            >
-                              Submit Survey
-                            </div>
-                          </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    <ColorPicker
+                      value={survey.brand_color || '#14b8a6'}
+                      onChange={(color) => setSurvey({ ...survey, brand_color: color })}
+                      showPresets={true}
+                      showCustom={true}
+                      showPreview={true}
+                      previewText="Submit Survey"
+                      isDark={true}
+                    />
                     <p className="text-xs text-gray-500">Accent color for the public survey form</p>
                   </div>
                   
