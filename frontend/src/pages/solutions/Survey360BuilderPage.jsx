@@ -22,10 +22,7 @@ import {
   MoreVertical,
   ExternalLink,
   Play,
-  GitBranch,
-  Upload,
-  Image,
-  X
+  GitBranch
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -36,8 +33,7 @@ import { Switch } from '../../components/ui/switch';
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { Skeleton } from '../../components/ui/skeleton';
-import { DatePicker } from '../../components/ui/date-picker';
-import { ColorPicker } from '../../components/ui/color-picker';
+import { SurveySettingsSidebar } from '../../components/ui/survey-settings-sidebar';
 import {
   Select,
   SelectContent,
@@ -45,14 +41,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '../../components/ui/sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
