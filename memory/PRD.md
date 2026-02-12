@@ -345,3 +345,100 @@ Added theme-aware styling to all Survey360 pages, allowing users to switch betwe
 - [ ] Add Excel export option
 - [ ] Survey scheduling (auto-publish/close)
 - [ ] Email invitation system
+
+---
+
+## Survey360 Advanced Analytics (Feb 12, 2026) - COMPLETE
+
+### Features Added:
+
+#### 1. Response Trends Chart (Line/Area Chart)
+- 14-day response history visualization
+- SVG-based line chart with area fill
+- Data points with hover states
+- Shows total and average statistics
+
+#### 2. Completion Rate Over Time (Bar Chart)
+- Daily completion percentage bars
+- Color-coded performance:
+  - Green (≥70%): Excellent
+  - Yellow (40-69%): Average
+  - Red (<40%): Needs attention
+- Y-axis percentage scale with legend
+
+#### 3. Average Time per Question (Horizontal Bar Chart)
+- Time estimate for each question type:
+  - Short Text: 15s
+  - Long Text: 45s
+  - Single Choice: 8s (+2s per option >4)
+  - Multiple Choice: 12s
+  - Dropdown: 6s
+  - Date: 10s
+  - Number: 8s
+  - Email: 12s
+  - Phone: 15s
+  - Rating: 5s
+- Answer count displayed per question
+- Total estimated survey time
+
+#### 4. Export Analytics Options
+- **Export Image (PNG)**: Visual summary with charts
+- **Export Report (TXT)**: Comprehensive text report
+- **Export JSON**: Raw analytics data for further processing
+
+### Summary Stats Cards:
+- Total Responses (with icon)
+- Completion Rate % (with icon)
+- Avg. Completion Time (with icon)
+- Completed Count (with icon)
+
+### Backend Changes:
+- File: `/app/backend/routes/survey360_routes.py`
+- Enhanced `GET /api/survey360/surveys/{id}/analytics` endpoint
+- New response fields:
+  - `response_trends` (14 days)
+  - `completion_rate_trends` (14 days)
+  - `question_times` (per question)
+  - `overall_completion_rate`
+  - `avg_completion_time`
+  - `completed_responses`
+
+### Frontend Changes:
+- File: `/app/frontend/src/pages/solutions/Survey360ResponsesPage.jsx`
+- New chart components:
+  - `TrendChart` - SVG line/area chart
+  - `CompletionRateChart` - Color-coded bar chart
+  - `QuestionTimeChart` - Horizontal bar chart
+- Export handler: `handleExportAnalytics(format)`
+- Analytics ref for export capture
+
+### Test Results: Backend API verified, Frontend rendering confirmed
+
+### Backlog:
+- [ ] Add real-time tracking per question (requires paradata)
+- [ ] PDF export with styled charts
+- [ ] Comparison analytics (vs previous period)
+- [ ] Drill-down by respondent segment
+
+---
+
+## Backlog (Updated Feb 12, 2026)
+
+### P0 (Completed)
+- [x] Light/Dark Mode Theme Toggle
+- [x] Advanced Analytics (Trends, Completion Rate, Time per Question, Export)
+
+### P1 (Next)
+- [ ] Make Demo Screen interactive (user question pending)
+
+### P2 (Future)
+- [ ] Add Excel export option
+- [ ] Survey scheduling (auto-publish/close)
+- [ ] Email invitation system
+- [ ] PDF export with styled charts
+
+### P3 (Backlog)
+- [ ] Redis Sentinel for true high availability
+- [ ] Comparison analytics (vs previous period)
+- [ ] Team collaboration features
+- [ ] Third-party integrations (Zapier, Mailchimp)
