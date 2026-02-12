@@ -167,47 +167,8 @@ export function DashboardHeader({
 
         {/* Right side actions - Far right */}
         <div className="flex items-center gap-1">
-          {/* Language Selector */}
-          <DropdownMenu>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <button 
-                    className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg ${hoverBg} ${textSecondary}`}
-                    data-testid="language-btn"
-                  >
-                    <Globe className="w-4 h-4" />
-                    <span className="text-sm hidden sm:inline">{currentLang.flag}</span>
-                    <ChevronDown className="w-3 h-3" />
-                  </button>
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent>Language</TooltipContent>
-            </Tooltip>
-            <DropdownMenuContent 
-              align="end" 
-              className={`w-48 ${bgSecondary} ${borderColor}`}
-            >
-              <DropdownMenuLabel className={textMuted}>Select Language</DropdownMenuLabel>
-              <DropdownMenuSeparator className={borderColor} />
-              {languages.map((lang) => (
-                <DropdownMenuItem
-                  key={lang.code}
-                  onClick={() => handleLanguageSelect(lang.code)}
-                  className={cn(
-                    `${textSecondary} hover:text-teal-500 ${hoverBg} cursor-pointer`,
-                    selectedLanguage === lang.code && 'text-teal-500'
-                  )}
-                >
-                  <span className="mr-2">{lang.flag}</span>
-                  {lang.name}
-                  {selectedLanguage === lang.code && (
-                    <Check className="w-4 h-4 ml-auto text-teal-500" />
-                  )}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Language Selector - Using reusable component */}
+          <LanguageSelectorCompact className={textSecondary} />
 
           {/* Help Menu */}
           <DropdownMenu>
