@@ -341,6 +341,7 @@ const NAV_ITEMS = [
   { id: 'surveys', icon: ClipboardList, label: 'Surveys' },
   { id: 'responses', icon: FileText, label: 'Responses' },
   { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+  { id: 'try-survey', icon: Play, label: 'Try Survey', highlight: true },
   { id: 'team', icon: Users, label: 'Team' },
   { id: 'settings', icon: Settings, label: 'Settings' },
 ];
