@@ -342,12 +342,12 @@ const QuestionTimeChart = ({ data, isDark }) => {
     </div>
   );
 };
-};
 
 export function Survey360ResponsesPage() {
   const navigate = useNavigate();
   const { currentOrg } = useOrgStore();
   const { theme } = useUIStore();
+  const analyticsRef = useRef(null);
   const isDark = theme === 'dark';
   const [responses, setResponses] = useState([]);
   const [surveys, setSurveys] = useState([]);
