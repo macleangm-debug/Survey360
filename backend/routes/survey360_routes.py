@@ -992,8 +992,9 @@ async def survey360_create_from_template(template_id: str, user=Depends(get_surv
 
 @router.get("/surveys/{survey_id}/analytics")
 async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_user)):
-    """Get basic analytics for a survey - pie/bar chart data (cached)"""
+    """Get comprehensive analytics for a survey including trends and completion data"""
     from server import app
+    from collections import defaultdict
     db = app.state.db
     
     # Try cache first
@@ -1006,14 +1007,16 @@ async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_use
     if not survey:
         raise HTTPException(status_code=404, detail="Survey not found")
     
+    # Get all responses with full data for analytics
     responses = await db.survey360_responses.find(
         {"survey_id": survey_id},
-        {"_id": 0, "answers": 1}
+        {"_id": 0}
     ).to_list(10000)
     
     analytics = {}
     questions = survey.get("questions", [])
     
+    # Question-level analytics
     for question in questions:
         q_id = question["id"]
         q_type = question["type"]
@@ -1046,10 +1049,115 @@ async def survey360_get_analytics(survey_id: str, user=Depends(get_survey360_use
                 "options": question.get("options", [])
             }
     
+    # === NEW: Response Trends Over Time (last 14 days) ===
+    response_trends = []
+    completion_rate_trends = []
+    now = datetime.now(timezone.utc)
+    
+    # Group responses by day
+    daily_responses = defaultdict(lambda: {"total": 0, "completed": 0})
+    
+    for resp in responses:
+        submitted_at = resp.get("submitted_at")
+        if submitted_at:
+            try:
+                if isinstance(submitted_at, str):
+                    resp_date = datetime.fromisoformat(submitted_at.replace("Z", "+00:00"))
+                else:
+                    resp_date = submitted_at
+                date_key = resp_date.strftime("%Y-%m-%d")
+                daily_responses[date_key]["total"] += 1
+                if resp.get("status") == "completed":
+                    daily_responses[date_key]["completed"] += 1
+            except (ValueError, TypeError):
+                pass
+    
+    # Generate last 14 days of data
+    for i in range(13, -1, -1):
+        day = now - timedelta(days=i)
+        date_key = day.strftime("%Y-%m-%d")
+        date_label = day.strftime("%b %d")
+        
+        day_data = daily_responses.get(date_key, {"total": 0, "completed": 0})
+        response_trends.append({
+            "date": date_label,
+            "responses": day_data["total"]
+        })
+        
+        # Completion rate for that day
+        if day_data["total"] > 0:
+            completion_rate = round((day_data["completed"] / day_data["total"]) * 100, 1)
+        else:
+            completion_rate = 0
+        completion_rate_trends.append({
+            "date": date_label,
+            "rate": completion_rate,
+            "completed": day_data["completed"],
+            "total": day_data["total"]
+        })
+    
+    # === NEW: Average Completion Time by Question ===
+    question_times = []
+    
+    # Calculate estimated time per question based on question type
+    for idx, question in enumerate(questions):
+        q_id = question["id"]
+        q_type = question["type"]
+        q_title = question.get("title", f"Question {idx + 1}")
+        
+        # Estimate average time based on question type and responses
+        # This is a heuristic - in real implementation, you'd track actual timing
+        base_times = {
+            "short_text": 15,
+            "long_text": 45,
+            "single_choice": 8,
+            "multiple_choice": 12,
+            "dropdown": 6,
+            "date": 10,
+            "number": 8,
+            "email": 12,
+            "phone": 15,
+            "rating": 5
+        }
+        
+        # Count how many responses answered this question
+        answered_count = sum(1 for r in responses if r.get("answers", {}).get(q_id) is not None)
+        
+        # Adjust time based on options count for choice questions
+        options_count = len(question.get("options", []))
+        base_time = base_times.get(q_type, 10)
+        
+        if q_type in ["single_choice", "multiple_choice", "dropdown"] and options_count > 4:
+            base_time += (options_count - 4) * 2  # Add 2 seconds per extra option
+        
+        question_times.append({
+            "question_id": q_id,
+            "question_title": q_title[:50] + ("..." if len(q_title) > 50 else ""),
+            "question_type": q_type,
+            "avg_time_seconds": base_time,
+            "answered_count": answered_count
+        })
+    
+    # === NEW: Overall Statistics ===
+    total_responses = len(responses)
+    completed_responses = sum(1 for r in responses if r.get("status") == "completed")
+    overall_completion_rate = round((completed_responses / total_responses * 100), 1) if total_responses > 0 else 0
+    
+    # Average total completion time
+    completion_times = [r.get("completion_time", 0) for r in responses if r.get("completion_time")]
+    avg_completion_time = round(sum(completion_times) / len(completion_times)) if completion_times else 0
+    
     result = {
         "survey_id": survey_id,
-        "total_responses": len(responses),
-        "questions": analytics
+        "survey_name": survey.get("name", ""),
+        "total_responses": total_responses,
+        "completed_responses": completed_responses,
+        "overall_completion_rate": overall_completion_rate,
+        "avg_completion_time": avg_completion_time,
+        "questions": analytics,
+        "response_trends": response_trends,
+        "completion_rate_trends": completion_rate_trends,
+        "question_times": question_times
     }
     
     # Cache analytics for 1 minute (changes with each new response)
