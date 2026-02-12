@@ -12,7 +12,7 @@ import {
   AlignLeft,
   List,
   CheckSquare,
-  Calendar,
+  Calendar as CalendarIcon,
   Hash,
   Mail,
   Phone,
@@ -25,7 +25,9 @@ import {
   GitBranch,
   Upload,
   Image,
-  X
+  X,
+  Clock,
+  Palette
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -36,6 +38,8 @@ import { Switch } from '../../components/ui/switch';
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { Skeleton } from '../../components/ui/skeleton';
+import { Calendar } from '../../components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
 import {
   Select,
   SelectContent,
