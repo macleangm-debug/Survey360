@@ -1088,6 +1088,313 @@ function TeamView() {
   );
 }
 
+// Try Survey View Component - Interactive survey filling experience
+function TrySurveyView({ surveys }) {
+  const [selectedSurvey, setSelectedSurvey] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [rating, setRating] = useState(0);
+
+  const survey = selectedSurvey || surveys[0];
+  const questions = survey?.questions || [];
+  const question = questions[currentQuestion];
+
+  const handleAnswer = (value) => {
+    setAnswers(prev => ({ ...prev, [question.id]: value }));
+  };
+
+  const handleNext = () => {
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(prev => prev + 1);
+    } else {
+      setSubmitted(true);
+      toast.success('Survey submitted successfully!', {
+        description: 'Thank you for your feedback (Demo mode)',
+      });
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(prev => prev - 1);
+    }
+  };
+
+  const resetSurvey = () => {
+    setCurrentQuestion(0);
+    setAnswers({});
+    setSubmitted(false);
+    setRating(0);
+  };
+
+  if (submitted) {
+    return (
+      <div className="space-y-6">
+        <div className="max-w-2xl mx-auto text-center py-12">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6"
+          >
+            <CheckCircle2 className="w-10 h-10 text-green-400" />
+          </motion.div>
+          <h2 className="text-3xl font-bold text-white mb-4">Thank You!</h2>
+          <p className="text-gray-400 mb-8">
+            Your response has been recorded. In a real survey, this data would be saved and available in your analytics dashboard.
+          </p>
+          <div className="flex justify-center gap-4">
+            <Button onClick={resetSurvey} variant="outline" className="border-white/10 text-gray-300">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Try Again
+            </Button>
+            <Button onClick={() => setSelectedSurvey(surveys[1])} className="bg-teal-500 hover:bg-teal-400 text-white">
+              Try Another Survey
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Try a Survey</h1>
+          <p className="text-gray-400">Experience how respondents fill out your surveys</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {surveys.map((s) => (
+            <Button
+              key={s.id}
+              variant={selectedSurvey?.id === s.id || (!selectedSurvey && s.id === surveys[0].id) ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => { setSelectedSurvey(s); resetSurvey(); }}
+              className={selectedSurvey?.id === s.id || (!selectedSurvey && s.id === surveys[0].id) 
+                ? 'bg-teal-500 hover:bg-teal-400 text-white' 
+                : 'border-white/10 text-gray-300'}
+            >
+              {s.name.split(' ').slice(0, 2).join(' ')}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Survey Card */}
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
+          {/* Survey Header */}
+          <div className="bg-gradient-to-r from-teal-500/20 to-cyan-500/20 px-6 py-4 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-teal-500/20 flex items-center justify-center">
+                <ClipboardList className="w-5 h-5 text-teal-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-white">{survey.name}</h3>
+                <p className="text-sm text-gray-400">{survey.description}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="px-6 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-gray-400">Question {currentQuestion + 1} of {questions.length}</span>
+              <span className="text-teal-400">{Math.round(((currentQuestion + 1) / questions.length) * 100)}%</span>
+            </div>
+            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+              <motion.div 
+                className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+          </div>
+
+          {/* Question Content */}
+          <div className="p-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={question?.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <div>
+                  <Label className="text-lg text-white mb-1 block">
+                    {question?.title}
+                    {question?.required && <span className="text-red-400 ml-1">*</span>}
+                  </Label>
+                </div>
+
+                {/* Rating Question */}
+                {question?.type === 'rating' && (
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => { setRating(star); handleAnswer(star); }}
+                        className="p-1 transition-transform hover:scale-110"
+                      >
+                        <Star 
+                          className={`w-10 h-10 ${star <= (answers[question.id] || rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600 hover:text-gray-400'}`} 
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Single Choice Question */}
+                {question?.type === 'single_choice' && (
+                  <div className="space-y-3">
+                    {question.options?.map((option, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleAnswer(option)}
+                        className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
+                          answers[question.id] === option 
+                            ? 'border-teal-500 bg-teal-500/10 text-teal-400' 
+                            : 'border-white/10 text-gray-300 hover:border-white/30'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            answers[question.id] === option ? 'border-teal-500' : 'border-gray-500'
+                          }`}>
+                            {answers[question.id] === option && (
+                              <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
+                            )}
+                          </div>
+                          {option}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Multiple Choice Question */}
+                {question?.type === 'multiple_choice' && (
+                  <div className="space-y-3">
+                    {question.options?.map((option, idx) => {
+                      const selected = (answers[question.id] || []).includes(option);
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            const current = answers[question.id] || [];
+                            if (selected) {
+                              handleAnswer(current.filter(o => o !== option));
+                            } else {
+                              handleAnswer([...current, option]);
+                            }
+                          }}
+                          className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
+                            selected
+                              ? 'border-teal-500 bg-teal-500/10 text-teal-400' 
+                              : 'border-white/10 text-gray-300 hover:border-white/30'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                              selected ? 'border-teal-500 bg-teal-500' : 'border-gray-500'
+                            }`}>
+                              {selected && <CheckCircle2 className="w-3 h-3 text-white" />}
+                            </div>
+                            {option}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Short Text Question */}
+                {question?.type === 'short_text' && (
+                  <Input 
+                    value={answers[question.id] || ''}
+                    onChange={(e) => handleAnswer(e.target.value)}
+                    placeholder="Type your answer..."
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                )}
+
+                {/* Email Question */}
+                {question?.type === 'email' && (
+                  <Input 
+                    type="email"
+                    value={answers[question.id] || ''}
+                    onChange={(e) => handleAnswer(e.target.value)}
+                    placeholder="your@email.com"
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                )}
+
+                {/* Long Text Question */}
+                {question?.type === 'long_text' && (
+                  <Textarea 
+                    value={answers[question.id] || ''}
+                    onChange={(e) => handleAnswer(e.target.value)}
+                    placeholder="Type your detailed answer..."
+                    rows={4}
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation */}
+          <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
+            <Button 
+              variant="ghost" 
+              onClick={handlePrev}
+              disabled={currentQuestion === 0}
+              className="text-gray-400 disabled:opacity-50"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </Button>
+            <Button 
+              onClick={handleNext}
+              className="bg-teal-500 hover:bg-teal-400 text-white"
+            >
+              {currentQuestion === questions.length - 1 ? (
+                <>
+                  Submit
+                  <Send className="w-4 h-4 ml-2" />
+                </>
+              ) : (
+                <>
+                  Next
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Info Card */}
+        <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg px-4 py-3">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="text-blue-400 font-medium">Demo Mode</p>
+              <p className="text-blue-400/70">
+                This is a sample survey. Your responses won't be saved. Start a free trial to create your own surveys!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Settings View Component
 function SettingsView() {
   return (
