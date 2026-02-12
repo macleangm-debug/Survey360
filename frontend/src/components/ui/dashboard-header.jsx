@@ -15,11 +15,11 @@ import {
   MessageCircle,
   Keyboard,
   ExternalLink,
-  Check,
   X,
   Menu,
+  Globe,
+  Check,
 } from 'lucide-react';
-import { Button } from './button';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import {
   DropdownMenu,
@@ -43,6 +43,17 @@ const KEYBOARD_SHORTCUTS = [
   { keys: ['Ctrl', 'D'], description: 'Go to dashboard' },
   { keys: ['Ctrl', '/'], description: 'Show shortcuts' },
   { keys: ['Esc'], description: 'Close modal' },
+];
+
+// Available languages
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
 ];
 
 // Sample notifications - can be passed as prop in real usage
@@ -83,12 +94,15 @@ export function DashboardHeader({
   onNotificationClick,
   onClearNotifications,
   helpLinks = [],
+  languages = LANGUAGES,
+  currentLanguage = 'en',
+  onLanguageChange,
   className,
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
   
   const isDark = theme === 'dark';
   
@@ -102,11 +116,19 @@ export function DashboardHeader({
   const inputBg = isDark ? 'bg-white/5' : 'bg-gray-100';
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  const currentLang = languages.find(l => l.code === selectedLanguage) || languages[0];
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (onSearch && searchQuery.trim()) {
       onSearch(searchQuery);
+    }
+  };
+
+  const handleLanguageSelect = (langCode) => {
+    setSelectedLanguage(langCode);
+    if (onLanguageChange) {
+      onLanguageChange(langCode);
     }
   };
 
@@ -138,7 +160,7 @@ export function DashboardHeader({
           </button>
         )}
 
-        {/* Search */}
+        {/* Search - Left side */}
         <form onSubmit={handleSearch} className="flex-1 max-w-md">
           <div className="relative">
             <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
@@ -160,8 +182,53 @@ export function DashboardHeader({
           </div>
         </form>
 
-        {/* Right side actions */}
+        {/* Spacer to push icons to far right */}
+        <div className="flex-1" />
+
+        {/* Right side actions - Far right */}
         <div className="flex items-center gap-1">
+          {/* Language Selector */}
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <button 
+                    className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg ${hoverBg} ${textSecondary}`}
+                    data-testid="language-btn"
+                  >
+                    <Globe className="w-4 h-4" />
+                    <span className="text-sm hidden sm:inline">{currentLang.flag}</span>
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Language</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent 
+              align="end" 
+              className={`w-48 ${bgSecondary} ${borderColor}`}
+            >
+              <DropdownMenuLabel className={textMuted}>Select Language</DropdownMenuLabel>
+              <DropdownMenuSeparator className={borderColor} />
+              {languages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onClick={() => handleLanguageSelect(lang.code)}
+                  className={cn(
+                    `${textSecondary} hover:text-teal-500 ${hoverBg} cursor-pointer`,
+                    selectedLanguage === lang.code && 'text-teal-500'
+                  )}
+                >
+                  <span className="mr-2">{lang.flag}</span>
+                  {lang.name}
+                  {selectedLanguage === lang.code && (
+                    <Check className="w-4 h-4 ml-auto text-teal-500" />
+                  )}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Help Menu */}
           <DropdownMenu>
             <Tooltip>
