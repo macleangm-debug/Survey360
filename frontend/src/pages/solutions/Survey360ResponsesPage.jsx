@@ -926,7 +926,7 @@ ${analytics?.question_times?.map((q, i) => `Q${i+1}: ${q.question_title} - ${q.a
             </Card>
           ) : loadingAnalytics ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Array(4).fill(0).map((_, i) => (
+              {Array(6).fill(0).map((_, i) => (
                 <Card key={i} className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
                   <CardContent className="p-6">
                     <Skeleton className={`h-6 w-1/2 mb-4 ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
@@ -935,30 +935,188 @@ ${analytics?.question_times?.map((q, i) => `Q${i+1}: ${q.question_title} - ${q.a
                 </Card>
               ))}
             </div>
-          ) : analytics && Object.keys(analytics.questions).length > 0 ? (
-            <div className="space-y-6">
-              <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
-                <CardHeader>
-                  <CardTitle className={`text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>Response Summary</CardTitle>
-                  <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>
-                    {analytics.total_responses} total responses
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.values(analytics.questions).map((q) => (
-                  <Card key={q.question_id} className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
-                    <CardContent className="p-6">
-                      {q.question_type === 'single_choice' || q.question_type === 'dropdown' ? (
-                        <SimplePieChart data={q.chart_data} title={q.question_title} isDark={isDark} />
-                      ) : (
-                        <SimpleBarChart data={q.chart_data} title={q.question_title} isDark={isDark} />
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+          ) : analytics ? (
+            <div ref={analyticsRef} className="space-y-6">
+              {/* Export Buttons */}
+              <div className="flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleExportAnalytics('png')}
+                  className={isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
+                >
+                  <Image className="w-4 h-4 mr-2" />
+                  Export Image
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleExportAnalytics('txt')}
+                  className={isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
+                >
+                  <FileDown className="w-4 h-4 mr-2" />
+                  Export Report
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleExportAnalytics('json')}
+                  className={isDark ? 'border-white/10 text-gray-300 hover:bg-white/5' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export JSON
+                </Button>
               </div>
+
+              {/* Summary Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center">
+                        <BarChart3 className="w-5 h-5 text-teal-400" />
+                      </div>
+                      <div>
+                        <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{analytics.total_responses}</p>
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Total Responses</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                        <Percent className="w-5 h-5 text-green-500" />
+                      </div>
+                      <div>
+                        <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{analytics.overall_completion_rate}%</p>
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Completion Rate</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                        <Timer className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                          {Math.floor((analytics.avg_completion_time || 0) / 60)}m {(analytics.avg_completion_time || 0) % 60}s
+                        </p>
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Avg. Completion</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                        <CheckCircle className="w-5 h-5 text-purple-500" />
+                      </div>
+                      <div>
+                        <p className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{analytics.completed_responses}</p>
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Completed</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Trend Charts Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Response Trends Chart */}
+                <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className={`text-base flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      <TrendingUp className="w-4 h-4 text-teal-400" />
+                      Response Trends
+                    </CardTitle>
+                    <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>
+                      Last 14 days
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TrendChart 
+                      data={analytics.response_trends} 
+                      dataKey="responses"
+                      title=""
+                      color="#14b8a6"
+                      isDark={isDark}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Completion Rate Over Time */}
+                <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className={`text-base flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      <Activity className="w-4 h-4 text-green-500" />
+                      Completion Rate Over Time
+                    </CardTitle>
+                    <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>
+                      Daily completion percentage
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CompletionRateChart data={analytics.completion_rate_trends} isDark={isDark} />
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Question Time Analysis */}
+              {analytics.question_times && analytics.question_times.length > 0 && (
+                <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className={`text-base flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      <Timer className="w-4 h-4 text-blue-500" />
+                      Average Time per Question
+                    </CardTitle>
+                    <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>
+                      Estimated time spent on each question
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <QuestionTimeChart data={analytics.question_times} isDark={isDark} />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Question Analytics */}
+              {Object.keys(analytics.questions || {}).length > 0 && (
+                <>
+                  <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    Question Breakdown
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {Object.values(analytics.questions).map((q) => (
+                      <Card key={q.question_id} className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                        <CardContent className="p-6">
+                          {q.question_type === 'single_choice' || q.question_type === 'dropdown' ? (
+                            <SimplePieChart data={q.chart_data} title={q.question_title} isDark={isDark} />
+                          ) : (
+                            <SimpleBarChart data={q.chart_data} title={q.question_title} isDark={isDark} />
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Empty state if no question analytics */}
+              {Object.keys(analytics.questions || {}).length === 0 && analytics.total_responses === 0 && (
+                <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+                  <CardContent className="py-12 text-center">
+                    <BarChart3 className={`w-12 h-12 ${isDark ? 'text-gray-600' : 'text-gray-400'} mx-auto mb-4`} />
+                    <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>No Responses Yet</h3>
+                    <p className={isDark ? 'text-gray-500' : 'text-gray-500'}>Share your survey to start collecting responses and see analytics</p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           ) : (
             <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
