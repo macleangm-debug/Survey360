@@ -856,7 +856,7 @@ function SurveysView({ surveys, onSelect }) {
 }
 
 // Responses View Component
-function ResponsesView({ responses }) {
+function ResponsesView({ responses, isSimulating, setIsSimulating }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -865,6 +865,25 @@ function ResponsesView({ responses }) {
           <p className="text-gray-400">View and manage survey responses</p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Live Simulation Toggle */}
+          <Button 
+            variant="outline" 
+            className={`border-white/10 ${isSimulating ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'text-gray-300'}`}
+            onClick={() => setIsSimulating(!isSimulating)}
+          >
+            {isSimulating ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse" />
+                Live
+                <Pause className="w-4 h-4 ml-2" />
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 mr-2" />
+                Start Simulation
+              </>
+            )}
+          </Button>
           <Button variant="outline" className="border-white/10 text-gray-300">
             <Download className="w-4 h-4 mr-2" />
             Export
@@ -875,6 +894,15 @@ function ResponsesView({ responses }) {
           </Button>
         </div>
       </div>
+
+      {isSimulating && (
+        <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-4 py-3 flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          <p className="text-sm text-green-400">
+            Live simulation active — New responses will appear automatically every few seconds
+          </p>
+        </div>
+      )}
 
       <div className="bg-white/5 rounded-xl border border-white/10 overflow-hidden">
         <table className="w-full">
@@ -889,8 +917,14 @@ function ResponsesView({ responses }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {responses.map((response) => (
-              <tr key={response.id} className="hover:bg-white/5 transition-colors">
+            {responses.map((response, idx) => (
+              <motion.tr 
+                key={response.id} 
+                className="hover:bg-white/5 transition-colors"
+                initial={idx === 0 ? { opacity: 0, x: -20, backgroundColor: 'rgba(20, 184, 166, 0.1)' } : false}
+                animate={{ opacity: 1, x: 0, backgroundColor: 'transparent' }}
+                transition={{ duration: 0.5 }}
+              >
                 <td className="px-4 py-3">
                   <p className="text-sm text-white">{response.respondent}</p>
                 </td>
@@ -924,7 +958,14 @@ function ResponsesView({ responses }) {
                     <Eye className="w-4 h-4" />
                   </Button>
                 </td>
-              </tr>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
             ))}
           </tbody>
         </table>
