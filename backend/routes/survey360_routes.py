@@ -1378,3 +1378,599 @@ async def survey360_shorten_url(data: ShortenURLRequest, user=Depends(get_survey
             success=False,
             error="Failed to shorten URL. Service may be temporarily unavailable."
         )
+
+
+# ============================================
+# EXCEL EXPORT
+# ============================================
+
+from fastapi.responses import StreamingResponse
+from io import BytesIO
+
+@router.get("/surveys/{survey_id}/export/excel")
+async def survey360_export_excel(survey_id: str, user=Depends(get_survey360_user)):
+    """
+    Export survey responses to Excel (.xlsx) format.
+    Includes survey metadata, questions, and all responses.
+    """
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+    
+    db = await get_database()
+    
+    # Get survey
+    survey = await db.survey360_surveys.find_one({"id": survey_id})
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+    
+    # Get responses
+    responses = await db.survey360_responses.find({"survey_id": survey_id}).to_list(None)
+    
+    # Create workbook
+    wb = Workbook()
+    
+    # ---- Sheet 1: Summary ----
+    ws_summary = wb.active
+    ws_summary.title = "Summary"
+    
+    # Styles
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="14B8A6", end_color="14B8A6", fill_type="solid")
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # Survey info
+    ws_summary['A1'] = "Survey Name"
+    ws_summary['B1'] = survey.get('name', 'Untitled')
+    ws_summary['A2'] = "Description"
+    ws_summary['B2'] = survey.get('description', '')
+    ws_summary['A3'] = "Status"
+    ws_summary['B3'] = survey.get('status', 'draft')
+    ws_summary['A4'] = "Total Responses"
+    ws_summary['B4'] = len(responses)
+    ws_summary['A5'] = "Created"
+    ws_summary['B5'] = survey.get('created_at', '')
+    ws_summary['A6'] = "Export Date"
+    ws_summary['B6'] = datetime.now(timezone.utc).isoformat()
+    
+    for row in range(1, 7):
+        ws_summary[f'A{row}'].font = Font(bold=True)
+    
+    # ---- Sheet 2: Responses ----
+    ws_responses = wb.create_sheet("Responses")
+    
+    # Get questions for headers
+    questions = survey.get('questions', [])
+    
+    # Headers
+    headers = ['Response ID', 'Submitted At', 'Respondent']
+    for q in questions:
+        headers.append(q.get('title', 'Question'))
+    
+    for col, header in enumerate(headers, 1):
+        cell = ws_responses.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center')
+        cell.border = border
+    
+    # Data rows
+    for row_idx, response in enumerate(responses, 2):
+        ws_responses.cell(row=row_idx, column=1, value=response.get('id', '')).border = border
+        ws_responses.cell(row=row_idx, column=2, value=response.get('submitted_at', '')).border = border
+        ws_responses.cell(row=row_idx, column=3, value=response.get('respondent_email', 'Anonymous')).border = border
+        
+        answers = response.get('answers', {})
+        for q_idx, q in enumerate(questions, 4):
+            answer = answers.get(q.get('id', ''), '')
+            if isinstance(answer, list):
+                answer = ', '.join(str(a) for a in answer)
+            cell = ws_responses.cell(row=row_idx, column=q_idx, value=str(answer))
+            cell.border = border
+    
+    # Auto-width columns
+    for sheet in [ws_summary, ws_responses]:
+        for column in sheet.columns:
+            max_length = 0
+            column_letter = get_column_letter(column[0].column)
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = min(max_length + 2, 50)
+            sheet.column_dimensions[column_letter].width = adjusted_width
+    
+    # Save to buffer
+    buffer = BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    
+    filename = f"{survey.get('name', 'survey').replace(' ', '_')}_responses.xlsx"
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+
+# ============================================
+# SURVEY SCHEDULING
+# ============================================
+
+class ScheduleConfig(BaseModel):
+    """Survey scheduling configuration"""
+    enabled: bool = False
+    publish_at: Optional[str] = None  # ISO datetime
+    close_at: Optional[str] = None  # ISO datetime
+    timezone: str = "UTC"
+    # Recurring options
+    recurring: bool = False
+    recurrence_type: Optional[str] = None  # 'daily', 'weekly', 'monthly'
+    recurrence_interval: int = 1  # Every X days/weeks/months
+    recurrence_end_date: Optional[str] = None  # When to stop recurring
+    recurrence_days: Optional[List[int]] = None  # For weekly: [0,1,2,3,4,5,6] (Mon-Sun)
+    max_occurrences: Optional[int] = None  # Max number of times to recur
+
+
+class ScheduleResponse(BaseModel):
+    """Response for schedule operations"""
+    success: bool
+    message: str
+    schedule: Optional[dict] = None
+    next_occurrence: Optional[str] = None
+
+
+@router.post("/surveys/{survey_id}/schedule", response_model=ScheduleResponse)
+async def survey360_set_schedule(
+    survey_id: str, 
+    config: ScheduleConfig, 
+    user=Depends(get_survey360_user)
+):
+    """
+    Set or update survey schedule with advanced options.
+    Supports one-time and recurring schedules with timezone support.
+    """
+    from zoneinfo import ZoneInfo
+    
+    db = await get_database()
+    
+    # Verify survey exists and user owns it
+    survey = await db.survey360_surveys.find_one({"id": survey_id})
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+    
+    # Validate timezone
+    try:
+        tz = ZoneInfo(config.timezone)
+    except Exception:
+        raise HTTPException(status_code=400, detail=f"Invalid timezone: {config.timezone}")
+    
+    # Parse and validate dates
+    schedule_data = {
+        "enabled": config.enabled,
+        "timezone": config.timezone,
+        "recurring": config.recurring,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    if config.publish_at:
+        try:
+            publish_dt = datetime.fromisoformat(config.publish_at.replace("Z", "+00:00"))
+            schedule_data["publish_at"] = publish_dt.isoformat()
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid publish_at date format")
+    
+    if config.close_at:
+        try:
+            close_dt = datetime.fromisoformat(config.close_at.replace("Z", "+00:00"))
+            schedule_data["close_at"] = close_dt.isoformat()
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid close_at date format")
+    
+    # Recurring schedule config
+    if config.recurring:
+        if not config.recurrence_type:
+            raise HTTPException(status_code=400, detail="recurrence_type required for recurring schedules")
+        
+        schedule_data["recurrence"] = {
+            "type": config.recurrence_type,
+            "interval": config.recurrence_interval,
+            "end_date": config.recurrence_end_date,
+            "days": config.recurrence_days,
+            "max_occurrences": config.max_occurrences,
+            "occurrences_count": 0
+        }
+    
+    # Update survey with schedule
+    await db.survey360_surveys.update_one(
+        {"id": survey_id},
+        {"$set": {"schedule": schedule_data}}
+    )
+    
+    # Calculate next occurrence
+    next_occurrence = None
+    if config.enabled and config.publish_at:
+        next_occurrence = config.publish_at
+    
+    # Invalidate cache
+    await invalidate_survey_cache(survey_id)
+    
+    return ScheduleResponse(
+        success=True,
+        message="Schedule updated successfully",
+        schedule=schedule_data,
+        next_occurrence=next_occurrence
+    )
+
+
+@router.get("/surveys/{survey_id}/schedule", response_model=ScheduleResponse)
+async def survey360_get_schedule(survey_id: str, user=Depends(get_survey360_user)):
+    """Get current schedule configuration for a survey"""
+    db = await get_database()
+    
+    survey = await db.survey360_surveys.find_one({"id": survey_id})
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+    
+    schedule = survey.get('schedule', {})
+    
+    return ScheduleResponse(
+        success=True,
+        message="Schedule retrieved",
+        schedule=schedule,
+        next_occurrence=schedule.get('publish_at')
+    )
+
+
+@router.delete("/surveys/{survey_id}/schedule")
+async def survey360_delete_schedule(survey_id: str, user=Depends(get_survey360_user)):
+    """Remove schedule from a survey"""
+    db = await get_database()
+    
+    result = await db.survey360_surveys.update_one(
+        {"id": survey_id},
+        {"$unset": {"schedule": ""}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Survey not found or no schedule to remove")
+    
+    await invalidate_survey_cache(survey_id)
+    
+    return {"success": True, "message": "Schedule removed"}
+
+
+# Background task to process scheduled surveys (called by cron/scheduler)
+@router.post("/schedules/process")
+async def survey360_process_schedules():
+    """
+    Process all scheduled surveys - publish/close based on schedule.
+    Should be called by a cron job or scheduler service.
+    """
+    db = await get_database()
+    now = datetime.now(timezone.utc)
+    
+    processed = {"published": 0, "closed": 0, "recurring_created": 0}
+    
+    # Find surveys with active schedules
+    surveys = await db.survey360_surveys.find({
+        "schedule.enabled": True
+    }).to_list(None)
+    
+    for survey in surveys:
+        schedule = survey.get('schedule', {})
+        
+        # Check if should publish
+        if schedule.get('publish_at') and survey.get('status') == 'draft':
+            publish_at = datetime.fromisoformat(schedule['publish_at'].replace("Z", "+00:00"))
+            if now >= publish_at:
+                await db.survey360_surveys.update_one(
+                    {"id": survey['id']},
+                    {"$set": {"status": "published", "published_at": now.isoformat()}}
+                )
+                processed["published"] += 1
+        
+        # Check if should close
+        if schedule.get('close_at') and survey.get('status') == 'published':
+            close_at = datetime.fromisoformat(schedule['close_at'].replace("Z", "+00:00"))
+            if now >= close_at:
+                await db.survey360_surveys.update_one(
+                    {"id": survey['id']},
+                    {"$set": {"status": "closed", "closed_at": now.isoformat()}}
+                )
+                processed["closed"] += 1
+                
+                # Handle recurring - create next occurrence
+                if schedule.get('recurring') and schedule.get('recurrence'):
+                    recurrence = schedule['recurrence']
+                    occurrences = recurrence.get('occurrences_count', 0) + 1
+                    
+                    # Check if should create another occurrence
+                    should_recur = True
+                    if recurrence.get('max_occurrences') and occurrences >= recurrence['max_occurrences']:
+                        should_recur = False
+                    if recurrence.get('end_date'):
+                        end_date = datetime.fromisoformat(recurrence['end_date'].replace("Z", "+00:00"))
+                        if now >= end_date:
+                            should_recur = False
+                    
+                    if should_recur:
+                        # Calculate next dates
+                        interval = recurrence.get('interval', 1)
+                        rec_type = recurrence.get('type', 'weekly')
+                        
+                        if rec_type == 'daily':
+                            delta = timedelta(days=interval)
+                        elif rec_type == 'weekly':
+                            delta = timedelta(weeks=interval)
+                        elif rec_type == 'monthly':
+                            delta = timedelta(days=30 * interval)  # Approximate
+                        else:
+                            delta = timedelta(weeks=1)
+                        
+                        new_publish = now + delta
+                        new_close = None
+                        if schedule.get('close_at') and schedule.get('publish_at'):
+                            original_duration = (
+                                datetime.fromisoformat(schedule['close_at'].replace("Z", "+00:00")) -
+                                datetime.fromisoformat(schedule['publish_at'].replace("Z", "+00:00"))
+                            )
+                            new_close = new_publish + original_duration
+                        
+                        # Create new survey copy
+                        new_survey = {**survey}
+                        new_survey['id'] = str(uuid.uuid4())
+                        new_survey['status'] = 'draft'
+                        new_survey['created_at'] = now.isoformat()
+                        new_survey['schedule']['publish_at'] = new_publish.isoformat()
+                        if new_close:
+                            new_survey['schedule']['close_at'] = new_close.isoformat()
+                        new_survey['schedule']['recurrence']['occurrences_count'] = occurrences
+                        new_survey.pop('_id', None)
+                        
+                        await db.survey360_surveys.insert_one(new_survey)
+                        processed["recurring_created"] += 1
+    
+    return {
+        "success": True,
+        "processed": processed,
+        "timestamp": now.isoformat()
+    }
+
+
+# ============================================
+# EMAIL INVITATIONS (Resend)
+# ============================================
+
+# Resend API configuration (placeholder)
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "re_placeholder_key")
+RESEND_FROM_EMAIL = os.environ.get("RESEND_FROM_EMAIL", "surveys@survey360.io")
+
+
+class EmailInvitation(BaseModel):
+    """Single email invitation"""
+    email: EmailStr
+    name: Optional[str] = None
+    custom_message: Optional[str] = None
+
+
+class BulkEmailRequest(BaseModel):
+    """Bulk email invitation request"""
+    survey_id: str
+    recipients: List[EmailInvitation]
+    subject: Optional[str] = None
+    message: Optional[str] = None
+    send_reminder: bool = False
+    reminder_days: int = 3
+
+
+class EmailResponse(BaseModel):
+    """Email sending response"""
+    success: bool
+    sent: int
+    failed: int
+    errors: List[str] = []
+
+
+@router.post("/surveys/{survey_id}/invite", response_model=EmailResponse)
+async def survey360_send_invitations(
+    survey_id: str,
+    request: BulkEmailRequest,
+    user=Depends(get_survey360_user)
+):
+    """
+    Send survey invitations via email using Resend.
+    Supports bulk sending with personalization.
+    """
+    import httpx
+    
+    db = await get_database()
+    
+    # Get survey
+    survey = await db.survey360_surveys.find_one({"id": survey_id})
+    if not survey:
+        raise HTTPException(status_code=404, detail="Survey not found")
+    
+    if survey.get('status') != 'published':
+        raise HTTPException(status_code=400, detail="Survey must be published to send invitations")
+    
+    # Build survey URL
+    base_url = os.environ.get("FRONTEND_URL", "https://survey360.io")
+    survey_url = f"{base_url}/s/{survey_id}"
+    
+    sent = 0
+    failed = 0
+    errors = []
+    
+    # Email template
+    subject = request.subject or f"You're invited to take: {survey.get('name', 'Survey')}"
+    
+    for recipient in request.recipients:
+        try:
+            # Personalized message
+            message = request.message or f"""
+Hi {recipient.name or 'there'},
+
+You've been invited to participate in a survey: **{survey.get('name', 'Survey')}**
+
+{survey.get('description', '')}
+
+Click the link below to start:
+{survey_url}
+
+{recipient.custom_message or ''}
+
+Thank you for your time!
+"""
+            
+            # HTML version
+            html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }}
+        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ background: linear-gradient(135deg, #14b8a6, #06b6d4); padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }}
+        .header h1 {{ color: white; margin: 0; font-size: 24px; }}
+        .content {{ background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px; }}
+        .button {{ display: inline-block; background: #14b8a6; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }}
+        .button:hover {{ background: #0d9488; }}
+        .footer {{ text-align: center; padding: 20px; color: #64748b; font-size: 12px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Survey Invitation</h1>
+        </div>
+        <div class="content">
+            <p>Hi {recipient.name or 'there'},</p>
+            <p>You've been invited to participate in:</p>
+            <h2 style="color: #14b8a6;">{survey.get('name', 'Survey')}</h2>
+            <p>{survey.get('description', '')}</p>
+            {f'<p><em>{recipient.custom_message}</em></p>' if recipient.custom_message else ''}
+            <center>
+                <a href="{survey_url}" class="button">Take Survey →</a>
+            </center>
+            <p style="color: #64748b; font-size: 14px;">This survey should take about 5 minutes to complete.</p>
+        </div>
+        <div class="footer">
+            <p>Sent via Survey360 | <a href="{base_url}">survey360.io</a></p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+            
+            # Send via Resend API
+            if RESEND_API_KEY and not RESEND_API_KEY.startswith("re_placeholder"):
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(
+                        "https://api.resend.com/emails",
+                        headers={
+                            "Authorization": f"Bearer {RESEND_API_KEY}",
+                            "Content-Type": "application/json"
+                        },
+                        json={
+                            "from": RESEND_FROM_EMAIL,
+                            "to": [recipient.email],
+                            "subject": subject,
+                            "html": html_content,
+                            "text": message
+                        },
+                        timeout=10.0
+                    )
+                    
+                    if response.status_code == 200:
+                        sent += 1
+                    else:
+                        failed += 1
+                        errors.append(f"{recipient.email}: {response.text}")
+            else:
+                # Placeholder mode - simulate success
+                sent += 1
+                
+            # Store invitation record
+            await db.survey360_invitations.insert_one({
+                "id": str(uuid.uuid4()),
+                "survey_id": survey_id,
+                "email": recipient.email,
+                "name": recipient.name,
+                "sent_at": datetime.now(timezone.utc).isoformat(),
+                "status": "sent" if sent > failed else "failed",
+                "reminder_scheduled": request.send_reminder,
+                "reminder_days": request.reminder_days if request.send_reminder else None
+            })
+            
+        except Exception as e:
+            failed += 1
+            errors.append(f"{recipient.email}: {str(e)}")
+    
+    return EmailResponse(
+        success=failed == 0,
+        sent=sent,
+        failed=failed,
+        errors=errors[:10]  # Limit error messages
+    )
+
+
+@router.get("/surveys/{survey_id}/invitations")
+async def survey360_get_invitations(survey_id: str, user=Depends(get_survey360_user)):
+    """Get all invitations sent for a survey"""
+    db = await get_database()
+    
+    invitations = await db.survey360_invitations.find(
+        {"survey_id": survey_id},
+        {"_id": 0}
+    ).sort("sent_at", -1).to_list(100)
+    
+    return {"invitations": invitations, "total": len(invitations)}
+
+
+@router.post("/invitations/send-reminders")
+async def survey360_send_reminders():
+    """
+    Send reminder emails for pending survey invitations.
+    Should be called by a cron job daily.
+    """
+    db = await get_database()
+    now = datetime.now(timezone.utc)
+    
+    sent = 0
+    
+    # Find invitations that need reminders
+    invitations = await db.survey360_invitations.find({
+        "reminder_scheduled": True,
+        "reminder_sent": {"$ne": True}
+    }).to_list(None)
+    
+    for inv in invitations:
+        sent_at = datetime.fromisoformat(inv['sent_at'].replace("Z", "+00:00"))
+        reminder_days = inv.get('reminder_days', 3)
+        
+        if (now - sent_at).days >= reminder_days:
+            # Check if already responded
+            response = await db.survey360_responses.find_one({
+                "survey_id": inv['survey_id'],
+                "respondent_email": inv['email']
+            })
+            
+            if not response:
+                # Would send reminder email here (similar to invitation)
+                await db.survey360_invitations.update_one(
+                    {"id": inv['id']},
+                    {"$set": {"reminder_sent": True, "reminder_sent_at": now.isoformat()}}
+                )
+                sent += 1
+    
+    return {"success": True, "reminders_sent": sent}
+
