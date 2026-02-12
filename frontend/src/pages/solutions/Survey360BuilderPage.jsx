@@ -25,9 +25,7 @@ import {
   GitBranch,
   Upload,
   Image,
-  X,
-  Clock,
-  Palette
+  X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
@@ -38,8 +36,8 @@ import { Switch } from '../../components/ui/switch';
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { Skeleton } from '../../components/ui/skeleton';
-import { Calendar } from '../../components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover';
+import { DatePicker } from '../../components/ui/date-picker';
+import { ColorPicker } from '../../components/ui/color-picker';
 import {
   Select,
   SelectContent,
