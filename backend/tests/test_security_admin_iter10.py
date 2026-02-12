@@ -7,7 +7,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://survey-demo.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://survey360-analytics.preview.emergentagent.com').rstrip('/')
 
 # Test credentials
 TEST_EMAIL = "test@datapulse.io"
