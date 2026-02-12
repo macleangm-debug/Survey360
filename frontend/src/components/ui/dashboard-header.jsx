@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -17,8 +18,6 @@ import {
   ExternalLink,
   X,
   Menu,
-  Globe,
-  Check,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import {
@@ -34,6 +33,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from './tooltip';
+import { LanguageSelectorCompact } from './language-selector';
 import { cn } from '../../lib/utils';
 
 // Keyboard shortcuts modal content
@@ -43,17 +43,6 @@ const KEYBOARD_SHORTCUTS = [
   { keys: ['Ctrl', 'D'], description: 'Go to dashboard' },
   { keys: ['Ctrl', '/'], description: 'Show shortcuts' },
   { keys: ['Esc'], description: 'Close modal' },
-];
-
-// Available languages
-const LANGUAGES = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'pt', name: 'Português', flag: '🇧🇷' },
-  { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  { code: 'zh', name: '中文', flag: '🇨🇳' },
 ];
 
 // Sample notifications - can be passed as prop in real usage
