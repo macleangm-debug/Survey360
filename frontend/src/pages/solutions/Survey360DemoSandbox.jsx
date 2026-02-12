@@ -554,11 +554,16 @@ export function Survey360DemoSandbox() {
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                           isActive 
                             ? 'bg-teal-500/10 text-teal-400' 
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            : item.highlight 
+                              ? 'text-teal-400 hover:bg-teal-500/10 border border-teal-500/30'
+                              : 'text-gray-400 hover:text-white hover:bg-white/5'
                         }`}
                       >
                         <Icon className="w-4 h-4" />
                         {item.label}
+                        {item.highlight && !isActive && (
+                          <Badge className="ml-auto bg-teal-500/20 text-teal-400 border-0 text-[10px] px-1.5">NEW</Badge>
+                        )}
                       </button>
                     );
                   })}
