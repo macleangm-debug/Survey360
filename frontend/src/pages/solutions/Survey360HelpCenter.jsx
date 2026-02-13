@@ -3497,44 +3497,53 @@ function TroubleshootingView({ isDark, selectedIssue, setSelectedIssue, onTabCha
 }
 
 // Keyboard Shortcuts View
-function KeyboardShortcutsView({ isDark }) {
+function KeyboardShortcutsView({ isDark, onTabChange, onArticleClick }) {
   const textPrimary = isDark ? 'text-white' : 'text-gray-900';
   const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
   const bgSecondary = isDark ? 'bg-[#0f1d32]' : 'bg-white';
   const borderColor = isDark ? 'border-white/10' : 'border-gray-200';
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className={`text-2xl font-bold ${textPrimary} mb-2`}>Keyboard Shortcuts</h1>
-        <p className={textSecondary}>Work faster with these keyboard shortcuts</p>
-      </div>
+    <div className="flex gap-8">
+      <HelpSidebar 
+        isDark={isDark} 
+        activeTab="shortcuts" 
+        onTabChange={onTabChange}
+        onArticleClick={onArticleClick}
+      />
+      
+      <div className="flex-1 min-w-0">
+        <div className="text-center mb-8">
+          <h1 className={`text-2xl font-bold ${textPrimary} mb-2`}>Keyboard Shortcuts</h1>
+          <p className={textSecondary}>Work faster with these keyboard shortcuts</p>
+        </div>
 
-      <div className="space-y-6">
-        {KEYBOARD_SHORTCUTS.map(section => (
-          <div key={section.category} className={`${bgSecondary} border ${borderColor} rounded-xl p-5`}>
-            <h2 className={`font-semibold ${textPrimary} mb-4`}>{section.category}</h2>
-            <div className="space-y-3">
-              {section.shortcuts.map((shortcut, idx) => (
-                <div key={idx} className="flex items-center justify-between">
-                  <span className={textSecondary}>{shortcut.action}</span>
-                  <div className="flex items-center gap-1">
-                    {shortcut.keys.map((key, keyIdx) => (
-                      <React.Fragment key={keyIdx}>
-                        <kbd className={`px-2 py-1 text-xs ${textPrimary} ${isDark ? 'bg-white/10' : 'bg-gray-100'} rounded border ${borderColor} font-mono`}>
-                          {key}
-                        </kbd>
-                        {keyIdx < shortcut.keys.length - 1 && (
-                          <span className={textSecondary}>+</span>
-                        )}
-                      </React.Fragment>
-                    ))}
+        <div className="space-y-6">
+          {KEYBOARD_SHORTCUTS.map(section => (
+            <div key={section.category} className={`${bgSecondary} border ${borderColor} rounded-xl p-5`}>
+              <h2 className={`font-semibold ${textPrimary} mb-4`}>{section.category}</h2>
+              <div className="space-y-3">
+                {section.shortcuts.map((shortcut, idx) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <span className={textSecondary}>{shortcut.action}</span>
+                    <div className="flex items-center gap-1">
+                      {shortcut.keys.map((key, keyIdx) => (
+                        <React.Fragment key={keyIdx}>
+                          <kbd className={`px-2 py-1 text-xs ${textPrimary} ${isDark ? 'bg-white/10' : 'bg-gray-100'} rounded border ${borderColor} font-mono`}>
+                            {key}
+                          </kbd>
+                          {keyIdx < shortcut.keys.length - 1 && (
+                            <span className={textSecondary}>+</span>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
