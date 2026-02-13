@@ -240,6 +240,7 @@ export function Survey360AppLayout({ children }) {
             showMobileMenu={true}
             searchPlaceholder="Search surveys..."
             onSearch={(query) => console.log('Search:', query)}
+            helpLinks={helpLinks}
           />
 
           {/* Main Content */}
