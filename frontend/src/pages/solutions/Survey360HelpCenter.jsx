@@ -3002,7 +3002,7 @@ function HomeView({ isDark, searchQuery, searchResults, onArticleClick, setActiv
 }
 
 // Article View Component
-function ArticleView({ categoryId, articleId, onBack, isDark, feedback, setFeedback }) {
+function ArticleView({ categoryId, articleId, onBack, onArticleClick, onTabChange, isDark, feedback, setFeedback }) {
   const category = HELP_CATEGORIES.find(c => c.id === categoryId);
   const article = category?.articles.find(a => a.id === articleId);
   const content = ARTICLE_CONTENT[articleId];
@@ -3018,8 +3018,10 @@ function ArticleView({ categoryId, articleId, onBack, isDark, feedback, setFeedb
     setFeedback(prev => ({ ...prev, [articleId]: isHelpful }));
   };
 
-  const handleArticleNav = (newArticleId) => {
-    window.location.href = `?tab=article&category=${categoryId}&article=${newArticleId}`;
+  const handleArticleNav = (newCategoryId, newArticleId) => {
+    if (onArticleClick) {
+      onArticleClick(newCategoryId, newArticleId);
+    }
   };
 
   if (!article || !content) {
@@ -3064,7 +3066,7 @@ function ArticleView({ categoryId, articleId, onBack, isDark, feedback, setFeedb
             {category.articles.map((art) => (
               <button
                 key={art.id}
-                onClick={() => handleArticleNav(art.id)}
+                onClick={() => handleArticleNav(categoryId, art.id)}
                 className={cn(
                   "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                   art.id === articleId
@@ -3086,11 +3088,11 @@ function ArticleView({ categoryId, articleId, onBack, isDark, feedback, setFeedb
               <Home className="w-3.5 h-3.5" />
               Help Center Home
             </button>
-            <button onClick={() => window.location.href = '?tab=faq'} className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 flex items-center gap-2`}>
+            <button onClick={() => onTabChange && onTabChange('faq')} className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 flex items-center gap-2`}>
               <HelpCircle className="w-3.5 h-3.5" />
               FAQ
             </button>
-            <button onClick={() => window.location.href = '?tab=troubleshooting'} className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 flex items-center gap-2`}>
+            <button onClick={() => onTabChange && onTabChange('troubleshooting')} className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 flex items-center gap-2`}>
               <AlertCircle className="w-3.5 h-3.5" />
               Troubleshooting
             </button>
@@ -3172,7 +3174,7 @@ function ArticleView({ categoryId, articleId, onBack, isDark, feedback, setFeedb
             {category.articles.filter(a => a.id !== articleId).slice(0, 3).map(relatedArticle => (
               <button
                 key={relatedArticle.id}
-                onClick={() => handleArticleNav(relatedArticle.id)}
+                onClick={() => handleArticleNav(categoryId, relatedArticle.id)}
                 className={`${bgSecondary} border ${borderColor} rounded-lg p-4 text-left hover:border-teal-500/30 transition-all`}
               >
                 <h4 className={`font-medium ${textPrimary} mb-1`}>{relatedArticle.title}</h4>
@@ -3191,7 +3193,7 @@ function ArticleView({ categoryId, articleId, onBack, isDark, feedback, setFeedb
               return (
                 <button
                   key={cat.id}
-                  onClick={() => window.location.href = `?tab=article&category=${cat.id}&article=${cat.articles[0].id}`}
+                  onClick={() => handleArticleNav(cat.id, cat.articles[0].id)}
                   className={`${bgSecondary} border ${borderColor} rounded-lg p-3 text-left hover:border-teal-500/30 transition-all`}
                 >
                   <div className="p-1.5 rounded-lg w-fit mb-2" style={{ backgroundColor: catColorStyle.bg }}>
