@@ -49,6 +49,7 @@ import { Survey360BillingPage } from './pages/solutions/Survey360BillingPage';
 import { Survey360DemoPage } from './pages/solutions/Survey360DemoPage';
 import { Survey360DemoSandbox } from './pages/solutions/Survey360DemoSandbox';
 import { PublicSurveyPage } from './pages/solutions/PublicSurveyPage';
+import { Survey360HelpCenter } from './pages/solutions/Survey360HelpCenter';
 import '@/App.css';
 
 // Register service worker
