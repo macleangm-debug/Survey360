@@ -2887,6 +2887,91 @@ export function Survey360HelpCenter() {
   );
 }
 
+// Shared Help Sidebar Component
+function HelpSidebar({ isDark, activeTab, onTabChange, onArticleClick }) {
+  const textPrimary = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
+  const textMuted = isDark ? 'text-gray-500' : 'text-gray-400';
+  const bgSecondary = isDark ? 'bg-[#0f1d32]' : 'bg-white';
+  const borderColor = isDark ? 'border-white/10' : 'border-gray-200';
+  const hoverBg = isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100';
+
+  const tabs = [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'faq', label: 'FAQ', icon: HelpCircle },
+    { id: 'troubleshooting', label: 'Troubleshooting', icon: AlertCircle },
+    { id: 'shortcuts', label: 'Shortcuts', icon: Keyboard },
+    { id: 'whats-new', label: "What's New", icon: Sparkles },
+  ];
+
+  return (
+    <aside className="hidden lg:block w-64 flex-shrink-0">
+      {/* Navigation */}
+      <div className={`${bgSecondary} border ${borderColor} rounded-xl p-4 sticky top-4`}>
+        <div className="flex items-center gap-2 mb-4 pb-3 border-b" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb' }}>
+          <div className="p-1.5 rounded-lg bg-teal-500/20">
+            <BookOpen className="w-4 h-4 text-teal-500" />
+          </div>
+          <span className={`font-medium ${textPrimary}`}>Help Center</span>
+        </div>
+        <nav className="space-y-1">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                className={cn(
+                  "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2",
+                  activeTab === tab.id
+                    ? "bg-teal-500/10 text-teal-400 font-medium"
+                    : `${textSecondary} ${hoverBg} hover:text-teal-400`
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Browse Categories */}
+      <div className={`${bgSecondary} border ${borderColor} rounded-xl p-4 mt-4`}>
+        <h4 className={`text-sm font-medium ${textPrimary} mb-3`}>Browse Topics</h4>
+        <div className="space-y-1">
+          {HELP_CATEGORIES.slice(0, 5).map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => onArticleClick(cat.id, cat.articles[0].id)}
+                className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 flex items-center gap-2 py-1.5`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {cat.title}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Contact Support */}
+      <div className={`${bgSecondary} border ${borderColor} rounded-xl p-4 mt-4`}>
+        <h4 className={`text-sm font-medium ${textPrimary} mb-2`}>Need more help?</h4>
+        <p className={`text-xs ${textMuted} mb-3`}>Can't find what you're looking for?</p>
+        <a 
+          href="mailto:support@survey360.io"
+          className="flex items-center gap-2 text-sm text-teal-400 hover:text-teal-300"
+        >
+          <Mail className="w-4 h-4" />
+          Contact Support
+        </a>
+      </div>
+    </aside>
+  );
+}
+
 // Home View Component
 function HomeView({ isDark, searchQuery, searchResults, onArticleClick, setActiveTab }) {
   const textPrimary = isDark ? 'text-white' : 'text-gray-900';
