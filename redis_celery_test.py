@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 class RedisCeleryTester:
-    def __init__(self, base_url="https://survey360-analytics.preview.emergentagent.com"):
+    def __init__(self, base_url="https://manual-preview.preview.emergentagent.com"):
         self.base_url = base_url
         self.session = requests.Session()
         self.session.headers.update({'Content-Type': 'application/json'})
