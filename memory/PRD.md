@@ -610,3 +610,84 @@ Added theme-aware styling to all Survey360 pages, allowing users to switch betwe
 ### Files Updated:
 - `/app/backend/routes/survey360_routes.py`
 - `/app/frontend/src/pages/solutions/Survey360SurveysPage.jsx` (EmailInvitationModal component)
+
+
+---
+
+## User Manual / Help Center (Feb 13, 2026) - COMPLETE
+
+### Feature: Comprehensive User Manual
+Implemented a full-featured Help Center accessible from the app header, providing self-service documentation to reduce support requests.
+
+### Access Points:
+- Help icon (?) in DashboardHeader → "User Manual" dropdown item
+- Direct URL: `/solutions/survey360/help`
+
+### Features:
+1. **Home Tab**
+   - Search functionality
+   - Popular Articles section
+   - Browse by Category grid
+   - Quick links to FAQ, Troubleshooting, Shortcuts
+
+2. **FAQ Tab**
+   - Expandable accordion-style questions
+   - Organized by category (General, Surveys, Responses & Analytics, Account & Billing)
+
+3. **Troubleshooting Tab**
+   - Common issues with symptoms tags
+   - Step-by-step solutions
+   - Issues covered: Survey loading, Responses not showing, Export issues, Email delivery, Login problems
+
+4. **Shortcuts Tab**
+   - Keyboard shortcuts organized by category
+   - Navigation, Survey Builder, General shortcuts
+
+5. **What's New Tab**
+   - Release notes with version history
+   - Feature announcements and improvements
+
+### Article Content:
+- Welcome to Survey360
+- Creating Your First Survey
+- Using the Survey Builder
+- Question Types Explained
+- Sharing via Link
+- Exporting Responses to Excel
+- Analytics Dashboard Overview
+
+### Files Updated:
+- `/app/frontend/src/App.js` - Added route for Help Center
+- `/app/frontend/src/pages/solutions/Survey360AppLayout.jsx` - Updated helpLinks in DashboardHeader
+- `/app/frontend/src/components/ui/dashboard-header.jsx` - Modified to always include Keyboard Shortcuts
+
+### Files Already Present:
+- `/app/frontend/src/pages/solutions/Survey360HelpCenter.jsx` - Comprehensive Help Center component
+
+---
+
+## Backlog (Updated Feb 13, 2026)
+
+### P0 (Completed)
+- [x] Light/Dark Mode Theme Toggle
+- [x] Advanced Analytics
+- [x] Reusable DashboardHeader Component
+- [x] Link Shortener Integration
+- [x] Interactive Demo Screen
+- [x] Excel Export
+- [x] Survey Scheduling
+- [x] Email Invitations (placeholder)
+- [x] **User Manual / Help Center**
+
+### P1 (Next)
+- [ ] QR Code Generation in ShareSurveyDialog
+- [ ] Resend Email Integration (make email invitations functional)
+
+### P2 (Future)
+- [ ] Apply i18n translations across entire UI
+- [ ] Team collaboration features
+- [ ] PDF export with styled charts
+
+### P3 (Backlog)
+- [ ] Third-party integrations (Zapier, Mailchimp)
+- [ ] Comparison analytics (vs previous period)
