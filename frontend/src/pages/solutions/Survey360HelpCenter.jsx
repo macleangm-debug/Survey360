@@ -1075,7 +1075,1628 @@ Run the same survey quarterly to track trends.
 - View schedule history
     `,
   },
+  // Sharing & Distribution Articles
+  'share-link': {
+    title: 'Sharing via Link',
+    content: `Share your survey with a simple link that works anywhere.
 
+## Getting Your Survey Link
+
+1. Publish your survey
+2. Click the **"Share"** button
+3. Copy the link from the dialog
+4. Share it anywhere!
+
+## Link Types
+
+### Standard Link
+- Full URL to your survey
+- Works in all browsers
+- Best for email and websites
+
+### Shortened Link
+- Compact URL using our link shortener
+- Perfect for SMS and social media
+- Easier to remember and type
+
+## Where to Share
+
+### Email
+- Paste link directly in email body
+- Add context about the survey
+- Include a deadline if applicable
+
+### Social Media
+- Works on Facebook, Twitter, LinkedIn
+- Use shortened link for character limits
+- Add a compelling call-to-action
+
+### Messaging Apps
+- WhatsApp, Slack, Teams
+- Link preview shows survey title
+- Great for quick distribution
+
+### QR Codes
+- Generate from share dialog
+- Print for physical locations
+- Perfect for events and signage
+
+## Tracking Link Performance
+
+- View click counts in analytics
+- See where responses come from
+- Track conversion rates
+    `,
+  },
+  'qr-codes': {
+    title: 'Using QR Codes',
+    content: `Generate QR codes for easy survey access on mobile devices.
+
+## What is a QR Code?
+
+A QR code is a scannable image that links directly to your survey. Users scan it with their phone camera to open the survey instantly.
+
+## Generating a QR Code
+
+1. Open your published survey
+2. Click the **"Share"** button
+3. Go to the **"QR Code"** tab
+4. Your QR code is generated automatically
+5. Download or print as needed
+
+## Download Options
+
+### Image Formats
+- **PNG** - Best for digital use
+- **SVG** - Best for print, scalable
+
+### Sizes
+- Small (200px) - Business cards
+- Medium (400px) - Flyers, posters
+- Large (800px) - Banners, signage
+
+## Best Uses for QR Codes
+
+### Events
+- Conference feedback
+- Workshop evaluations
+- Registration check-in
+
+### Retail
+- Customer satisfaction surveys
+- Product feedback
+- Receipt surveys
+
+### Print Materials
+- Magazine/newspaper ads
+- Direct mail pieces
+- Product packaging
+
+### Physical Locations
+- Restaurant tables
+- Hotel rooms
+- Store displays
+
+## Tips for QR Codes
+
+- Ensure good contrast
+- Test before printing
+- Include a brief instruction
+- Add your logo nearby
+- Make it big enough to scan
+    `,
+  },
+  'email-invitations': {
+    title: 'Sending Email Invitations',
+    content: `Send personalized survey invitations directly via email.
+
+## Setting Up Email Invitations
+
+1. Go to your survey
+2. Click **"Share"** → **"Email Invitations"**
+3. Enter recipient email addresses
+4. Customize your message
+5. Click **"Send"**
+
+## Adding Recipients
+
+### Manual Entry
+- Type or paste email addresses
+- One per line or comma-separated
+- Validates email format
+
+### Import from File
+- Upload CSV with email column
+- Map columns if needed
+- Handles large lists
+
+## Customizing Your Message
+
+### Subject Line
+- Keep it clear and compelling
+- Include survey topic
+- Add urgency if appropriate
+
+### Email Body
+- Personal greeting available
+- Explain survey purpose
+- Mention estimated time
+- Thank them in advance
+
+### Branding
+- Your logo included
+- Brand colors applied
+- Professional appearance
+
+## Tracking & Reminders
+
+### Track Opens & Clicks
+- See who opened the email
+- Track who clicked the link
+- Monitor completion status
+
+### Send Reminders
+- To non-responders only
+- Customize reminder message
+- Set reminder schedule
+
+## Best Practices
+
+- Personalize when possible
+- Send at optimal times
+- Follow up appropriately
+- Respect unsubscribes
+    `,
+  },
+  'embed-website': {
+    title: 'Embedding on Your Website',
+    content: `Add surveys directly to your website or app.
+
+## Embed Options
+
+### Inline Embed
+Survey appears within your page:
+- Seamless integration
+- Matches your site design
+- Good for feedback forms
+
+### Popup Embed
+Survey appears as an overlay:
+- Triggered by button click
+- Doesn't take page space
+- Good for optional feedback
+
+### Slide-in Widget
+Survey slides in from the side:
+- Non-intrusive
+- Can trigger on scroll or time
+- Good for exit surveys
+
+## Getting the Embed Code
+
+1. Open your survey
+2. Click **"Share"** → **"Embed"**
+3. Choose embed type
+4. Customize appearance
+5. Copy the code
+6. Paste in your website HTML
+
+## Customization Options
+
+### Size
+- Width (px or %)
+- Height (px or auto)
+- Responsive sizing
+
+### Appearance
+- Border style
+- Background color
+- Padding
+
+### Behavior
+- Auto-resize height
+- Redirect on completion
+- Custom callbacks
+
+## Technical Requirements
+
+- JavaScript enabled
+- Modern browser
+- HTTPS recommended
+
+## Common Use Cases
+
+- Website feedback forms
+- Product satisfaction surveys
+- Support ticket follow-ups
+- Checkout surveys
+    `,
+  },
+  'link-shortener': {
+    title: 'Using the Link Shortener',
+    content: `Create compact, memorable links for your surveys.
+
+## Why Use Short Links?
+
+### Character Limits
+- SMS has 160 character limit
+- Twitter/X has limits too
+- Short links save space
+
+### Easier to Share
+- Simpler to read aloud
+- Easier to remember
+- Cleaner appearance
+
+### Tracking
+- Built-in click tracking
+- See link performance
+- A/B test different links
+
+## Creating Short Links
+
+1. Open your survey
+2. Click **"Share"**
+3. Go to **"Link"** tab
+4. Click **"Shorten Link"**
+5. Copy your shortened URL
+
+## Short Link Format
+
+Your links look like:
+- https://survey.link/abc123
+- Automatically generated
+- Always available while survey is active
+
+## Managing Short Links
+
+### View Analytics
+- Total clicks
+- Unique visitors
+- Geographic data
+
+### Deactivate
+- Short link stops working
+- Original link still works
+- Can reactivate later
+
+## Best Practices
+
+- Use for SMS campaigns
+- Include in social posts
+- Add to print materials
+- Track campaign performance
+    `,
+  },
+  // Responses Articles
+  'viewing-responses': {
+    title: 'Viewing Responses',
+    content: `See all responses to your surveys in one place.
+
+## Accessing Responses
+
+1. Go to **"Responses"** from the sidebar
+2. Select a survey (or view all)
+3. Browse individual responses
+
+## Response List View
+
+### Information Shown
+- Response ID
+- Submission date/time
+- Completion status
+- Key answers summary
+
+### Sorting Options
+- Newest first
+- Oldest first
+- By completion status
+- By specific answer
+
+## Individual Response View
+
+Click any response to see:
+- All questions and answers
+- Time spent on survey
+- Submission metadata
+- Response history
+
+## Response Status
+
+### Complete
+- All required questions answered
+- Survey was submitted
+- Counts toward totals
+
+### Partial
+- Started but not finished
+- May have some answers
+- Can be excluded from reports
+
+### In Progress
+- Currently being filled out
+- Updates in real-time
+- May convert to complete
+
+## Quick Actions
+
+- **Export** - Download response data
+- **Delete** - Remove a response
+- **Flag** - Mark for follow-up
+- **Notes** - Add internal comments
+    `,
+  },
+  'filtering-responses': {
+    title: 'Filtering & Searching Responses',
+    content: `Find specific responses quickly with powerful filters.
+
+## Basic Search
+
+Type in the search box to find:
+- Specific text in responses
+- Email addresses
+- Response IDs
+
+## Filter Options
+
+### By Date
+- Today
+- Last 7 days
+- Last 30 days
+- Custom date range
+
+### By Status
+- Complete only
+- Partial only
+- All responses
+
+### By Answer
+- Filter by specific question
+- Match exact answers
+- Include/exclude values
+
+## Advanced Filtering
+
+### Multiple Filters
+Combine filters for precise results:
+- Date AND Status
+- Question answer AND Date
+- Multiple question conditions
+
+### Save Filters
+1. Create your filter combination
+2. Click **"Save Filter"**
+3. Name your filter
+4. Access from saved filters list
+
+## Using Filters Effectively
+
+### Quality Control
+Filter for suspicious responses:
+- Very fast completion
+- Identical answers
+- Inconsistent data
+
+### Segmentation
+Analyze specific groups:
+- By demographic answers
+- By satisfaction level
+- By date period
+
+### Follow-up
+Find responses needing action:
+- Low satisfaction scores
+- Specific feedback mentions
+- Incomplete submissions
+    `,
+  },
+  'export-responses': {
+    title: 'Exporting Responses to Excel',
+    content: `Download your survey data for analysis in Excel or other tools.
+
+## Quick Export
+
+1. Go to **"Responses"**
+2. Select your survey
+3. Click **"Export Excel"**
+4. File downloads automatically
+
+## Export Contents
+
+### Summary Sheet
+- Survey name and description
+- Total responses
+- Date range
+- Response rate
+
+### Responses Sheet
+- One row per response
+- One column per question
+- Timestamp and metadata
+- Formatted headers
+
+## Export Options
+
+### All Responses
+- Every response included
+- Complete and partial
+- Full date range
+
+### Filtered Export
+- Apply filters first
+- Only matching responses export
+- Good for segments
+
+### Date Range
+- Select specific period
+- Compare time periods
+- Historical analysis
+
+## File Format
+
+### Excel (.xlsx)
+- Formatted headers
+- Auto-width columns
+- Ready for analysis
+
+### Data Includes
+- Response ID
+- Submission timestamp
+- All question answers
+- Completion status
+
+## Tips for Analysis
+
+- Use Excel pivot tables
+- Create charts from data
+- Filter and sort in Excel
+- Share with stakeholders
+    `,
+  },
+  'response-notifications': {
+    title: 'Response Notifications',
+    content: `Stay informed when new responses come in.
+
+## Setting Up Notifications
+
+1. Go to your survey settings
+2. Find **"Notifications"** section
+3. Enable desired notifications
+4. Save settings
+
+## Notification Types
+
+### Email Notifications
+- Receive email for each response
+- Includes summary of answers
+- Link to view full response
+
+### Daily Digest
+- One email per day
+- Summary of all responses
+- Sent at set time
+
+### Weekly Summary
+- Weekly overview
+- Response trends
+- Key metrics
+
+### Threshold Alerts
+- Alert when reaching response goal
+- Notify on low satisfaction scores
+- Custom conditions
+
+## Managing Notifications
+
+### Who Receives
+- Survey creator (default)
+- Team members
+- External email addresses
+
+### Frequency
+- Every response
+- Batched (hourly/daily)
+- Summary only
+
+### Content
+- Full response details
+- Summary only
+- Key metrics
+
+## Best Practices
+
+- Don't overwhelm inbox
+- Use digest for high-volume surveys
+- Set up alerts for important metrics
+- Include team for collaboration
+    `,
+  },
+  // Analytics Articles
+  'analytics-overview': {
+    title: 'Analytics Dashboard Overview',
+    content: `Understand your survey performance at a glance.
+
+## Dashboard Components
+
+### Summary Cards
+Quick stats showing:
+- Total responses
+- Completion rate
+- Average time
+- Active period
+
+### Response Trends
+Line chart showing:
+- Responses over time
+- 14-day history
+- Trend direction
+
+### Completion Rate
+Bar chart showing:
+- Daily completion rates
+- Color-coded performance
+- Benchmarks
+
+## Key Metrics Explained
+
+### Response Rate
+Percentage of people who started the survey:
+- High rate = Good distribution
+- Low rate = Check targeting
+
+### Completion Rate
+Percentage of starters who finished:
+- High rate = Good survey design
+- Low rate = Survey may be too long
+
+### Average Time
+How long responses take:
+- Compare to expected time
+- Identify issues if too fast/slow
+
+## Using Analytics
+
+### Identify Problems
+- Drop-off points
+- Confusing questions
+- Technical issues
+
+### Measure Success
+- Goal achievement
+- Trend improvement
+- Benchmark comparison
+
+### Optimize Surveys
+- Shorten if completion low
+- Simplify complex questions
+- Improve instructions
+    `,
+  },
+  'response-charts': {
+    title: 'Understanding Response Charts',
+    content: `Make sense of the charts in your survey analytics.
+
+## Chart Types
+
+### Bar Charts
+Used for:
+- Multiple choice questions
+- Single select questions
+- Categorical data
+
+Reading tips:
+- Longer bar = more responses
+- Compare relative lengths
+- Check percentages
+
+### Pie Charts
+Used for:
+- Distribution overview
+- Single select questions
+- Percentage breakdown
+
+Reading tips:
+- Larger slice = more responses
+- Hover for exact numbers
+- Best for 2-6 categories
+
+### Rating Charts
+Used for:
+- Star ratings
+- Scale questions
+- NPS scores
+
+Reading tips:
+- See distribution across scale
+- Calculate average
+- Identify trends
+
+### Word Clouds
+Used for:
+- Text responses
+- Open-ended questions
+- Common themes
+
+Reading tips:
+- Bigger word = more frequent
+- Identify key themes
+- Look for patterns
+
+## Interacting with Charts
+
+### Hover
+- See exact values
+- View percentages
+- See response counts
+
+### Click
+- Filter by segment
+- Drill down
+- Cross-tabulate
+
+### Export
+- Download as image
+- Include in reports
+- Share with team
+    `,
+  },
+  'completion-rates': {
+    title: 'Tracking Completion Rates',
+    content: `Monitor and improve how many people finish your surveys.
+
+## Understanding Completion Rate
+
+### Calculation
+Completion Rate = (Completed / Started) × 100
+
+### What's Good?
+- 80%+ = Excellent
+- 60-80% = Good
+- 40-60% = Average
+- Below 40% = Needs improvement
+
+## Viewing Completion Data
+
+1. Go to survey analytics
+2. Find "Completion Rate" section
+3. View trend over time
+4. Identify patterns
+
+## Factors Affecting Completion
+
+### Survey Length
+- Shorter = higher completion
+- Aim for under 10 minutes
+- Show progress bar
+
+### Question Complexity
+- Simple = better
+- Clear instructions
+- Logical flow
+
+### Mobile Experience
+- Mobile-friendly design
+- Easy to tap answers
+- Readable text
+
+### Technical Issues
+- Fast loading
+- Error handling
+- Save progress
+
+## Improving Completion
+
+### Quick Wins
+- Remove unnecessary questions
+- Add progress indicator
+- Mobile optimize
+
+### Content Changes
+- Clearer questions
+- Better instructions
+- Logical ordering
+
+### Technical Fixes
+- Faster loading
+- Better error messages
+- Auto-save progress
+    `,
+  },
+  'export-reports': {
+    title: 'Exporting Analytics Reports',
+    content: `Download and share your analytics data.
+
+## Export Options
+
+### Export Image (PNG)
+- Visual summary
+- Charts and graphs
+- Presentation-ready
+
+### Export Report (TXT)
+- Text summary
+- Key metrics
+- Easy to email
+
+### Export JSON
+- Raw data
+- For further analysis
+- API integration
+
+## How to Export
+
+1. Go to survey analytics
+2. Click **"Export"** button
+3. Choose format
+4. Download file
+
+## Report Contents
+
+### Summary Section
+- Survey overview
+- Date range
+- Total responses
+- Key metrics
+
+### Response Breakdown
+- Per-question analysis
+- Charts and data
+- Percentages
+
+### Trends
+- Time-based data
+- Comparison periods
+- Growth metrics
+
+## Sharing Reports
+
+### Email
+- Attach downloaded files
+- Include summary
+- Link to live dashboard
+
+### Presentations
+- Use PNG exports
+- Add to slides
+- Include context
+
+### Stakeholders
+- Schedule regular reports
+- Highlight key findings
+- Include recommendations
+    `,
+  },
+  'trends-analysis': {
+    title: 'Response Trends Analysis',
+    content: `Analyze how survey responses change over time.
+
+## Trends Dashboard
+
+### Response Volume
+- Daily response counts
+- Week-over-week comparison
+- Identify peak times
+
+### Satisfaction Trends
+- Average ratings over time
+- NPS score changes
+- Sentiment shifts
+
+### Completion Trends
+- Rate changes over time
+- Identify issues
+- Measure improvements
+
+## Reading Trend Charts
+
+### Line Charts
+- X-axis = Time
+- Y-axis = Metric value
+- Direction shows trend
+
+### Interpreting Trends
+
+**Upward Trend**
+- Increasing responses
+- Improving satisfaction
+- Growing engagement
+
+**Downward Trend**
+- Decreasing activity
+- Falling satisfaction
+- Needs attention
+
+**Flat Trend**
+- Stable performance
+- Consistent results
+- May need boost
+
+## Using Trends
+
+### Spot Problems Early
+- Sudden drops
+- Unusual patterns
+- Anomalies
+
+### Measure Impact
+- After changes
+- Campaign effects
+- Seasonal patterns
+
+### Plan Ahead
+- Predict volumes
+- Resource planning
+- Goal setting
+
+## Comparing Periods
+
+1. Select date range
+2. Choose comparison period
+3. View side-by-side
+4. Calculate differences
+    `,
+  },
+  // Team Articles
+  'team-management': {
+    title: 'Managing Team Members',
+    content: `Add, manage, and organize your team in Survey360.
+
+## Team Overview
+
+### Viewing Team
+1. Go to Settings
+2. Click **"Team"**
+3. See all members
+
+### Member Information
+- Name and email
+- Role
+- Join date
+- Last active
+
+## Adding Members
+
+### Invite Process
+1. Click **"Invite Member"**
+2. Enter email address
+3. Select role
+4. Add personal message (optional)
+5. Send invitation
+
+### Invitation Status
+- **Pending** - Not yet accepted
+- **Accepted** - Active member
+- **Expired** - Need to resend
+
+## Managing Members
+
+### Change Role
+1. Find member in list
+2. Click role dropdown
+3. Select new role
+4. Confirm change
+
+### Remove Member
+1. Find member
+2. Click **"Remove"**
+3. Confirm removal
+4. Access revoked immediately
+
+## Team Activity
+
+### View Activity
+- Who created surveys
+- Who viewed responses
+- Recent actions
+
+### Audit Trail
+- All team actions logged
+- Filter by member
+- Filter by action type
+    `,
+  },
+  'roles-permissions': {
+    title: 'Roles & Permissions',
+    content: `Understand what each role can do in Survey360.
+
+## Available Roles
+
+### Owner
+The account creator:
+- Full access to everything
+- Manage billing
+- Delete organization
+- Cannot be removed
+
+### Admin
+Full access except billing:
+- Create/edit all surveys
+- Manage team members
+- View all responses
+- Export all data
+
+### Editor
+Content creation focus:
+- Create/edit surveys
+- View all responses
+- Export data
+- Cannot manage team
+
+### Viewer
+Read-only access:
+- View published surveys
+- View responses (if permitted)
+- Cannot create or edit
+- Limited exports
+
+## Permission Matrix
+
+| Action | Owner | Admin | Editor | Viewer |
+|--------|-------|-------|--------|--------|
+| Create surveys | Yes | Yes | Yes | No |
+| Edit surveys | Yes | Yes | Yes | No |
+| Delete surveys | Yes | Yes | Own only | No |
+| View responses | Yes | Yes | Yes | Limited |
+| Export data | Yes | Yes | Yes | Own only |
+| Manage team | Yes | Yes | No | No |
+| Billing | Yes | No | No | No |
+
+## Choosing Roles
+
+### Give Admin to:
+- Managers
+- Team leads
+- Trusted collaborators
+
+### Give Editor to:
+- Survey creators
+- Marketing team
+- Researchers
+
+### Give Viewer to:
+- Stakeholders
+- Executives
+- External partners
+    `,
+  },
+  'organization-settings': {
+    title: 'Organization Settings',
+    content: `Configure your organization's Survey360 account.
+
+## Organization Profile
+
+### Basic Info
+- Organization name
+- Description
+- Logo
+- Website
+
+### Updating Profile
+1. Go to Settings
+2. Click **"Organization"**
+3. Edit fields
+4. Save changes
+
+## Branding Settings
+
+### Default Branding
+Set defaults for all surveys:
+- Logo
+- Primary color
+- Secondary color
+- Font preference
+
+### Email Branding
+Customize invitation emails:
+- Header logo
+- Footer text
+- Brand colors
+
+## Security Settings
+
+### Password Policy
+- Minimum length
+- Complexity requirements
+- Expiration period
+
+### Two-Factor Auth
+- Enable for organization
+- Require for all members
+- Recovery options
+
+### Session Settings
+- Timeout duration
+- Remember me option
+- IP restrictions
+
+## Data Settings
+
+### Data Retention
+- How long to keep responses
+- Auto-delete settings
+- Archive options
+
+### Export Permissions
+- Who can export
+- Export formats allowed
+- Audit logging
+    `,
+  },
+  // Settings Articles
+  'profile-settings': {
+    title: 'Profile Settings',
+    content: `Manage your personal Survey360 profile.
+
+## Accessing Profile
+
+1. Click your avatar (bottom-left)
+2. Select **"Settings"**
+3. You're on the Profile tab
+
+## Profile Information
+
+### Display Name
+- How you appear to team
+- Shows on surveys you create
+- Can be different from email
+
+### Email Address
+- Used for login
+- Receives notifications
+- Change requires verification
+
+### Profile Picture
+- Upload an image
+- Or use initials avatar
+- Appears across the app
+
+## Updating Profile
+
+1. Edit desired fields
+2. Click **"Save Changes"**
+3. Changes apply immediately
+
+## Account Security
+
+### Change Password
+1. Enter current password
+2. Enter new password
+3. Confirm new password
+4. Click **"Update"**
+
+### Two-Factor Authentication
+1. Click **"Enable 2FA"**
+2. Scan QR with authenticator app
+3. Enter verification code
+4. Save backup codes
+
+## Connected Accounts
+
+### Link Accounts
+- Google account
+- Microsoft account
+- Enables SSO login
+
+### Unlink Accounts
+1. Find connected account
+2. Click **"Disconnect"**
+3. Confirm action
+    `,
+  },
+  'notification-preferences': {
+    title: 'Notification Preferences',
+    content: `Control what notifications you receive.
+
+## Notification Types
+
+### Email Notifications
+- New responses
+- Survey milestones
+- Team activity
+- System updates
+
+### In-App Notifications
+- Real-time alerts
+- Activity feed
+- @mentions
+
+### Browser Notifications
+- Desktop alerts
+- Even when tab is closed
+- Quick response awareness
+
+## Configuring Notifications
+
+1. Go to **Settings**
+2. Click **"Notifications"**
+3. Toggle each type on/off
+4. Save preferences
+
+## Email Frequency
+
+### Immediate
+- Every notification
+- Real-time delivery
+- Best for low volume
+
+### Daily Digest
+- Once per day
+- Combined summary
+- Less inbox clutter
+
+### Weekly Summary
+- Once per week
+- Overview of activity
+- Good for managers
+
+## Notification Categories
+
+### Response Alerts
+- New response received
+- Response milestone reached
+- Survey completed goal
+
+### Survey Alerts
+- Survey published
+- Survey closing soon
+- Survey closed
+
+### Team Alerts
+- New member joined
+- Role changes
+- Survey shared with you
+
+### System Alerts
+- Maintenance scheduled
+- New features
+- Important updates
+    `,
+  },
+  'language-settings': {
+    title: 'Language & Region Settings',
+    content: `Customize Survey360 for your language and location.
+
+## Changing Language
+
+1. Go to **Settings**
+2. Find **"Language"** section
+3. Select your language
+4. Interface updates immediately
+
+## Available Languages
+
+- English (US)
+- Spanish (Español)
+- French (Français)
+- Portuguese (Português)
+- Swahili (Kiswahili)
+- Arabic (العربية)
+
+## Language Features
+
+### Interface Language
+- All menus and buttons
+- Help text
+- Error messages
+- System notifications
+
+### Right-to-Left Support
+For Arabic:
+- RTL text direction
+- Mirrored layout
+- Proper alignment
+
+## Region Settings
+
+### Date Format
+- MM/DD/YYYY (US)
+- DD/MM/YYYY (Europe)
+- YYYY-MM-DD (ISO)
+
+### Time Format
+- 12-hour (AM/PM)
+- 24-hour
+
+### Timezone
+- Auto-detect
+- Manual selection
+- Affects scheduling
+
+## Survey Languages
+
+### Multi-language Surveys
+- Create translations
+- Respondent chooses language
+- Analytics combined
+
+### Default Language
+- Set survey default
+- Fallback language
+- Translation priority
+    `,
+  },
+  'theme-settings': {
+    title: 'Theme & Appearance',
+    content: `Customize how Survey360 looks for you.
+
+## Theme Options
+
+### Dark Mode
+- Easy on eyes
+- Great for night use
+- Reduces glare
+- Modern appearance
+
+### Light Mode
+- Traditional appearance
+- Better in bright environments
+- High contrast
+- Print-friendly
+
+### System
+- Follows your OS setting
+- Auto-switches
+- Best of both worlds
+
+## Changing Theme
+
+### Quick Toggle
+Click the sun/moon icon in the header
+
+### In Settings
+1. Go to **Settings**
+2. Find **"Theme"** tab
+3. Select preference
+4. Preview changes
+
+## Theme Features
+
+### Accent Color
+- Teal (default)
+- Consistent throughout
+- Branded experience
+
+### Contrast
+- Optimized for readability
+- Accessible colors
+- Clear hierarchy
+
+## Display Options
+
+### Sidebar
+- Expanded or collapsed
+- Remember preference
+- Responsive on mobile
+
+### Density
+- Comfortable (default)
+- Compact for more info
+- Touch-friendly on mobile
+    `,
+  },
+  'security-settings': {
+    title: 'Security Settings',
+    content: `Keep your Survey360 account secure.
+
+## Password Security
+
+### Strong Password
+Requirements:
+- At least 8 characters
+- Mix of upper/lowercase
+- Numbers and symbols
+- Not easily guessable
+
+### Changing Password
+1. Go to Settings > Security
+2. Enter current password
+3. Enter new password
+4. Confirm and save
+
+## Two-Factor Authentication
+
+### Enable 2FA
+1. Go to Security settings
+2. Click **"Enable 2FA"**
+3. Scan QR code with authenticator
+4. Enter verification code
+5. Save backup codes securely
+
+### Backup Codes
+- Get 10 one-time codes
+- Use if phone unavailable
+- Store securely
+- Can regenerate if needed
+
+## Session Security
+
+### Active Sessions
+- See all logged-in devices
+- Last activity time
+- Location (approximate)
+
+### Sign Out Other Sessions
+1. View active sessions
+2. Click **"Sign out"** next to session
+3. Or "Sign out all" for all devices
+
+## Security Recommendations
+
+### Do
+- Use unique password
+- Enable 2FA
+- Review sessions regularly
+- Log out on shared devices
+
+### Don't
+- Share your password
+- Use public WiFi without VPN
+- Leave sessions open
+- Ignore security alerts
+    `,
+  },
+  // Billing Articles
+  'pricing-plans': {
+    title: 'Understanding Pricing Plans',
+    content: `Learn about Survey360 pricing and features.
+
+## Available Plans
+
+### Free Plan ($0/month)
+Perfect for getting started:
+- 3 surveys
+- 100 responses/month
+- Basic analytics
+- Email support
+
+### Starter Plan ($15/month)
+For small teams:
+- Unlimited surveys
+- 500 responses/month
+- Skip logic
+- Remove branding
+
+### Professional Plan ($39/month)
+For growing businesses:
+- Unlimited surveys
+- 2,500 responses/month
+- Advanced analytics
+- Priority support
+- Custom branding
+
+### Business Plan ($79/month)
+For larger teams:
+- Unlimited surveys
+- 10,000 responses/month
+- Team collaboration
+- API access
+- Dedicated support
+
+## Feature Comparison
+
+| Feature | Free | Starter | Pro | Business |
+|---------|------|---------|-----|----------|
+| Surveys | 3 | Unlimited | Unlimited | Unlimited |
+| Responses | 100/mo | 500/mo | 2,500/mo | 10,000/mo |
+| Question types | 10 | 10 | 10 | 10 |
+| Analytics | Basic | Standard | Advanced | Advanced |
+| Support | Email | Email | Priority | Dedicated |
+
+## Choosing a Plan
+
+### Free is best for:
+- Testing the platform
+- Simple one-time surveys
+- Personal use
+
+### Paid plans for:
+- Regular survey needs
+- Business requirements
+- Team collaboration
+- Professional features
+    `,
+  },
+  'upgrade-plan': {
+    title: 'Upgrading Your Plan',
+    content: `Move to a higher plan for more features.
+
+## Why Upgrade?
+
+### More Responses
+- Higher monthly limits
+- Accommodate growth
+- No interruptions
+
+### Better Features
+- Advanced analytics
+- Skip logic
+- Custom branding
+- API access
+
+### Priority Support
+- Faster responses
+- Dedicated help
+- Phone support (Business)
+
+## How to Upgrade
+
+1. Go to **Settings**
+2. Click **"Billing"**
+3. View **"Available Plans"**
+4. Click **"Upgrade"** on desired plan
+5. Enter payment details
+6. Confirm upgrade
+
+## Billing Changes
+
+### Pro-rated
+- Pay difference for current period
+- New features immediately
+- Full price next billing
+
+### Billing Cycle
+- Monthly or annual
+- Annual saves 20%
+- Cancel anytime
+
+## After Upgrading
+
+### Immediate Access
+- New limits apply
+- Features unlocked
+- Settings available
+
+### Confirmation
+- Email receipt
+- Invoice available
+- Updated dashboard
+
+## Downgrading
+
+If you need to downgrade:
+1. Consider implications
+2. Go to Billing
+3. Select lower plan
+4. Active at next billing cycle
+5. Features reduce accordingly
+    `,
+  },
+  'billing-history': {
+    title: 'Viewing Billing History',
+    content: `Access your payment records and invoices.
+
+## Accessing Billing History
+
+1. Go to **Settings**
+2. Click **"Billing"**
+3. Scroll to **"Billing History"**
+
+## Invoice Information
+
+### Each Invoice Shows
+- Invoice number
+- Date
+- Amount
+- Payment method
+- Status
+
+### Invoice Status
+- **Paid** - Successfully processed
+- **Pending** - Processing
+- **Failed** - Payment issue
+
+## Downloading Invoices
+
+### Individual Invoice
+1. Find the invoice
+2. Click **"Download"**
+3. PDF saves to device
+
+### All Invoices
+1. Click **"Download All"**
+2. Select date range
+3. ZIP file downloads
+
+## Invoice Contents
+
+### Header
+- Your organization name
+- Billing address
+- Invoice number and date
+
+### Line Items
+- Plan name
+- Billing period
+- Amount
+
+### Payment Details
+- Payment method used
+- Transaction ID
+- Amount paid
+
+## Managing Records
+
+### For Accounting
+- Download monthly
+- Keep for records
+- Match to expenses
+
+### For Taxes
+- Annual summary available
+- Shows all payments
+- Export for accountant
+    `,
+  },
+  'payment-methods': {
+    title: 'Managing Payment Methods',
+    content: `Add, update, or remove payment methods.
+
+## Accepted Payment Methods
+
+### Credit Cards
+- Visa
+- Mastercard
+- American Express
+
+### Other Methods
+- PayPal
+- Bank transfer (Enterprise)
+
+## Adding Payment Method
+
+1. Go to **Settings** > **Billing**
+2. Click **"Payment Methods"**
+3. Click **"Add Payment Method"**
+4. Enter card details
+5. Verify and save
+
+## Updating Payment Method
+
+### Change Default
+1. Find the payment method
+2. Click **"Make Default"**
+3. Future charges use this
+
+### Update Card
+1. Find the card
+2. Click **"Edit"**
+3. Update expiration or address
+4. Save changes
+
+## Removing Payment Method
+
+1. Must have another method first
+2. Find method to remove
+3. Click **"Remove"**
+4. Confirm deletion
+
+## Failed Payments
+
+### What Happens
+- Email notification sent
+- Grace period (usually 7 days)
+- Service continues temporarily
+
+### Fixing Issues
+1. Check card validity
+2. Ensure sufficient funds
+3. Update payment method
+4. Retry payment
+
+## Security
+
+### Card Storage
+- We don't store full card numbers
+- Encrypted transmission
+- PCI compliant
+
+### Fraud Protection
+- Verification required
+- Suspicious activity alerts
+- Secure checkout
+    `,
+  },
+};
 // Main Help Center Component
 export function Survey360HelpCenter() {
   const navigate = useNavigate();
