@@ -3550,7 +3550,7 @@ function KeyboardShortcutsView({ isDark, onTabChange, onArticleClick }) {
 }
 
 // What's New View
-function WhatsNewView({ isDark }) {
+function WhatsNewView({ isDark, onTabChange, onArticleClick }) {
   const textPrimary = isDark ? 'text-white' : 'text-gray-900';
   const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
   const textMuted = isDark ? 'text-gray-500' : 'text-gray-400';
@@ -3558,37 +3558,46 @@ function WhatsNewView({ isDark }) {
   const borderColor = isDark ? 'border-white/10' : 'border-gray-200';
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className={`text-2xl font-bold ${textPrimary} mb-2`}>What's New</h1>
-        <p className={textSecondary}>Latest updates and improvements to Survey360</p>
-      </div>
+    <div className="flex gap-8">
+      <HelpSidebar 
+        isDark={isDark} 
+        activeTab="whats-new" 
+        onTabChange={onTabChange}
+        onArticleClick={onArticleClick}
+      />
+      
+      <div className="flex-1 min-w-0">
+        <div className="text-center mb-8">
+          <h1 className={`text-2xl font-bold ${textPrimary} mb-2`}>What's New</h1>
+          <p className={textSecondary}>Latest updates and improvements to Survey360</p>
+        </div>
 
-      <div className="space-y-8">
-        {WHATS_NEW.map(release => (
-          <div key={release.version} className={`${bgSecondary} border ${borderColor} rounded-xl p-6`}>
-            <div className="flex items-center gap-3 mb-4">
-              <Badge className="bg-teal-500/20 text-teal-400 border-0">v{release.version}</Badge>
-              <span className={textMuted}>{release.date}</span>
-            </div>
-            <div className="space-y-3">
-              {release.highlights.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <Badge 
-                    variant="outline" 
-                    className={`shrink-0 ${item.type === 'feature' ? 'border-teal-500/30 text-teal-400' : 'border-blue-500/30 text-blue-400'}`}
-                  >
-                    {item.type === 'feature' ? 'New' : 'Improved'}
-                  </Badge>
-                  <div>
-                    <h4 className={`font-medium ${textPrimary}`}>{item.title}</h4>
-                    <p className={`text-sm ${textMuted}`}>{item.description}</p>
+        <div className="space-y-8">
+          {WHATS_NEW.map(release => (
+            <div key={release.version} className={`${bgSecondary} border ${borderColor} rounded-xl p-6`}>
+              <div className="flex items-center gap-3 mb-4">
+                <Badge className="bg-teal-500/20 text-teal-400 border-0">v{release.version}</Badge>
+                <span className={textMuted}>{release.date}</span>
+              </div>
+              <div className="space-y-3">
+                {release.highlights.map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <Badge 
+                      variant="outline" 
+                      className={`shrink-0 ${item.type === 'feature' ? 'border-teal-500/30 text-teal-400' : 'border-blue-500/30 text-blue-400'}`}
+                    >
+                      {item.type === 'feature' ? 'New' : 'Improved'}
+                    </Badge>
+                    <div>
+                      <h4 className={`font-medium ${textPrimary}`}>{item.title}</h4>
+                      <p className={`text-sm ${textMuted}`}>{item.description}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
