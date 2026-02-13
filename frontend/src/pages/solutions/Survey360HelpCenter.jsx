@@ -2766,24 +2766,36 @@ export function Survey360HelpCenter() {
           isDark={isDark} 
           expandedFaq={expandedFaq} 
           setExpandedFaq={setExpandedFaq}
+          onTabChange={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }}
+          onArticleClick={handleArticleClick}
         />;
       case 'troubleshooting':
         return <TroubleshootingView 
           isDark={isDark}
           selectedIssue={selectedIssue}
           setSelectedIssue={setSelectedIssue}
+          onTabChange={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }}
+          onArticleClick={handleArticleClick}
         />;
       case 'shortcuts':
-        return <KeyboardShortcutsView isDark={isDark} />;
+        return <KeyboardShortcutsView 
+          isDark={isDark}
+          onTabChange={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }}
+          onArticleClick={handleArticleClick}
+        />;
       case 'whats-new':
-        return <WhatsNewView isDark={isDark} />;
+        return <WhatsNewView 
+          isDark={isDark}
+          onTabChange={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }}
+          onArticleClick={handleArticleClick}
+        />;
       default:
         return <HomeView 
           isDark={isDark}
           searchQuery={searchQuery}
           searchResults={searchResults}
           onArticleClick={handleArticleClick}
-          setActiveTab={setActiveTab}
+          setActiveTab={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }}
         />;
     }
   };
