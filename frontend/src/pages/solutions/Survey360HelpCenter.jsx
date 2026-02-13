@@ -782,7 +782,299 @@ Best for: Phone numbers
 4. **Provide clear labels** - Especially for rating scales (1 = Poor, 5 = Excellent)
     `,
   },
-};
+  'survey-logic': {
+    title: 'Adding Survey Logic & Branching',
+    content: `Make your surveys smarter with conditional logic and branching.
+
+## What is Survey Logic?
+
+Survey logic allows you to show or hide questions based on previous answers. This creates a personalized experience for each respondent.
+
+## Types of Logic
+
+### Skip Logic
+Skip to a specific question based on an answer:
+- If "Yes" → Go to Question 5
+- If "No" → Skip to Question 8
+
+### Display Logic
+Show/hide questions conditionally:
+- Show follow-up only if rating is below 3
+- Hide detailed questions if user selects "Not applicable"
+
+### Branch Logic
+Create different survey paths:
+- Customer path vs. Non-customer path
+- Different questions by department
+
+## Setting Up Logic
+
+1. Select a question in the builder
+2. Click the **Logic** tab in settings
+3. Choose the logic type
+4. Set conditions and actions
+5. Save your changes
+
+## Example Use Cases
+
+### Customer Satisfaction
+- Ask "Were you satisfied?" (Yes/No)
+- If No → Show "What could we improve?"
+- If Yes → Skip to "Would you recommend us?"
+
+### Product Feedback
+- Ask "Which product do you use?"
+- Show relevant questions for that product only
+
+## Tips for Effective Logic
+
+- Keep logic simple and testable
+- Always preview your survey to verify paths
+- Consider edge cases
+- Document complex logic for team reference
+    `,
+  },
+  'survey-templates': {
+    title: 'Using Survey Templates',
+    content: `Get started quickly with our pre-built survey templates.
+
+## Available Templates
+
+### Customer Satisfaction
+Perfect for measuring customer happiness:
+- Overall satisfaction rating
+- NPS (Net Promoter Score)
+- Service quality questions
+- Improvement suggestions
+
+### Employee Feedback
+Gather workplace insights:
+- Job satisfaction
+- Work-life balance
+- Management feedback
+- Growth opportunities
+
+### Event Registration
+Collect attendee information:
+- Contact details
+- Session preferences
+- Dietary requirements
+- Special accommodations
+
+### Product Feedback
+Learn what users think:
+- Feature usage
+- Ease of use
+- Feature requests
+- Bug reports
+
+### Market Research
+Understand your market:
+- Demographics
+- Buying behavior
+- Brand awareness
+- Competitor analysis
+
+### Website Feedback
+Improve your site:
+- Navigation ease
+- Content usefulness
+- Design feedback
+- Performance issues
+
+## Using Templates
+
+1. Click **"New Survey"**
+2. Select **"Use Template"**
+3. Browse or search templates
+4. Click to preview
+5. Click **"Use This Template"**
+6. Customize as needed
+7. Publish when ready
+
+## Customizing Templates
+
+After selecting a template:
+- Add or remove questions
+- Edit question text
+- Change the order
+- Update branding
+- Modify settings
+    `,
+  },
+  'survey-settings': {
+    title: 'Survey Settings & Options',
+    content: `Configure your survey exactly how you want it.
+
+## General Settings
+
+### Survey Name & Description
+- Give your survey a clear, descriptive name
+- Add a description for respondents
+- Set internal notes for your team
+
+### Status
+- **Draft** - Not yet published, still editing
+- **Published** - Live and accepting responses
+- **Closed** - No longer accepting responses
+
+## Response Settings
+
+### Response Limits
+- Set maximum number of responses
+- Limit responses per person
+- Set time-based limits
+
+### Anonymous vs. Identified
+- **Anonymous** - No identifying information collected
+- **Identified** - Track who responded (requires login or email)
+
+## Display Options
+
+### Branding
+- Upload your logo
+- Set brand colors
+- Custom thank you message
+- Custom closed message
+
+### Question Display
+- One question per page
+- All questions on one page
+- Progress bar visibility
+- Question numbering
+
+## Advanced Settings
+
+### Scheduling
+- Set publish date/time
+- Set close date/time
+- Recurring surveys
+
+### Notifications
+- Email on new response
+- Daily/weekly summaries
+- Threshold alerts
+
+### Access Control
+- Public link
+- Password protected
+- Email invitation only
+    `,
+  },
+  'publishing-survey': {
+    title: 'Publishing Your Survey',
+    content: `Make your survey live and start collecting responses.
+
+## Before Publishing
+
+### Pre-Launch Checklist
+- Review all questions for clarity
+- Test the survey yourself
+- Check logic and branching
+- Verify mobile appearance
+- Proofread all text
+- Set up notifications
+
+## How to Publish
+
+1. Click **"Preview"** to review your survey
+2. Make any final adjustments
+3. Click **"Publish"** button
+4. Confirm publication
+5. Your survey is now live!
+
+## After Publishing
+
+### Get Your Link
+- Copy the survey link
+- Share via your preferred channels
+- Generate QR code if needed
+
+### Monitor Responses
+- Check the Responses tab regularly
+- Watch for any issues
+- Track completion rates
+
+## Making Changes
+
+### While Published
+- You can edit text and minor changes
+- Adding/removing questions affects data consistency
+- Consider closing first for major changes
+
+### Closing the Survey
+- Click **"Close Survey"** when done
+- Responses are no longer accepted
+- You can reopen if needed
+
+## Best Practices
+
+- Publish during business hours
+- Have your distribution plan ready
+- Monitor early responses for issues
+- Send reminders for better response rates
+    `,
+  },
+  'survey-scheduling': {
+    title: 'Scheduling Surveys',
+    content: `Schedule your surveys to publish and close automatically.
+
+## Setting Up a Schedule
+
+### Publish Date
+1. Go to Survey Settings
+2. Click **"Schedule"**
+3. Select publish date and time
+4. Choose timezone
+5. Save settings
+
+### Close Date
+1. Set when survey should close
+2. Responses stop being accepted
+3. Survey status changes to "Closed"
+
+## Recurring Surveys
+
+Set up surveys that repeat automatically:
+
+### Frequency Options
+- **Daily** - Same survey every day
+- **Weekly** - Specific day each week
+- **Monthly** - Specific date each month
+
+### Recurring Settings
+- Number of occurrences (or no limit)
+- End date for recurring
+- Automatic notifications
+
+## Timezone Support
+
+Available timezones:
+- UTC
+- US Eastern/Central/Pacific
+- Europe London/Paris/Berlin
+- Asia Tokyo/Singapore
+- Australia Sydney
+
+## Use Cases
+
+### Monthly Check-ins
+Schedule employee satisfaction surveys for the first Monday of each month.
+
+### Event Feedback
+Schedule to open when event starts and close 48 hours after.
+
+### Seasonal Research
+Run the same survey quarterly to track trends.
+
+## Managing Scheduled Surveys
+
+- View upcoming scheduled surveys
+- Edit schedule before publish time
+- Cancel scheduled publication
+- View schedule history
+    `,
+  },
 
 // Main Help Center Component
 export function Survey360HelpCenter() {
