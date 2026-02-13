@@ -360,14 +360,11 @@ const WHATS_NEW = [
   },
 ];
 
-// Article Content (simplified - in production this would be from a CMS)
+// Article Content - Comprehensive documentation for all articles
 const ARTICLE_CONTENT = {
   'welcome': {
     title: 'Welcome to Survey360',
-    content: `
-# Welcome to Survey360! 👋
-
-Survey360 is your complete survey lifecycle management platform. Whether you're collecting customer feedback, conducting research, or gathering team insights, we've got you covered.
+    content: `Survey360 is your complete survey lifecycle management platform. Whether you're collecting customer feedback, conducting research, or gathering team insights, we've got you covered.
 
 ## What You Can Do
 
@@ -407,8 +404,139 @@ Get real-time insights with our analytics dashboard:
 - Use the search to find specific topics
 - Check the FAQ for common questions
 - Contact support if you need assistance
+    `,
+  },
+  'dashboard-overview': {
+    title: 'Dashboard Overview',
+    content: `The Dashboard is your command center for managing all survey activities. Here's what you'll find:
 
-Let's get started! 🚀
+## Main Dashboard Elements
+
+### Statistics Cards
+At the top, you'll see key metrics:
+- **Total Surveys** - Number of surveys you've created
+- **Total Responses** - Combined responses across all surveys
+- **Active Surveys** - Currently published surveys
+- **Response Rate** - Average completion percentage
+
+### Response Trends Chart
+A visual graph showing response activity over the last 14 days. Hover over data points to see exact counts for each day.
+
+### Quick Actions Panel
+Fast access to common tasks:
+- Create New Survey
+- View All Surveys
+- View Responses
+
+### Recent Activity Feed
+Shows the latest responses and survey activities, including:
+- New response submissions
+- Survey status changes
+- Team member actions
+
+## Navigation Tips
+
+- Use the sidebar to navigate between sections
+- The search bar helps you find specific surveys quickly
+- Toggle between light and dark mode using the theme button
+- Access help anytime via the question mark icon
+    `,
+  },
+  'account-setup': {
+    title: 'Setting Up Your Account',
+    content: `Get your Survey360 account configured for the best experience.
+
+## Profile Settings
+
+### Update Your Information
+1. Click your avatar in the bottom-left corner
+2. Select "Settings"
+3. Update your name, email, and profile picture
+
+### Change Password
+1. Go to Settings > Security
+2. Enter your current password
+3. Enter and confirm your new password
+4. Click "Update Password"
+
+## Organization Setup
+
+### Create an Organization
+Organizations help you manage team surveys:
+1. Go to Settings > Organization
+2. Click "Create Organization"
+3. Enter organization name and details
+4. Invite team members
+
+### Invite Team Members
+1. Navigate to your organization settings
+2. Click "Invite Member"
+3. Enter their email address
+4. Select their role (Admin, Editor, or Viewer)
+5. They'll receive an email invitation
+
+## Notification Preferences
+
+Control what notifications you receive:
+- **Email notifications** - New responses, survey completion
+- **Browser notifications** - Real-time updates
+- **Weekly digest** - Summary of survey activity
+
+Go to Settings > Notifications to customize your preferences.
+    `,
+  },
+  'invite-team': {
+    title: 'Inviting Team Members',
+    content: `Collaborate with your team on Survey360 by inviting members to your organization.
+
+## How to Invite Members
+
+1. Go to **Settings** from the sidebar
+2. Click on **Team** or **Organization**
+3. Click **"Invite Member"** button
+4. Enter their email address
+5. Select their role
+6. Click **Send Invitation**
+
+## Understanding Roles
+
+### Admin
+- Full access to all features
+- Can manage team members
+- Can delete surveys and responses
+- Access to billing settings
+
+### Editor
+- Create and edit surveys
+- View all responses
+- Export data
+- Cannot manage team or billing
+
+### Viewer
+- View surveys and responses only
+- Cannot create or edit surveys
+- Can export their own reports
+
+## Managing Team Members
+
+### Change Roles
+1. Go to Team settings
+2. Find the member
+3. Click the role dropdown
+4. Select the new role
+
+### Remove Members
+1. Go to Team settings
+2. Find the member
+3. Click the remove button
+4. Confirm removal
+
+## Best Practices
+
+- Invite team members before starting projects
+- Use appropriate roles for security
+- Regularly review team access
+- Remove inactive members promptly
     `,
   },
   'create-first-survey': {
