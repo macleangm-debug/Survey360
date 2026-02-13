@@ -49,6 +49,7 @@ export function Survey360AppLayout({ children }) {
   const { currentOrg, organizations, setCurrentOrg } = useOrgStore();
   const { theme, setTheme } = useUIStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -58,6 +59,13 @@ export function Survey360AppLayout({ children }) {
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
+
+  // Help links for DashboardHeader
+  const helpLinks = [
+    { icon: Book, label: 'User Manual', action: () => navigate('/solutions/survey360/help') },
+    { icon: MessageCircle, label: 'Contact Support', href: 'mailto:support@survey360.io' },
+    { icon: Keyboard, label: 'Keyboard Shortcuts', action: () => setShowShortcuts(true) },
+  ];
 
   // Check if user is authenticated
   useEffect(() => {
