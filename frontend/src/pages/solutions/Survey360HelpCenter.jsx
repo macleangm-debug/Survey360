@@ -2755,6 +2755,8 @@ export function Survey360HelpCenter() {
           categoryId={activeCategory} 
           articleId={activeArticle}
           onBack={() => { setActiveTab('home'); setSearchParams({}); }}
+          onArticleClick={handleArticleClick}
+          onTabChange={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }}
           isDark={isDark}
           feedback={articleFeedback}
           setFeedback={setArticleFeedback}
