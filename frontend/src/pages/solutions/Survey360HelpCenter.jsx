@@ -3318,54 +3318,63 @@ function ArticleView({ categoryId, articleId, onBack, onArticleClick, onTabChang
 }
 
 // FAQ View Component
-function FAQView({ isDark, expandedFaq, setExpandedFaq }) {
+function FAQView({ isDark, expandedFaq, setExpandedFaq, onTabChange, onArticleClick }) {
   const textPrimary = isDark ? 'text-white' : 'text-gray-900';
   const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
   const bgSecondary = isDark ? 'bg-[#0f1d32]' : 'bg-white';
   const borderColor = isDark ? 'border-white/10' : 'border-gray-200';
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className={`text-2xl font-bold ${textPrimary} mb-2`}>Frequently Asked Questions</h1>
-        <p className={textSecondary}>Quick answers to common questions about Survey360</p>
-      </div>
+    <div className="flex gap-8">
+      <HelpSidebar 
+        isDark={isDark} 
+        activeTab="faq" 
+        onTabChange={onTabChange}
+        onArticleClick={onArticleClick}
+      />
+      
+      <div className="flex-1 min-w-0">
+        <div className="text-center mb-8">
+          <h1 className={`text-2xl font-bold ${textPrimary} mb-2`}>Frequently Asked Questions</h1>
+          <p className={textSecondary}>Quick answers to common questions about Survey360</p>
+        </div>
 
-      <div className="space-y-6">
-        {FAQ_DATA.map((section, sectionIdx) => (
-          <div key={section.category}>
-            <h2 className={`text-lg font-semibold ${textPrimary} mb-3`}>{section.category}</h2>
-            <div className={`${bgSecondary} border ${borderColor} rounded-xl overflow-hidden`}>
-              {section.questions.map((faq, idx) => {
-                const id = `${sectionIdx}-${idx}`;
-                const isExpanded = expandedFaq === id;
-                return (
-                  <div key={idx} className={`border-b ${borderColor} last:border-0`}>
-                    <button
-                      onClick={() => setExpandedFaq(isExpanded ? null : id)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left"
-                    >
-                      <span className={`font-medium ${textPrimary}`}>{faq.q}</span>
-                      <ChevronDown className={`w-5 h-5 ${textSecondary} transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                    </button>
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <p className={`px-5 pb-4 ${textSecondary}`}>{faq.a}</p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })}
+        <div className="space-y-6">
+          {FAQ_DATA.map((section, sectionIdx) => (
+            <div key={section.category}>
+              <h2 className={`text-lg font-semibold ${textPrimary} mb-3`}>{section.category}</h2>
+              <div className={`${bgSecondary} border ${borderColor} rounded-xl overflow-hidden`}>
+                {section.questions.map((faq, idx) => {
+                  const id = `${sectionIdx}-${idx}`;
+                  const isExpanded = expandedFaq === id;
+                  return (
+                    <div key={idx} className={`border-b ${borderColor} last:border-0`}>
+                      <button
+                        onClick={() => setExpandedFaq(isExpanded ? null : id)}
+                        className="w-full flex items-center justify-between px-5 py-4 text-left"
+                      >
+                        <span className={`font-medium ${textPrimary}`}>{faq.q}</span>
+                        <ChevronDown className={`w-5 h-5 ${textSecondary} transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                      </button>
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <p className={`px-5 pb-4 ${textSecondary}`}>{faq.a}</p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
