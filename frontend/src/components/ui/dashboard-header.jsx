@@ -113,10 +113,13 @@ export function DashboardHeader({
   const defaultHelpLinks = [
     { icon: Book, label: 'Documentation', href: '#docs' },
     { icon: MessageCircle, label: 'Contact Support', href: '#support' },
-    { icon: Keyboard, label: 'Keyboard Shortcuts', action: () => setShowShortcuts(true) },
   ];
 
-  const resolvedHelpLinks = helpLinks.length > 0 ? helpLinks : defaultHelpLinks;
+  // Always include keyboard shortcuts as the last item
+  const resolvedHelpLinks = [
+    ...(helpLinks.length > 0 ? helpLinks : defaultHelpLinks),
+    { icon: Keyboard, label: 'Keyboard Shortcuts', action: () => setShowShortcuts(true) },
+  ];
 
   return (
     <>
