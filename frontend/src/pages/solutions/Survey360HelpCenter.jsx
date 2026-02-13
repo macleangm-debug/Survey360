@@ -3010,9 +3010,14 @@ function ArticleView({ categoryId, articleId, onBack, isDark, feedback, setFeedb
   const textMuted = isDark ? 'text-gray-500' : 'text-gray-400';
   const bgSecondary = isDark ? 'bg-[#0f1d32]' : 'bg-white';
   const borderColor = isDark ? 'border-white/10' : 'border-gray-200';
+  const hoverBg = isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100';
 
   const handleFeedback = (isHelpful) => {
     setFeedback(prev => ({ ...prev, [articleId]: isHelpful }));
+  };
+
+  const handleArticleNav = (newArticleId) => {
+    window.location.href = `?tab=article&category=${categoryId}&article=${newArticleId}`;
   };
 
   if (!article || !content) {
@@ -3025,87 +3030,177 @@ function ArticleView({ categoryId, articleId, onBack, isDark, feedback, setFeedb
     );
   }
 
+  // Get color style helper
+  const getColorStyle = (color) => {
+    const colors = {
+      teal: { bg: '#14b8a620', text: '#14b8a6' },
+      blue: { bg: '#3b82f620', text: '#3b82f6' },
+      purple: { bg: '#a855f720', text: '#a855f7' },
+      green: { bg: '#10b98120', text: '#10b981' },
+      orange: { bg: '#f59e0b20', text: '#f59e0b' },
+      pink: { bg: '#ec489920', text: '#ec4899' },
+      yellow: { bg: '#eab30820', text: '#eab308' },
+      gray: { bg: '#6b728020', text: '#6b7280' },
+    };
+    return colors[color] || colors.gray;
+  };
+
+  const colorStyle = getColorStyle(category.color);
+
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm mb-6">
-        <button onClick={onBack} className={`${textSecondary} hover:text-teal-400`}>Help Center</button>
-        <ChevronRight className={`w-4 h-4 ${textMuted}`} />
-        <span className={textSecondary}>{category.title}</span>
-        <ChevronRight className={`w-4 h-4 ${textMuted}`} />
-        <span className={textPrimary}>{article.title}</span>
-      </div>
-
-      {/* Article */}
-      <article className={`${bgSecondary} border ${borderColor} rounded-xl p-8`}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className={`p-2 rounded-lg`} style={{ backgroundColor: `${category.color === 'teal' ? '#14b8a620' : category.color === 'blue' ? '#3b82f620' : '#6b728020'}` }}>
-            <category.icon className="w-5 h-5" style={{ color: category.color === 'teal' ? '#14b8a6' : category.color === 'blue' ? '#3b82f6' : '#6b7280' }} />
+    <div className="flex gap-8">
+      {/* Left Sidebar - Category Navigation */}
+      <aside className={`hidden lg:block w-64 flex-shrink-0`}>
+        <div className={`${bgSecondary} border ${borderColor} rounded-xl p-4 sticky top-4`}>
+          <div className="flex items-center gap-2 mb-4 pb-3 border-b" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb' }}>
+            <div className="p-1.5 rounded-lg" style={{ backgroundColor: colorStyle.bg }}>
+              <category.icon className="w-4 h-4" style={{ color: colorStyle.text }} />
+            </div>
+            <span className={`font-medium ${textPrimary}`}>{category.title}</span>
           </div>
-          <div>
-            <h1 className={`text-2xl font-bold ${textPrimary}`}>{content.title}</h1>
-            <p className={`text-sm ${textMuted}`}>{article.readTime} read</p>
-          </div>
+          <nav className="space-y-1">
+            {category.articles.map((art) => (
+              <button
+                key={art.id}
+                onClick={() => handleArticleNav(art.id)}
+                className={cn(
+                  "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
+                  art.id === articleId
+                    ? "bg-teal-500/10 text-teal-400 font-medium"
+                    : `${textSecondary} ${hoverBg} hover:text-teal-400`
+                )}
+              >
+                {art.title}
+              </button>
+            ))}
+          </nav>
         </div>
 
-        <div className={`prose ${isDark ? 'prose-invert' : ''} max-w-none`}>
-          <div className={`${textSecondary} space-y-4`} dangerouslySetInnerHTML={{ 
-            __html: content.content
-              .replace(/^# (.*$)/gm, `<h1 class="${textPrimary} text-2xl font-bold mt-8 mb-4">$1</h1>`)
-              .replace(/^## (.*$)/gm, `<h2 class="${textPrimary} text-xl font-semibold mt-6 mb-3">$1</h2>`)
-              .replace(/^### (.*$)/gm, `<h3 class="${textPrimary} text-lg font-medium mt-4 mb-2">$1</h3>`)
-              .replace(/\*\*(.*?)\*\*/g, `<strong class="${textPrimary}">$1</strong>`)
-              .replace(/\*(.*?)\*/g, `<em>$1</em>`)
-              .replace(/^- (.*$)/gm, `<li class="ml-4">$1</li>`)
-              .replace(/\n\n/g, '</p><p class="mb-4">')
-          }} />
-        </div>
-
-        {/* Feedback */}
-        <div className={`mt-8 pt-6 border-t ${borderColor}`}>
-          <p className={`text-sm ${textSecondary} mb-3`}>Was this article helpful?</p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant={feedback[articleId] === true ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleFeedback(true)}
-              className={feedback[articleId] === true ? 'bg-teal-500' : ''}
-            >
-              <ThumbsUp className="w-4 h-4 mr-1" />
-              Yes
-            </Button>
-            <Button
-              variant={feedback[articleId] === false ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleFeedback(false)}
-              className={feedback[articleId] === false ? 'bg-red-500' : ''}
-            >
-              <ThumbsDown className="w-4 h-4 mr-1" />
-              No
-            </Button>
-          </div>
-          {feedback[articleId] !== undefined && (
-            <p className={`text-sm ${textMuted} mt-2`}>
-              {feedback[articleId] ? 'Glad this helped! 🎉' : 'Thanks for the feedback. We\'ll improve this article.'}
-            </p>
-          )}
-        </div>
-      </article>
-
-      {/* Related Articles */}
-      <div className="mt-8">
-        <h3 className={`text-lg font-semibold ${textPrimary} mb-4`}>Related Articles</h3>
-        <div className="grid md:grid-cols-2 gap-4">
-          {category.articles.filter(a => a.id !== articleId).slice(0, 2).map(relatedArticle => (
-            <button
-              key={relatedArticle.id}
-              onClick={() => window.location.href = `?tab=article&category=${categoryId}&article=${relatedArticle.id}`}
-              className={`${bgSecondary} border ${borderColor} rounded-lg p-4 text-left hover:border-teal-500/30 transition-all`}
-            >
-              <h4 className={`font-medium ${textPrimary} mb-1`}>{relatedArticle.title}</h4>
-              <p className={`text-sm ${textMuted}`}>{relatedArticle.readTime}</p>
+        {/* Quick Links */}
+        <div className={`${bgSecondary} border ${borderColor} rounded-xl p-4 mt-4`}>
+          <h4 className={`text-sm font-medium ${textPrimary} mb-3`}>Quick Links</h4>
+          <div className="space-y-2">
+            <button onClick={onBack} className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 flex items-center gap-2`}>
+              <Home className="w-3.5 h-3.5" />
+              Help Center Home
             </button>
-          ))}
+            <button onClick={() => window.location.href = '?tab=faq'} className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 flex items-center gap-2`}>
+              <HelpCircle className="w-3.5 h-3.5" />
+              FAQ
+            </button>
+            <button onClick={() => window.location.href = '?tab=troubleshooting'} className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 flex items-center gap-2`}>
+              <AlertCircle className="w-3.5 h-3.5" />
+              Troubleshooting
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 min-w-0">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm mb-6">
+          <button onClick={onBack} className={`${textSecondary} hover:text-teal-400`}>Help Center</button>
+          <ChevronRight className={`w-4 h-4 ${textMuted}`} />
+          <span className={textSecondary}>{category.title}</span>
+          <ChevronRight className={`w-4 h-4 ${textMuted}`} />
+          <span className={textPrimary}>{article.title}</span>
+        </div>
+
+        {/* Article */}
+        <article className={`${bgSecondary} border ${borderColor} rounded-xl p-8`}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg" style={{ backgroundColor: colorStyle.bg }}>
+              <category.icon className="w-5 h-5" style={{ color: colorStyle.text }} />
+            </div>
+            <div>
+              <h1 className={`text-2xl font-bold ${textPrimary}`}>{content.title}</h1>
+              <p className={`text-sm ${textMuted}`}>{article.readTime} read</p>
+            </div>
+          </div>
+
+          <div className={`prose ${isDark ? 'prose-invert' : ''} max-w-none`}>
+            <div className={`${textSecondary} space-y-4`} dangerouslySetInnerHTML={{ 
+              __html: content.content
+                .replace(/^## (.*$)/gm, `<h2 class="${textPrimary} text-xl font-semibold mt-6 mb-3">$1</h2>`)
+                .replace(/^### (.*$)/gm, `<h3 class="${textPrimary} text-lg font-medium mt-4 mb-2">$1</h3>`)
+                .replace(/\*\*(.*?)\*\*/g, `<strong class="${textPrimary}">$1</strong>`)
+                .replace(/\*(.*?)\*/g, `<em>$1</em>`)
+                .replace(/^- (.*$)/gm, `<li class="ml-4 mb-1">$1</li>`)
+                .replace(/^\d+\. (.*$)/gm, `<li class="ml-4 mb-1 list-decimal">$1</li>`)
+                .replace(/\n\n/g, '</p><p class="mb-4">')
+            }} />
+          </div>
+
+          {/* Feedback */}
+          <div className={`mt-8 pt-6 border-t ${borderColor}`}>
+            <p className={`text-sm ${textSecondary} mb-3`}>Was this article helpful?</p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={feedback[articleId] === true ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => handleFeedback(true)}
+                className={feedback[articleId] === true ? 'bg-teal-500' : ''}
+              >
+                <ThumbsUp className="w-4 h-4 mr-1" />
+                Yes
+              </Button>
+              <Button
+                variant={feedback[articleId] === false ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => handleFeedback(false)}
+                className={feedback[articleId] === false ? 'bg-red-500' : ''}
+              >
+                <ThumbsDown className="w-4 h-4 mr-1" />
+                No
+              </Button>
+            </div>
+            {feedback[articleId] !== undefined && (
+              <p className={`text-sm ${textMuted} mt-2`}>
+                {feedback[articleId] ? 'Glad this helped!' : 'Thanks for the feedback. We\'ll improve this article.'}
+              </p>
+            )}
+          </div>
+        </article>
+
+        {/* Related Articles - Now in a grid below */}
+        <div className="mt-8">
+          <h3 className={`text-lg font-semibold ${textPrimary} mb-4`}>Related Articles</h3>
+          <div className="grid md:grid-cols-3 gap-4">
+            {category.articles.filter(a => a.id !== articleId).slice(0, 3).map(relatedArticle => (
+              <button
+                key={relatedArticle.id}
+                onClick={() => handleArticleNav(relatedArticle.id)}
+                className={`${bgSecondary} border ${borderColor} rounded-lg p-4 text-left hover:border-teal-500/30 transition-all`}
+              >
+                <h4 className={`font-medium ${textPrimary} mb-1`}>{relatedArticle.title}</h4>
+                <p className={`text-sm ${textMuted}`}>{relatedArticle.readTime}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Other Categories */}
+        <div className="mt-8">
+          <h3 className={`text-lg font-semibold ${textPrimary} mb-4`}>Explore Other Topics</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {HELP_CATEGORIES.filter(c => c.id !== categoryId).slice(0, 4).map(cat => {
+              const catColorStyle = getColorStyle(cat.color);
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => window.location.href = `?tab=article&category=${cat.id}&article=${cat.articles[0].id}`}
+                  className={`${bgSecondary} border ${borderColor} rounded-lg p-3 text-left hover:border-teal-500/30 transition-all`}
+                >
+                  <div className="p-1.5 rounded-lg w-fit mb-2" style={{ backgroundColor: catColorStyle.bg }}>
+                    <cat.icon className="w-4 h-4" style={{ color: catColorStyle.text }} />
+                  </div>
+                  <h4 className={`font-medium text-sm ${textPrimary}`}>{cat.title}</h4>
+                  <p className={`text-xs ${textMuted}`}>{cat.articles.length} articles</p>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
