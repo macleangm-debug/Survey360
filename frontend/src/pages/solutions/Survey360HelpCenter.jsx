@@ -3381,7 +3381,7 @@ function FAQView({ isDark, expandedFaq, setExpandedFaq, onTabChange, onArticleCl
 }
 
 // Troubleshooting View Component
-function TroubleshootingView({ isDark, selectedIssue, setSelectedIssue }) {
+function TroubleshootingView({ isDark, selectedIssue, setSelectedIssue, onTabChange, onArticleClick }) {
   const textPrimary = isDark ? 'text-white' : 'text-gray-900';
   const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
   const textMuted = isDark ? 'text-gray-500' : 'text-gray-400';
@@ -3393,48 +3393,57 @@ function TroubleshootingView({ isDark, selectedIssue, setSelectedIssue }) {
 
   if (issue) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <button
-          onClick={() => setSelectedIssue(null)}
-          className={`flex items-center gap-2 ${textSecondary} hover:text-teal-400 mb-6`}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to issues
-        </button>
+      <div className="flex gap-8">
+        <HelpSidebar 
+          isDark={isDark} 
+          activeTab="troubleshooting" 
+          onTabChange={onTabChange}
+          onArticleClick={onArticleClick}
+        />
+        
+        <div className="flex-1 min-w-0">
+          <button
+            onClick={() => setSelectedIssue(null)}
+            className={`flex items-center gap-2 ${textSecondary} hover:text-teal-400 mb-6`}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to issues
+          </button>
 
-        <div className={`${bgSecondary} border ${borderColor} rounded-xl p-6`}>
-          <div className="flex items-start gap-4 mb-6">
-            <div className="p-3 rounded-lg bg-orange-500/10">
-              <AlertCircle className="w-6 h-6 text-orange-500" />
-            </div>
-            <div>
-              <h1 className={`text-xl font-bold ${textPrimary} mb-2`}>{issue.title}</h1>
-              <div className="flex flex-wrap gap-2">
-                {issue.symptoms.map((symptom, idx) => (
-                  <Badge key={idx} variant="outline" className={`${borderColor} ${textMuted}`}>
-                    {symptom}
-                  </Badge>
-                ))}
+          <div className={`${bgSecondary} border ${borderColor} rounded-xl p-6`}>
+            <div className="flex items-start gap-4 mb-6">
+              <div className="p-3 rounded-lg bg-orange-500/10">
+                <AlertCircle className="w-6 h-6 text-orange-500" />
               </div>
-            </div>
-          </div>
-
-          <h2 className={`font-semibold ${textPrimary} mb-4`}>Try these solutions:</h2>
-          <div className="space-y-3">
-            {issue.solutions.map((solution, idx) => (
-              <div key={idx} className={`flex items-start gap-3 p-3 rounded-lg ${isDark ? 'bg-white/5' : 'bg-gray-50'}`}>
-                <div className="w-6 h-6 rounded-full bg-teal-500/20 flex items-center justify-center shrink-0">
-                  <span className="text-sm font-medium text-teal-400">{idx + 1}</span>
+              <div>
+                <h1 className={`text-xl font-bold ${textPrimary} mb-2`}>{issue.title}</h1>
+                <div className="flex flex-wrap gap-2">
+                  {issue.symptoms.map((symptom, idx) => (
+                    <Badge key={idx} variant="outline" className={`${borderColor} ${textMuted}`}>
+                      {symptom}
+                    </Badge>
+                  ))}
                 </div>
-                <p className={textSecondary}>{solution}</p>
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div className={`mt-6 p-4 rounded-lg ${isDark ? 'bg-teal-500/10' : 'bg-teal-50'} border border-teal-500/30`}>
-            <p className={`text-sm ${isDark ? 'text-teal-400' : 'text-teal-700'}`}>
-              <strong>Still having issues?</strong> Contact our support team for personalized help.
-            </p>
+            <h2 className={`font-semibold ${textPrimary} mb-4`}>Try these solutions:</h2>
+            <div className="space-y-3">
+              {issue.solutions.map((solution, idx) => (
+                <div key={idx} className={`flex items-start gap-3 p-3 rounded-lg ${isDark ? 'bg-white/5' : 'bg-gray-50'}`}>
+                  <div className="w-6 h-6 rounded-full bg-teal-500/20 flex items-center justify-center shrink-0">
+                    <span className="text-sm font-medium text-teal-400">{idx + 1}</span>
+                  </div>
+                  <p className={textSecondary}>{solution}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className={`mt-6 p-4 rounded-lg ${isDark ? 'bg-teal-500/10' : 'bg-teal-50'} border border-teal-500/30`}>
+              <p className={`text-sm ${isDark ? 'text-teal-400' : 'text-teal-700'}`}>
+                <strong>Still having issues?</strong> Contact our support team for personalized help.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -3442,37 +3451,46 @@ function TroubleshootingView({ isDark, selectedIssue, setSelectedIssue }) {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className={`text-2xl font-bold ${textPrimary} mb-2`}>Troubleshooting Guide</h1>
-        <p className={textSecondary}>Select your issue to get step-by-step solutions</p>
-      </div>
+    <div className="flex gap-8">
+      <HelpSidebar 
+        isDark={isDark} 
+        activeTab="troubleshooting" 
+        onTabChange={onTabChange}
+        onArticleClick={onArticleClick}
+      />
+      
+      <div className="flex-1 min-w-0">
+        <div className="text-center mb-8">
+          <h1 className={`text-2xl font-bold ${textPrimary} mb-2`}>Troubleshooting Guide</h1>
+          <p className={textSecondary}>Select your issue to get step-by-step solutions</p>
+        </div>
 
-      <div className="grid gap-4">
-        {TROUBLESHOOTING_DATA.map(issue => (
-          <button
-            key={issue.id}
-            onClick={() => setSelectedIssue(issue.id)}
-            className={`${bgSecondary} border ${borderColor} rounded-xl p-5 text-left ${hoverBg} transition-all hover:border-orange-500/30`}
-          >
-            <div className="flex items-start gap-4">
-              <div className="p-2 rounded-lg bg-orange-500/10">
-                <AlertCircle className="w-5 h-5 text-orange-500" />
-              </div>
-              <div className="flex-1">
-                <h3 className={`font-semibold ${textPrimary} mb-2`}>{issue.title}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {issue.symptoms.slice(0, 3).map((symptom, idx) => (
-                    <Badge key={idx} variant="outline" className={`${borderColor} ${textMuted} text-xs`}>
-                      {symptom}
-                    </Badge>
-                  ))}
+        <div className="grid gap-4">
+          {TROUBLESHOOTING_DATA.map(issue => (
+            <button
+              key={issue.id}
+              onClick={() => setSelectedIssue(issue.id)}
+              className={`${bgSecondary} border ${borderColor} rounded-xl p-5 text-left ${hoverBg} transition-all hover:border-orange-500/30`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-2 rounded-lg bg-orange-500/10">
+                  <AlertCircle className="w-5 h-5 text-orange-500" />
                 </div>
+                <div className="flex-1">
+                  <h3 className={`font-semibold ${textPrimary} mb-2`}>{issue.title}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {issue.symptoms.slice(0, 3).map((symptom, idx) => (
+                      <Badge key={idx} variant="outline" className={`${borderColor} ${textMuted} text-xs`}>
+                        {symptom}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <ChevronRight className={`w-5 h-5 ${textMuted}`} />
               </div>
-              <ChevronRight className={`w-5 h-5 ${textMuted}`} />
-            </div>
-          </button>
-        ))}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
