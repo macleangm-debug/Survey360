@@ -64,7 +64,6 @@ export function Survey360AppLayout({ children }) {
   const helpLinks = [
     { icon: Book, label: 'User Manual', action: () => navigate('/solutions/survey360/help') },
     { icon: MessageCircle, label: 'Contact Support', href: 'mailto:support@survey360.io' },
-    { icon: Keyboard, label: 'Keyboard Shortcuts', action: () => setShowShortcuts(true) },
   ];
 
   // Check if user is authenticated
