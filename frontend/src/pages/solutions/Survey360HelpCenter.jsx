@@ -2982,105 +2982,114 @@ function HomeView({ isDark, searchQuery, searchResults, onArticleClick, setActiv
   const hoverBg = isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100';
 
   return (
-    <div className="space-y-8">
-      {/* Hero */}
-      <div className="text-center py-8">
-        <h1 className={`text-3xl font-bold ${textPrimary} mb-3`}>How can we help you?</h1>
-        <p className={textSecondary}>Search our knowledge base or browse categories below</p>
-      </div>
-
-      {/* Popular Articles */}
-      <div>
-        <h2 className={`text-lg font-semibold ${textPrimary} mb-4 flex items-center gap-2`}>
-          <Star className="w-5 h-5 text-yellow-500" />
-          Popular Articles
-        </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {HELP_CATEGORIES.flatMap(cat => 
-            cat.articles.filter(a => a.popular).map(article => (
-              <button
-                key={`${cat.id}-${article.id}`}
-                onClick={() => onArticleClick(cat.id, article.id)}
-                className={`${bgSecondary} border ${borderColor} rounded-xl p-4 text-left ${hoverBg} transition-all hover:border-teal-500/30`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg bg-${cat.color}-500/10`}>
-                    <cat.icon className="w-4 h-4" style={{ color: cat.color === 'teal' ? '#14b8a6' : cat.color === 'blue' ? '#3b82f6' : cat.color === 'purple' ? '#a855f7' : cat.color === 'green' ? '#10b981' : '#f59e0b' }} />
-                  </div>
-                  <div>
-                    <h3 className={`font-medium ${textPrimary} mb-1`}>{article.title}</h3>
-                    <p className={`text-xs ${textMuted}`}>{cat.title} • {article.readTime}</p>
-                  </div>
-                </div>
-              </button>
-            ))
-          )}
+    <div className="flex gap-8">
+      <HelpSidebar 
+        isDark={isDark} 
+        activeTab="home" 
+        onTabChange={setActiveTab}
+        onArticleClick={onArticleClick}
+      />
+      
+      <div className="flex-1 min-w-0 space-y-8">
+        {/* Hero */}
+        <div className="text-center py-8">
+          <h1 className={`text-3xl font-bold ${textPrimary} mb-3`}>How can we help you?</h1>
+          <p className={textSecondary}>Search our knowledge base or browse categories below</p>
         </div>
-      </div>
 
-      {/* Categories Grid */}
-      <div>
-        <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Browse by Category</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {HELP_CATEGORIES.map(category => {
-            const Icon = category.icon;
-            return (
-              <div
-                key={category.id}
-                className={`${bgSecondary} border ${borderColor} rounded-xl p-5 transition-all hover:border-teal-500/30`}
-              >
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3`} style={{ backgroundColor: `${category.color === 'teal' ? '#14b8a620' : category.color === 'blue' ? '#3b82f620' : category.color === 'purple' ? '#a855f720' : category.color === 'green' ? '#10b98120' : category.color === 'orange' ? '#f59e0b20' : category.color === 'pink' ? '#ec489920' : category.color === 'yellow' ? '#eab30820' : '#6b728020'}` }}>
-                  <Icon className="w-5 h-5" style={{ color: category.color === 'teal' ? '#14b8a6' : category.color === 'blue' ? '#3b82f6' : category.color === 'purple' ? '#a855f7' : category.color === 'green' ? '#10b981' : category.color === 'orange' ? '#f59e0b' : category.color === 'pink' ? '#ec4899' : category.color === 'yellow' ? '#eab308' : '#6b7280' }} />
-                </div>
-                <h3 className={`font-semibold ${textPrimary} mb-1`}>{category.title}</h3>
-                <p className={`text-sm ${textMuted} mb-3`}>{category.description}</p>
-                <div className="space-y-1">
-                  {category.articles.slice(0, 3).map(article => (
-                    <button
-                      key={article.id}
-                      onClick={() => onArticleClick(category.id, article.id)}
-                      className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 transition-colors flex items-center gap-1`}
-                    >
-                      <ChevronRight className="w-3 h-3" />
-                      {article.title}
-                    </button>
-                  ))}
-                  {category.articles.length > 3 && (
-                    <p className={`text-xs ${textMuted} pl-4`}>+{category.articles.length - 3} more articles</p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        {/* Popular Articles */}
+        <div>
+          <h2 className={`text-lg font-semibold ${textPrimary} mb-4 flex items-center gap-2`}>
+            <Star className="w-5 h-5 text-yellow-500" />
+            Popular Articles
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {HELP_CATEGORIES.flatMap(cat => 
+              cat.articles.filter(a => a.popular).map(article => (
+                <button
+                  key={`${cat.id}-${article.id}`}
+                  onClick={() => onArticleClick(cat.id, article.id)}
+                  className={`${bgSecondary} border ${borderColor} rounded-xl p-4 text-left ${hoverBg} transition-all hover:border-teal-500/30`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg bg-${cat.color}-500/10`}>
+                      <cat.icon className="w-4 h-4" style={{ color: cat.color === 'teal' ? '#14b8a6' : cat.color === 'blue' ? '#3b82f6' : cat.color === 'purple' ? '#a855f7' : cat.color === 'green' ? '#10b981' : '#f59e0b' }} />
+                    </div>
+                    <div>
+                      <h3 className={`font-medium ${textPrimary} mb-1`}>{article.title}</h3>
+                      <p className={`text-xs ${textMuted}`}>{cat.title} • {article.readTime}</p>
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Quick Links */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <button
-          onClick={() => setActiveTab('faq')}
-          className={`${bgSecondary} border ${borderColor} rounded-xl p-5 text-left ${hoverBg} transition-all`}
-        >
-          <HelpCircle className="w-6 h-6 text-teal-500 mb-2" />
-          <h3 className={`font-semibold ${textPrimary} mb-1`}>Frequently Asked Questions</h3>
-          <p className={`text-sm ${textMuted}`}>Quick answers to common questions</p>
-        </button>
-        <button
-          onClick={() => setActiveTab('troubleshooting')}
-          className={`${bgSecondary} border ${borderColor} rounded-xl p-5 text-left ${hoverBg} transition-all`}
-        >
-          <AlertCircle className="w-6 h-6 text-orange-500 mb-2" />
-          <h3 className={`font-semibold ${textPrimary} mb-1`}>Troubleshooting</h3>
-          <p className={`text-sm ${textMuted}`}>Fix common issues yourself</p>
-        </button>
-        <button
-          onClick={() => setActiveTab('shortcuts')}
-          className={`${bgSecondary} border ${borderColor} rounded-xl p-5 text-left ${hoverBg} transition-all`}
-        >
-          <Keyboard className="w-6 h-6 text-purple-500 mb-2" />
-          <h3 className={`font-semibold ${textPrimary} mb-1`}>Keyboard Shortcuts</h3>
-          <p className={`text-sm ${textMuted}`}>Work faster with shortcuts</p>
-        </button>
+        {/* Categories Grid */}
+        <div>
+          <h2 className={`text-lg font-semibold ${textPrimary} mb-4`}>Browse by Category</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {HELP_CATEGORIES.map(category => {
+              const Icon = category.icon;
+              return (
+                <div
+                  key={category.id}
+                  className={`${bgSecondary} border ${borderColor} rounded-xl p-5 transition-all hover:border-teal-500/30`}
+                >
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3`} style={{ backgroundColor: `${category.color === 'teal' ? '#14b8a620' : category.color === 'blue' ? '#3b82f620' : category.color === 'purple' ? '#a855f720' : category.color === 'green' ? '#10b98120' : category.color === 'orange' ? '#f59e0b20' : category.color === 'pink' ? '#ec489920' : category.color === 'yellow' ? '#eab30820' : '#6b728020'}` }}>
+                    <Icon className="w-5 h-5" style={{ color: category.color === 'teal' ? '#14b8a6' : category.color === 'blue' ? '#3b82f6' : category.color === 'purple' ? '#a855f7' : category.color === 'green' ? '#10b981' : category.color === 'orange' ? '#f59e0b' : category.color === 'pink' ? '#ec4899' : category.color === 'yellow' ? '#eab308' : '#6b7280' }} />
+                  </div>
+                  <h3 className={`font-semibold ${textPrimary} mb-1`}>{category.title}</h3>
+                  <p className={`text-sm ${textMuted} mb-3`}>{category.description}</p>
+                  <div className="space-y-1">
+                    {category.articles.slice(0, 3).map(article => (
+                      <button
+                        key={article.id}
+                        onClick={() => onArticleClick(category.id, article.id)}
+                        className={`w-full text-left text-sm ${textSecondary} hover:text-teal-400 transition-colors flex items-center gap-1`}
+                      >
+                        <ChevronRight className="w-3 h-3" />
+                        {article.title}
+                      </button>
+                    ))}
+                    {category.articles.length > 3 && (
+                      <p className={`text-xs ${textMuted} pl-4`}>+{category.articles.length - 3} more articles</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Quick Links */}
+        <div className="grid md:grid-cols-3 gap-4">
+          <button
+            onClick={() => setActiveTab('faq')}
+            className={`${bgSecondary} border ${borderColor} rounded-xl p-5 text-left ${hoverBg} transition-all`}
+          >
+            <HelpCircle className="w-6 h-6 text-teal-500 mb-2" />
+            <h3 className={`font-semibold ${textPrimary} mb-1`}>Frequently Asked Questions</h3>
+            <p className={`text-sm ${textMuted}`}>Quick answers to common questions</p>
+          </button>
+          <button
+            onClick={() => setActiveTab('troubleshooting')}
+            className={`${bgSecondary} border ${borderColor} rounded-xl p-5 text-left ${hoverBg} transition-all`}
+          >
+            <AlertCircle className="w-6 h-6 text-orange-500 mb-2" />
+            <h3 className={`font-semibold ${textPrimary} mb-1`}>Troubleshooting</h3>
+            <p className={`text-sm ${textMuted}`}>Fix common issues yourself</p>
+          </button>
+          <button
+            onClick={() => setActiveTab('shortcuts')}
+            className={`${bgSecondary} border ${borderColor} rounded-xl p-5 text-left ${hoverBg} transition-all`}
+          >
+            <Keyboard className="w-6 h-6 text-purple-500 mb-2" />
+            <h3 className={`font-semibold ${textPrimary} mb-1`}>Keyboard Shortcuts</h3>
+            <p className={`text-sm ${textMuted}`}>Work faster with shortcuts</p>
+          </button>
+        </div>
       </div>
     </div>
   );
