@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
   Book,
+  BookOpen,
   HelpCircle,
   ChevronRight,
   ChevronDown,
