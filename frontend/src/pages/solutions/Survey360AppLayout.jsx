@@ -49,7 +49,6 @@ export function Survey360AppLayout({ children }) {
   const { currentOrg, organizations, setCurrentOrg } = useOrgStore();
   const { theme, setTheme } = useUIStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const handleLogout = () => {
     logout();
