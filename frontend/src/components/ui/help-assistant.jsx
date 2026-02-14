@@ -169,6 +169,30 @@ export function HelpAssistant({ isDark = true }) {
                 </div>
               </div>
             ))}
+            
+            {/* Suggested Questions */}
+            {showSuggestions && messages.length === 1 && !isLoading && (
+              <div className="mt-2">
+                <p className={cn("text-xs mb-2", textSecondary)}>Try asking:</p>
+                <div className="flex flex-wrap gap-2">
+                  {SUGGESTED_QUESTIONS.map((question, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => sendMessage(question)}
+                      className={cn(
+                        "text-xs px-3 py-1.5 rounded-full border transition-colors",
+                        borderColor,
+                        isDark ? "bg-white/5 hover:bg-white/10" : "bg-gray-100 hover:bg-gray-200",
+                        "text-teal-400 hover:text-teal-300"
+                      )}
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             {isLoading && (
               <div className="flex gap-3">
                 <div className="w-7 h-7 rounded-full bg-gradient-to-r from-teal-500 to-teal-600 flex items-center justify-center">
