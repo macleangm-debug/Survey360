@@ -164,6 +164,71 @@ async def chat_with_assistant(request: Request, chat_message: ChatMessage):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI Assistant error: {str(e)}")
 
+class FeedbackRequest(BaseModel):
+    session_id: Optional[str] = None
+    message_id: str
+    is_helpful: bool
+    question: Optional[str] = None
+
+# Store feedback and question analytics (in production, use MongoDB)
+feedback_store = []
+question_analytics = {}
+
+@router.post("/feedback")
+async def submit_feedback(feedback: FeedbackRequest):
+    """Submit feedback for an AI response and track questions"""
+    try:
+        # Store feedback
+        feedback_entry = {
+            "session_id": feedback.session_id,
+            "message_id": feedback.message_id,
+            "is_helpful": feedback.is_helpful,
+            "question": feedback.question,
+            "timestamp": str(uuid.uuid4())  # Simple timestamp proxy
+        }
+        feedback_store.append(feedback_entry)
+        
+        # Track question frequency for FAQ improvements
+        if feedback.question:
+            question_lower = feedback.question.lower().strip()
+            if question_lower not in question_analytics:
+                question_analytics[question_lower] = {
+                    "question": feedback.question,
+                    "count": 0,
+                    "helpful_count": 0,
+                    "not_helpful_count": 0
+                }
+            question_analytics[question_lower]["count"] += 1
+            if feedback.is_helpful:
+                question_analytics[question_lower]["helpful_count"] += 1
+            else:
+                question_analytics[question_lower]["not_helpful_count"] += 1
+        
+        return {"message": "Feedback recorded", "success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to record feedback: {str(e)}")
+
+@router.get("/analytics")
+async def get_question_analytics():
+    """Get analytics on most asked questions (for FAQ improvements)"""
+    # Sort by count descending
+    sorted_questions = sorted(
+        question_analytics.values(),
+        key=lambda x: x["count"],
+        reverse=True
+    )
+    
+    return {
+        "total_questions": sum(q["count"] for q in sorted_questions),
+        "total_helpful": sum(q["helpful_count"] for q in sorted_questions),
+        "total_not_helpful": sum(q["not_helpful_count"] for q in sorted_questions),
+        "top_questions": sorted_questions[:10],
+        "needs_improvement": [
+            q for q in sorted_questions 
+            if q["not_helpful_count"] > q["helpful_count"] and q["count"] >= 2
+        ][:5]
+    }
+
 @router.post("/reset")
 async def reset_chat_session(session_id: str):
     """Reset a chat session"""
