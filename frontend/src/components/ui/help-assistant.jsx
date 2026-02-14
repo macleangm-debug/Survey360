@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './button';
 import { cn } from '../../lib/utils';
 
@@ -15,7 +16,72 @@ const SUGGESTED_QUESTIONS = [
   "What question types are available?",
 ];
 
+// Parse markdown links in text and render them as clickable
+function MessageContent({ content, isDark, onLinkClick }) {
+  // Regex to find markdown links [text](url)
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+  
+  while ((match = linkRegex.exec(content)) !== null) {
+    // Add text before the link
+    if (match.index > lastIndex) {
+      parts.push({
+        type: 'text',
+        content: content.slice(lastIndex, match.index)
+      });
+    }
+    
+    // Add the link
+    parts.push({
+      type: 'link',
+      text: match[1],
+      url: match[2]
+    });
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Add remaining text
+  if (lastIndex < content.length) {
+    parts.push({
+      type: 'text',
+      content: content.slice(lastIndex)
+    });
+  }
+  
+  // If no links found, return plain text
+  if (parts.length === 0) {
+    return <p className="whitespace-pre-wrap">{content}</p>;
+  }
+  
+  return (
+    <div className="whitespace-pre-wrap">
+      {parts.map((part, idx) => {
+        if (part.type === 'text') {
+          return <span key={idx}>{part.content}</span>;
+        }
+        return (
+          <button
+            key={idx}
+            onClick={() => onLinkClick(part.url)}
+            className={cn(
+              "inline-flex items-center gap-1 text-teal-400 hover:text-teal-300 underline underline-offset-2 transition-colors"
+            )}
+          >
+            {part.text}
+            <ExternalLink className="w-3 h-3" />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function HelpAssistant({ isDark = true }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -29,6 +95,13 @@ export function HelpAssistant({ isDark = true }) {
   const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Handle clicking article links
+  const handleLinkClick = (url) => {
+    // Close the chat and navigate to the article
+    setIsOpen(false);
+    navigate(url);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
