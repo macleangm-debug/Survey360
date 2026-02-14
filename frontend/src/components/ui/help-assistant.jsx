@@ -238,7 +238,15 @@ export function HelpAssistant({ isDark = true }) {
                     ? "bg-blue-500 text-white rounded-br-md"
                     : cn(bgSecondary, textPrimary, "rounded-bl-md border", borderColor)
                 )}>
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  {msg.role === 'user' ? (
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  ) : (
+                    <MessageContent 
+                      content={msg.content} 
+                      isDark={isDark} 
+                      onLinkClick={handleLinkClick}
+                    />
+                  )}
                 </div>
               </div>
             ))}
