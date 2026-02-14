@@ -3099,17 +3099,21 @@ function HelpSidebar({ isDark, activeTab, onTabChange, onArticleClick }) {
         </div>
       </div>
 
-      {/* Contact Support */}
+      {/* AI Assistant Prompt */}
       <div className={`${bgSecondary} border ${borderColor} rounded-xl p-4 mt-4`}>
         <h4 className={`text-sm font-medium ${textPrimary} mb-2`}>Need more help?</h4>
         <p className={`text-xs ${textMuted} mb-3`}>Can't find what you're looking for?</p>
-        <a 
-          href="mailto:support@survey360.io"
-          className="flex items-center gap-2 text-sm text-teal-400 hover:text-teal-300"
+        <button 
+          onClick={() => {
+            // Trigger the AI Assistant (it's a floating button at bottom-right)
+            const assistantBtn = document.querySelector('[data-testid="help-assistant-btn"]');
+            if (assistantBtn) assistantBtn.click();
+          }}
+          className="flex items-center gap-2 text-sm text-teal-400 hover:text-teal-300 transition-colors"
         >
-          <Mail className="w-4 h-4" />
-          Contact Support
-        </a>
+          <Sparkles className="w-4 h-4" />
+          Ask AI Assistant
+        </button>
       </div>
     </aside>
   );
