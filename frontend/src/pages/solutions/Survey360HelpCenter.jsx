@@ -2940,6 +2940,31 @@ function NewHomeView({ isDark, searchQuery, setSearchQuery, searchResults, onArt
               );
             })}
           </nav>
+
+          {/* FAQ & Support Links */}
+          <div className={`mt-6 pt-5 border-t ${borderColor}`}>
+            <button
+              onClick={() => setActiveTab('faq')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${hoverBg} ${textSecondary} transition-colors`}
+            >
+              <HelpCircle className="w-4 h-4 text-teal-500/70" />
+              <span>FAQs</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('troubleshooting')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${hoverBg} ${textSecondary} transition-colors`}
+            >
+              <AlertCircle className="w-4 h-4 text-orange-500/70" />
+              <span>Troubleshooting</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('shortcuts')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm ${hoverBg} ${textSecondary} transition-colors`}
+            >
+              <Keyboard className="w-4 h-4 text-purple-500/70" />
+              <span>Keyboard Shortcuts</span>
+            </button>
+          </div>
         </div>
 
         {/* Right Column - Content */}
