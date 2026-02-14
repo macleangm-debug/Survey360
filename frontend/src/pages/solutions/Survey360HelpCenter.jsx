@@ -2715,6 +2715,7 @@ export function Survey360HelpCenter() {
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [articleFeedback, setArticleFeedback] = useState({});
   const [copied, setCopied] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   // Theme classes
   const bgPrimary = isDark ? 'bg-[#0a1628]' : 'bg-gray-50';
@@ -2791,109 +2792,23 @@ export function Survey360HelpCenter() {
           onArticleClick={handleArticleClick}
         />;
       default:
-        return <HomeView 
+        return <NewHomeView 
           isDark={isDark}
           searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
           searchResults={searchResults}
           onArticleClick={handleArticleClick}
           setActiveTab={(tab) => { setActiveTab(tab); setSearchParams({ tab }); }}
+          expandedCategory={expandedCategory}
+          setExpandedCategory={setExpandedCategory}
         />;
     }
   };
 
   return (
     <div className={`min-h-screen ${bgPrimary}`}>
-      {/* Header */}
-      <div className={`${bgSecondary} border-b ${borderColor} sticky top-0 z-10`}>
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                onClick={() => navigate('/solutions/survey360/app/dashboard')}
-                className={textSecondary}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to App
-              </Button>
-              <div className={`h-6 w-px ${borderColor}`} />
-              <div className="flex items-center gap-2">
-                <Book className="w-5 h-5 text-teal-500" />
-                <span className={`font-semibold ${textPrimary}`}>Help Center</span>
-              </div>
-            </div>
-            
-            {/* Search */}
-            <div className="relative w-96">
-              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for help..."
-                className={`pl-10 ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-200'} ${textPrimary}`}
-              />
-              {searchQuery && searchResults.length > 0 && (
-                <div className={`absolute top-full left-0 right-0 mt-1 ${bgSecondary} border ${borderColor} rounded-lg shadow-xl max-h-80 overflow-y-auto z-50`}>
-                  {searchResults.map((result, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => { handleArticleClick(result.category.id, result.id); setSearchQuery(''); }}
-                      className={`w-full text-left px-4 py-3 ${hoverBg} border-b ${borderColor} last:border-0`}
-                    >
-                      <p className={`text-sm font-medium ${textPrimary}`}>{result.title}</p>
-                      <p className={`text-xs ${textMuted}`}>{result.category.title} • {result.readTime}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Quick Actions */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopyLink}
-                className={textSecondary}
-              >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              </Button>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex items-center gap-1 mt-4">
-            {[
-              { id: 'home', label: 'Home', icon: Home },
-              { id: 'faq', label: 'FAQ', icon: HelpCircle },
-              { id: 'troubleshooting', label: 'Troubleshooting', icon: AlertCircle },
-              { id: 'shortcuts', label: 'Shortcuts', icon: Keyboard },
-              { id: 'whats-new', label: "What's New", icon: Sparkles },
-            ].map(tab => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id || (activeTab === 'article' && tab.id === 'home');
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => { setActiveTab(tab.id); setSearchParams({ tab: tab.id }); }}
-                  className={cn(
-                    'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-teal-500/10 text-teal-400'
-                      : `${textSecondary} ${hoverBg}`
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         {renderContent()}
       </div>
     </div>
