@@ -2967,7 +2967,7 @@ function NewHomeView({ isDark, searchQuery, setSearchQuery, searchResults, onArt
           </div>
 
           {/* Content Sections by Category */}
-          {HELP_CATEGORIES.slice(0, 4).map((category) => {
+          {HELP_CATEGORIES.map((category) => {
             const Icon = category.icon;
             return (
               <div key={category.id} className={`${bgSecondary} border ${borderColor} rounded-xl p-5`}>
