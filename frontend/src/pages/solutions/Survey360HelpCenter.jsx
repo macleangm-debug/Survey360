@@ -2815,6 +2815,192 @@ export function Survey360HelpCenter() {
   );
 }
 
+// New Home View Component - Clean Two-Column Layout
+function NewHomeView({ isDark, searchQuery, setSearchQuery, searchResults, onArticleClick, setActiveTab, expandedCategory, setExpandedCategory }) {
+  const textPrimary = isDark ? 'text-white' : 'text-gray-900';
+  const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
+  const textMuted = isDark ? 'text-gray-500' : 'text-gray-400';
+  const bgSecondary = isDark ? 'bg-[#0f1d32]' : 'bg-white';
+  const borderColor = isDark ? 'border-white/10' : 'border-gray-200';
+  const hoverBg = isDark ? 'hover:bg-white/5' : 'hover:bg-gray-100';
+
+  // Quick links data
+  const quickLinks = [
+    { id: 'getting-started-guide', title: 'Getting Started Guide', icon: Zap, categoryId: 'getting-started', articleId: 'welcome' },
+    { id: 'offline-mode', title: 'Offline Mode Guide', icon: Globe, categoryId: 'sharing', articleId: 'embed-website' },
+    { id: 'security', title: 'Security Options', icon: Shield, categoryId: 'settings', articleId: 'security-settings' },
+  ];
+
+  // Category icons mapping
+  const getCategoryIcon = (categoryId) => {
+    const icons = {
+      'getting-started': Zap,
+      'surveys': ClipboardList,
+      'sharing': Share2,
+      'responses': FileText,
+      'analytics': BarChart3,
+      'team': Users,
+      'settings': Settings,
+      'billing': CreditCard,
+    };
+    return icons[categoryId] || HelpCircle;
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className={`text-3xl font-bold ${textPrimary} mb-2`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          Help Center
+        </h1>
+        <p className={textSecondary}>
+          Find answers, tutorials, and documentation for Survey360
+        </p>
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${textMuted}`} />
+        <Input
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search articles, guides, and tutorials..."
+          className={`w-full pl-12 py-6 text-base ${isDark ? 'bg-[#0f1d32] border-white/10' : 'bg-white border-gray-200'} ${textPrimary} rounded-xl`}
+        />
+        {searchQuery && searchResults.length > 0 && (
+          <div className={`absolute top-full left-0 right-0 mt-2 ${bgSecondary} border ${borderColor} rounded-xl shadow-xl max-h-80 overflow-y-auto z-50`}>
+            {searchResults.map((result, idx) => (
+              <button
+                key={idx}
+                onClick={() => { onArticleClick(result.category.id, result.id); setSearchQuery(''); }}
+                className={`w-full text-left px-4 py-3 ${hoverBg} border-b ${borderColor} last:border-0`}
+              >
+                <p className={`text-sm font-medium ${textPrimary}`}>{result.title}</p>
+                <p className={`text-xs ${textMuted}`}>{result.category.title} • {result.readTime}</p>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Main Content - Two Column Layout */}
+      <div className="flex gap-6">
+        {/* Left Column - Categories */}
+        <div className={`w-72 flex-shrink-0 ${bgSecondary} border ${borderColor} rounded-xl p-5`}>
+          <div className="flex items-center gap-2 mb-5">
+            <div className="p-1.5 rounded-lg bg-teal-500/10">
+              <ClipboardList className="w-4 h-4 text-teal-500" />
+            </div>
+            <h2 className={`font-semibold ${textPrimary}`}>Categories</h2>
+          </div>
+          
+          <nav className="space-y-1">
+            {HELP_CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              const isExpanded = expandedCategory === category.id;
+              return (
+                <div key={category.id}>
+                  <button
+                    onClick={() => setExpandedCategory(isExpanded ? null : category.id)}
+                    className={cn(
+                      "w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors",
+                      isExpanded ? "bg-white/5" : hoverBg,
+                      textSecondary
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-4 h-4 text-teal-500/70" />
+                      <span className={isExpanded ? textPrimary : ''}>{category.title}</span>
+                    </div>
+                    <ChevronRight className={cn(
+                      "w-4 h-4 transition-transform",
+                      isExpanded && "rotate-90"
+                    )} />
+                  </button>
+                  
+                  {isExpanded && (
+                    <div className="ml-10 mt-1 space-y-1">
+                      {category.articles.slice(0, 4).map((article) => (
+                        <button
+                          key={article.id}
+                          onClick={() => onArticleClick(category.id, article.id)}
+                          className={`w-full text-left px-3 py-1.5 text-sm ${textMuted} hover:text-teal-400 transition-colors`}
+                        >
+                          {article.title}
+                        </button>
+                      ))}
+                      {category.articles.length > 4 && (
+                        <p className={`px-3 py-1 text-xs ${textMuted}`}>
+                          +{category.articles.length - 4} more
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Right Column - Content */}
+        <div className="flex-1 space-y-6">
+          {/* Quick Links */}
+          <div className={`${bgSecondary} border ${borderColor} rounded-xl p-5`}>
+            <h2 className={`font-semibold ${textPrimary} mb-4`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              Quick Links
+            </h2>
+            <div className="grid grid-cols-3 gap-4">
+              {quickLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <button
+                    key={link.id}
+                    onClick={() => onArticleClick(link.categoryId, link.articleId)}
+                    className={`flex items-center gap-3 px-4 py-3 ${isDark ? 'bg-white/5' : 'bg-gray-50'} border ${borderColor} rounded-xl ${hoverBg} transition-all hover:border-teal-500/30`}
+                  >
+                    <Icon className="w-4 h-4 text-teal-500" />
+                    <span className={`text-sm ${textPrimary}`}>{link.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Content Sections by Category */}
+          {HELP_CATEGORIES.slice(0, 4).map((category) => {
+            const Icon = category.icon;
+            return (
+              <div key={category.id} className={`${bgSecondary} border ${borderColor} rounded-xl p-5`}>
+                <div className="flex items-center gap-2 mb-4">
+                  <Icon className="w-5 h-5 text-teal-500" />
+                  <h2 className={`font-semibold ${textPrimary}`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    {category.title}
+                  </h2>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {category.articles.slice(0, 2).map((article) => (
+                    <button
+                      key={article.id}
+                      onClick={() => onArticleClick(category.id, article.id)}
+                      className={`text-left p-4 ${isDark ? 'bg-white/5' : 'bg-gray-50'} border ${borderColor} rounded-xl ${hoverBg} transition-all hover:border-teal-500/30`}
+                    >
+                      <h3 className={`font-medium ${textPrimary} mb-1`}>{article.title}</h3>
+                      <p className={`text-sm ${textMuted}`}>
+                        {category.description.slice(0, 60)}...
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Shared Help Sidebar Component
 function HelpSidebar({ isDark, activeTab, onTabChange, onArticleClick }) {
   const textPrimary = isDark ? 'text-white' : 'text-gray-900';
