@@ -5,17 +5,28 @@ import { cn } from '../../lib/utils';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
+// Suggested questions for quick access
+const SUGGESTED_QUESTIONS = [
+  "How do I create a survey?",
+  "How do I share my survey?",
+  "What's my response limit?",
+  "How do I export responses?",
+  "How do I add team members?",
+  "What question types are available?",
+];
+
 export function HelpAssistant({ isDark = true }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hi! I'm the Survey360 AI Assistant. How can I help you today? Ask me anything about creating surveys, sharing them, analyzing responses, or managing your account."
+      content: "Hi! I'm the Survey360 AI Assistant. How can I help you today?"
     }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
