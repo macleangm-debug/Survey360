@@ -1,0 +1,105 @@
+{
+  "summary": "P1 Priority Features Testing Complete - Token Surveys, CATI Center, Back-check, Preload/Write-back. Backend: 28/29 tests passed (96.5%), 1 skipped due to route conflict. Frontend: All 4 P1 pages load correctly with proper UI elements.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "GET /api/cati/projects/{project_id}/queue",
+        "issue": "Route conflict - /projects/{project_id}/queue matches /projects/{org_id}/{project_id}. Returns 404 'Project not found' when trying to get queue for a valid CATI project.",
+        "priority": "HIGH",
+        "root_cause": "FastAPI route ordering conflict in cati_routes.py. Routes /projects/{org_id}, /projects/{org_id}/{project_id}, and /projects/{project_id}/queue conflict. When calling /projects/{project_id}/queue, it matches /projects/{org_id}/{project_id} with org_id=project_id and project_id='queue'",
+        "suggested_fix": "Move queue routes before project detail routes OR use more specific route patterns like /projects/queue/{project_id}"
+      }
+    ],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "P1 pages form loading",
+        "issue": "All 4 P1 pages (Token Surveys, CATI, Back-check, Preload/Writeback) call /api/forms?org_id={org_id} but backend expects project_id parameter",
+        "affected_selectors": [],
+        "error": "422 Unprocessable Entity - Field required: project_id",
+        "priority": "MEDIUM",
+        "files_affected": [
+          "/app/frontend/src/pages/TokenSurveysPage.jsx:91",
+          "/app/frontend/src/pages/CATIPage.jsx:86",
+          "/app/frontend/src/pages/BackcheckPage.jsx:103",
+          "/app/frontend/src/pages/PreloadWritebackPage.jsx:90"
+        ],
+        "suggested_fix": "Either update frontend to pass project_id OR update backend /api/forms endpoint to accept org_id as optional parameter"
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_p1_features_iter12.py",
+    "/app/test_reports/pytest/pytest_results_iter12.xml"
+  ],
+  "action_items": [
+    "FIX (HIGH): Backend CATI route conflict - /api/cati/projects/{project_id}/queue returns 404 due to route ordering conflict with /projects/{org_id}/{project_id}",
+    "FIX (MEDIUM): Frontend/Backend mismatch - P1 pages call /api/forms?org_id=... but backend requires project_id"
+  ],
+  "critical_code_review_comments": [
+    "CATI Routes: Line 151-169 and 292 in cati_routes.py have route conflicts. Routes with similar patterns /projects/{org_id}, /projects/{org_id}/{project_id}, /projects/{project_id}/queue will match incorrectly",
+    "Forms API: The list_forms endpoint (line 97-143 in form_routes.py) requires project_id but P1 feature pages don't have project context - they work at org level"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_p1_features_iter12.py"
+  ],
+  "success_rate": {
+    "backend": "96.5% (28/29 passed, 1 skipped)",
+    "frontend": "100% - All 4 P1 pages load correctly"
+  },
+  "seed_data_creation": "Created multiple test distributions, panels, CATI projects, backcheck configs, preload configs, and writeback configs via API tests",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "P1 features testing complete. Key issues: 1) CATI queue GET route returns 404 due to route pattern conflict, 2) Forms API requires project_id but P1 pages pass org_id. All 4 P1 pages (Token Surveys, CATI Center, Back-check, Preload/Writeback) UI is working - dialogs open, buttons work, stats display correctly.",
+  "features_verified": {
+    "token_surveys": {
+      "page_loads": true,
+      "stats_display": true,
+      "distributions_tab": true,
+      "panels_tab": true,
+      "create_distribution_dialog": true,
+      "create_panel_button": true,
+      "api_endpoints_working": ["POST /api/surveys/distributions", "GET /api/surveys/distributions/{org_id}", "POST /api/surveys/panels", "GET /api/surveys/panels/{org_id}"]
+    },
+    "cati_center": {
+      "page_loads": true,
+      "stats_display": true,
+      "projects_tab": true,
+      "workstation_tab": true,
+      "callbacks_tab": true,
+      "statistics_tab": true,
+      "new_cati_project_dialog": true,
+      "api_endpoints_working": ["POST /api/cati/projects", "GET /api/cati/projects/{org_id}", "PUT /api/cati/projects/{project_id}/activate", "POST /api/cati/projects/{project_id}/queue"],
+      "api_endpoints_broken": ["GET /api/cati/projects/{project_id}/queue - route conflict"]
+    },
+    "backcheck_center": {
+      "page_loads": true,
+      "stats_display": true,
+      "backcheck_queue_tab": true,
+      "configurations_tab": true,
+      "reports_tab": true,
+      "new_configuration_dialog": true,
+      "api_endpoints_working": ["POST /api/backcheck/configs", "GET /api/backcheck/configs/{org_id}", "GET /api/backcheck/queue/{org_id}", "GET /api/backcheck/reports/{org_id}/summary"]
+    },
+    "preload_writeback": {
+      "page_loads": true,
+      "stats_display": true,
+      "preload_configurations_tab": true,
+      "writeback_configurations_tab": true,
+      "execution_logs_tab": true,
+      "new_preload_dialog": true,
+      "new_writeback_button": true,
+      "api_endpoints_working": ["POST /api/preload/configs", "GET /api/preload/configs/{org_id}", "POST /api/preload/writeback/configs", "GET /api/preload/writeback/configs/{org_id}", "GET /api/preload/logs/{org_id}", "GET /api/preload/writeback/logs/{org_id}"]
+    },
+    "navigation": {
+      "sidebar_shows_token_surveys": true,
+      "sidebar_shows_cati_center": true,
+      "sidebar_shows_backcheck": true,
+      "sidebar_shows_preload_writeback": true
+    }
+  }
+}

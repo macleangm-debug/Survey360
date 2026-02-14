@@ -1,0 +1,72 @@
+{
+  "summary": "Iteration 26 - Verified NonP and Cluster tabs in AdvancedStatsPanel. Backend: 11/11 tests passed (after fixing Wilcoxon numpy.bool serialization bug). Frontend: All 9 tabs visible (T-Test, ANOVA, Corr, Reg, GLM, Mixed, EFA, NonP, Cluster) with correct form components.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_nonparam_cluster_ui_iter26.py",
+    "/app/test_reports/pytest/pytest_results_iter26.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "stats_routes.py Line 1048: Fixed Wilcoxon test numpy.bool serialization - changed 'significant': p_value < 0.05 to 'significant': bool(p_value < 0.05)",
+    "AdvancedStatsPanel.jsx Lines 534-544: Correct 9-tab grid with NonP and Cluster tabs visible",
+    "AdvancedStatsPanel.jsx Lines 1020-1106: NonP tab has proper test type selection (Mann-Whitney, Wilcoxon, Kruskal-Wallis) with validation",
+    "AdvancedStatsPanel.jsx Lines 1109-1194: Cluster tab has proper clustering method selection (K-Means, Hierarchical) with linkage options"
+  ],
+  "updated_files": [
+    "/app/backend/routes/stats_routes.py",
+    "/app/backend/tests/test_nonparam_cluster_ui_iter26.py"
+  ],
+  "success_rate": {
+    "backend": "100% (11/11 passed)",
+    "frontend": "100% - All UI elements verified"
+  },
+  "test_credentials": {
+    "email": "demo@datapulse.io",
+    "password": "Test123!",
+    "org_id": "a07e901a-bd5f-450d-8533-ed4f7ec629a5",
+    "form_id": "124427aa-d482-4292-af6e-2042ae5cabbd"
+  },
+  "seed_data_creation": "No new test data created. Used existing form for testing.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "AdvancedStatsPanel has 9 tabs working correctly. NonP tab supports Mann-Whitney U, Wilcoxon signed-rank, and Kruskal-Wallis H tests. Cluster tab supports K-Means (with elbow method auto-detection) and Hierarchical clustering (with ward, complete, average, single linkage options). Backend endpoints at /api/statistics/nonparametric and /api/statistics/clustering are fully functional.",
+  "features_verified": {
+    "nonp_tab": {
+      "tab_visibility": "PASS - NonP tab visible in 9-tab grid",
+      "mann_whitney_option": "PASS - Mann-Whitney U (2 groups) test type available",
+      "wilcoxon_option": "PASS - Wilcoxon Signed-Rank (paired) test type available",
+      "kruskal_wallis_option": "PASS - Kruskal-Wallis H (3+ groups) test type available",
+      "form_fields": "PASS - Test Type, Dependent Variable, Grouping Variable selectors present",
+      "run_button": "PASS - Run Test button visible"
+    },
+    "cluster_tab": {
+      "tab_visibility": "PASS - Cluster tab visible in 9-tab grid",
+      "kmeans_option": "PASS - K-Means clustering method available",
+      "hierarchical_option": "PASS - Hierarchical clustering method available",
+      "form_fields": "PASS - Clustering Method, Variables, Number of Clusters inputs present",
+      "linkage_option": "PASS - Linkage method options available for hierarchical",
+      "run_button": "PASS - Run Clustering button visible"
+    },
+    "backend_endpoints": {
+      "POST /api/statistics/nonparametric (kruskal_wallis)": "PASS - Returns H_statistic, p_value, eta_squared, posthoc",
+      "POST /api/statistics/nonparametric (mann_whitney)": "PASS - Returns U_statistic, p_value, effect_size_r",
+      "POST /api/statistics/nonparametric (wilcoxon)": "PASS - Returns W_statistic, p_value (after fix)",
+      "POST /api/statistics/clustering (kmeans)": "PASS - Returns cluster_profiles, silhouette_score, elbow_data",
+      "POST /api/statistics/clustering (hierarchical)": "PASS - Returns cluster_profiles, dendrogram data"
+    }
+  },
+  "bug_fixed": {
+    "issue": "Wilcoxon test returning 500 error due to numpy.bool serialization",
+    "file": "/app/backend/routes/stats_routes.py",
+    "line": 1048,
+    "fix": "Changed 'significant': p_value < 0.05 to 'significant': bool(p_value < 0.05)"
+  }
+}
