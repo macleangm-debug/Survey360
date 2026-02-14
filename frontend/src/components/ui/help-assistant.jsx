@@ -86,13 +86,15 @@ export function HelpAssistant({ isDark = true }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hi! I'm the Survey360 AI Assistant. How can I help you today?"
+      content: "Hi! I'm the Survey360 AI Assistant. How can I help you today?",
+      id: 'welcome'
     }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [feedback, setFeedback] = useState({}); // Track feedback per message
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -101,6 +103,27 @@ export function HelpAssistant({ isDark = true }) {
     // Close the chat and navigate to the article
     setIsOpen(false);
     navigate(url);
+  };
+
+  // Handle feedback submission
+  const handleFeedback = async (messageId, isHelpful, question) => {
+    setFeedback(prev => ({ ...prev, [messageId]: isHelpful ? 'helpful' : 'not-helpful' }));
+    
+    // Send feedback to backend
+    try {
+      await fetch(`${BACKEND_URL}/api/help-assistant/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message_id: messageId,
+          is_helpful: isHelpful,
+          question: question
+        })
+      });
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+    }
   };
 
   const scrollToBottom = () => {
