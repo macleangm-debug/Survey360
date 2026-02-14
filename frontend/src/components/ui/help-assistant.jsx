@@ -144,9 +144,12 @@ export function HelpAssistant({ isDark = true }) {
     const userMessage = (messageText || input).trim();
     if (!userMessage || isLoading) return;
 
+    const userMsgId = `user-${Date.now()}`;
+    const assistantMsgId = `assistant-${Date.now()}`;
+    
     setInput('');
     setShowSuggestions(false);
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setMessages(prev => [...prev, { role: 'user', content: userMessage, id: userMsgId }]);
     setIsLoading(true);
 
     try {
@@ -163,11 +166,17 @@ export function HelpAssistant({ isDark = true }) {
 
       const data = await response.json();
       setSessionId(data.session_id);
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: data.response, 
+        id: assistantMsgId,
+        question: userMessage // Store the question for feedback tracking
+      }]);
     } catch (error) {
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: "Sorry, I'm having trouble connecting right now. Please try again or browse the Help Center articles."
+        content: "Sorry, I'm having trouble connecting right now. Please try again or browse the Help Center articles.",
+        id: assistantMsgId
       }]);
     } finally {
       setIsLoading(false);
