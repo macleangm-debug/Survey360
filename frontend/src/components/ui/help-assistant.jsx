@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles, ExternalLink } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles, ExternalLink, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './button';
 import { cn } from '../../lib/utils';
