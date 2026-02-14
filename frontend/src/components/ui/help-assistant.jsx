@@ -86,7 +86,7 @@ export function HelpAssistant({ isDark = true }) {
       <button
         onClick={() => setIsOpen(true)}
         className={cn(
-          "fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-50 transition-all hover:scale-105",
+          "fixed bottom-24 right-6 w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-50 transition-all hover:scale-105",
           "bg-gradient-to-r from-teal-500 to-teal-600 text-white",
           isOpen && "hidden"
         )}
