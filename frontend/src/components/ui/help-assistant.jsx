@@ -99,7 +99,7 @@ export function HelpAssistant({ isDark = true }) {
       {isOpen && (
         <div 
           className={cn(
-            "fixed bottom-6 right-6 w-96 h-[500px] rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden",
+            "fixed bottom-24 right-6 w-96 h-[500px] rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden",
             bgSecondary, borderColor, "border"
           )}
           data-testid="help-assistant-window"
