@@ -222,7 +222,7 @@ export function HelpAssistant({ isDark = true }) {
                 disabled={isLoading}
               />
               <button
-                onClick={sendMessage}
+                onClick={() => sendMessage()}
                 disabled={!input.trim() || isLoading}
                 className={cn(
                   "p-2 rounded-lg transition-colors",
