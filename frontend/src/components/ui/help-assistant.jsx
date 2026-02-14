@@ -247,7 +247,7 @@ export function HelpAssistant({ isDark = true }) {
           <div className={cn("flex-1 overflow-y-auto p-4 space-y-4", bgPrimary)}>
             {messages.map((msg, idx) => (
               <div
-                key={idx}
+                key={msg.id || idx}
                 className={cn(
                   "flex gap-3",
                   msg.role === 'user' ? "flex-row-reverse" : ""
@@ -264,20 +264,57 @@ export function HelpAssistant({ isDark = true }) {
                     : <Bot className="w-3.5 h-3.5 text-white" />
                   }
                 </div>
-                <div className={cn(
-                  "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm",
-                  msg.role === 'user'
-                    ? "bg-blue-500 text-white rounded-br-md"
-                    : cn(bgSecondary, textPrimary, "rounded-bl-md border", borderColor)
-                )}>
-                  {msg.role === 'user' ? (
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
-                  ) : (
-                    <MessageContent 
-                      content={msg.content} 
-                      isDark={isDark} 
-                      onLinkClick={handleLinkClick}
-                    />
+                <div className="flex flex-col gap-1 max-w-[80%]">
+                  <div className={cn(
+                    "rounded-2xl px-4 py-2.5 text-sm",
+                    msg.role === 'user'
+                      ? "bg-blue-500 text-white rounded-br-md"
+                      : cn(bgSecondary, textPrimary, "rounded-bl-md border", borderColor)
+                  )}>
+                    {msg.role === 'user' ? (
+                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                    ) : (
+                      <MessageContent 
+                        content={msg.content} 
+                        isDark={isDark} 
+                        onLinkClick={handleLinkClick}
+                      />
+                    )}
+                  </div>
+                  
+                  {/* Feedback buttons for assistant messages (not welcome message) */}
+                  {msg.role === 'assistant' && msg.id !== 'welcome' && (
+                    <div className="flex items-center gap-2 mt-1 ml-1">
+                      {feedback[msg.id] ? (
+                        <span className={cn("text-xs", textSecondary)}>
+                          {feedback[msg.id] === 'helpful' ? 'Thanks for the feedback!' : 'Thanks, we\'ll improve!'}
+                        </span>
+                      ) : (
+                        <>
+                          <span className={cn("text-xs", textSecondary)}>Was this helpful?</span>
+                          <button
+                            onClick={() => handleFeedback(msg.id, true, msg.question)}
+                            className={cn(
+                              "p-1 rounded hover:bg-white/10 transition-colors",
+                              textSecondary, "hover:text-green-400"
+                            )}
+                            title="Yes, helpful"
+                          >
+                            <ThumbsUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleFeedback(msg.id, false, msg.question)}
+                            className={cn(
+                              "p-1 rounded hover:bg-white/10 transition-colors",
+                              textSecondary, "hover:text-red-400"
+                            )}
+                            title="Not helpful"
+                          >
+                            <ThumbsDown className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
