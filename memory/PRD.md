@@ -666,7 +666,7 @@ Implemented a full-featured Help Center accessible from the app header, providin
 
 ---
 
-## Backlog (Updated Feb 13, 2026)
+## Backlog (Updated Feb 15, 2026)
 
 ### P0 (Completed)
 - [x] Light/Dark Mode Theme Toggle
@@ -678,21 +678,95 @@ Implemented a full-featured Help Center accessible from the app header, providin
 - [x] Survey Scheduling
 - [x] Email Invitations (placeholder)
 - [x] **User Manual / Help Center**
+- [x] **Admin Dashboard for AI Analytics** (Feb 15, 2026)
 
 ### P1 (Next)
 - [ ] QR Code Generation in ShareSurveyDialog
 - [ ] Resend Email Integration (make email invitations functional)
-- [ ] Integrate Real LLM for AI Assistant (replace mocked responses)
 
 ### P2 (Future)
 - [ ] Apply i18n translations across entire UI
 - [ ] Team collaboration features
 - [ ] PDF export with styled charts
-- [ ] Admin Dashboard for AI Analytics (FAQ improvements)
 
 ### P3 (Backlog)
 - [ ] Third-party integrations (Zapier, Mailchimp)
 - [ ] Comparison analytics (vs previous period)
+
+---
+
+## Admin Dashboard for Help Center Analytics (Feb 15, 2026) - COMPLETE
+
+### Feature: Admin Analytics Dashboard
+Created a comprehensive admin dashboard to monitor AI Assistant usage, feedback, and identify areas for improvement.
+
+### Backend Changes:
+- **File**: `/app/backend/routes/help_assistant_routes.py`
+- **Refactored**: Moved from in-memory storage to MongoDB for persistence
+- **New Collections**:
+  - `help_assistant_sessions` - Chat session metadata
+  - `help_assistant_messages` - All chat messages for analytics
+  - `help_assistant_feedback` - User feedback on AI responses
+  - `help_assistant_analytics` - Aggregated question analytics
+
+### New API Endpoints:
+- `GET /api/help-assistant/analytics/admin` - Comprehensive admin analytics
+- `DELETE /api/help-assistant/analytics/clear` - Clear all analytics data
+
+### Admin Dashboard Response Data:
+```json
+{
+  "summary": {
+    "total_sessions": 2,
+    "total_messages": 3,
+    "total_feedback": 4,
+    "satisfaction_rate": 50.0
+  },
+  "top_questions": [...],
+  "needs_improvement": [...],
+  "daily_activity": [...14 days...],
+  "recent_feedback": [...]
+}
+```
+
+### Frontend Changes:
+- **New File**: `/app/frontend/src/pages/solutions/Survey360HelpAnalyticsAdmin.jsx`
+- **Modified**: `/app/frontend/src/pages/solutions/Survey360SettingsPage.jsx` - Added Admin tab
+- **Modified**: `/app/frontend/src/App.js` - Added route
+
+### Dashboard Features:
+1. **Summary Stats Cards**:
+   - Total Sessions
+   - Total Messages
+   - Helpful Responses
+   - Needs Improvement
+
+2. **Daily Activity Chart**:
+   - Bar chart showing messages over 14 days
+   - Hover tooltips for exact counts
+
+3. **Satisfaction Rate Gauge**:
+   - Circular progress indicator
+   - Color-coded (green/yellow/red)
+   - Helpful vs Not Helpful breakdown
+
+4. **Top Questions Asked**:
+   - Ranked list of frequently asked questions
+   - Feedback counts per question
+
+5. **Needs Improvement Section**:
+   - Questions with more negative than positive feedback
+   - Helps identify content gaps
+
+6. **Recent Feedback**:
+   - Latest user feedback with questions
+
+### Access:
+- Settings > Admin tab > "Open Dashboard" button
+- Direct URL: `/solutions/survey360/app/help-analytics`
+- Public URL: `/solutions/survey360/help/analytics`
+
+### Test Results: API verified, UI verified via screenshots
 
 ---
 
