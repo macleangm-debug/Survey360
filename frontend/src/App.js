@@ -50,6 +50,7 @@ import { Survey360DemoPage } from './pages/solutions/Survey360DemoPage';
 import { Survey360DemoSandbox } from './pages/solutions/Survey360DemoSandbox';
 import { PublicSurveyPage } from './pages/solutions/PublicSurveyPage';
 import { Survey360HelpCenter } from './pages/solutions/Survey360HelpCenter';
+import Survey360HelpAnalyticsAdmin from './pages/solutions/Survey360HelpAnalyticsAdmin';
 import '@/App.css';
 
 // Register service worker
