@@ -347,8 +347,6 @@ async def get_admin_analytics(request: Request):
         
         # Calculate totals from questions
         total_questions_asked = sum(q.get("count", 0) for q in all_questions)
-        total_helpful = sum(q.get("helpful_count", 0) for q in all_questions)
-        total_not_helpful = sum(q.get("not_helpful_count", 0) for q in all_questions)
         
         # Get questions needing improvement
         needs_improvement = [
