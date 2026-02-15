@@ -296,6 +296,7 @@ function App() {
           <Route path="/solutions/survey360/demo" element={<Survey360DemoPage />} />
           <Route path="/solutions/survey360/demo/sandbox" element={<Survey360DemoSandbox />} />
           <Route path="/solutions/survey360/help" element={<Survey360HelpCenter />} />
+          <Route path="/solutions/survey360/help/analytics" element={<Survey360HelpAnalyticsAdmin />} />
           <Route path="/solutions/survey360/login" element={<Survey360LoginPage />} />
           <Route path="/solutions/survey360/register" element={<Survey360RegisterPage />} />
           <Route path="/solutions/survey360/app" element={<Survey360AppLayout />}>
@@ -306,6 +307,7 @@ function App() {
             <Route path="responses" element={<Survey360ResponsesPage />} />
             <Route path="billing" element={<Survey360BillingPage />} />
             <Route path="settings" element={<Survey360SettingsPage />} />
+            <Route path="help-analytics" element={<Survey360HelpAnalyticsAdmin />} />
             <Route index element={<Navigate to="dashboard" replace />} />
           </Route>
           
