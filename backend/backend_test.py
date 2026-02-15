@@ -17,7 +17,7 @@ import json
 class Survey360BackendTester:
     def __init__(self):
         # Use the public endpoint from frontend env
-        self.base_url = "https://manual-preview.preview.emergentagent.com"
+        self.base_url = "https://survey-support-ai.preview.emergentagent.com"
         self.tests_run = 0
         self.tests_passed = 0
         self.test_results = []
@@ -105,7 +105,7 @@ class Survey360BackendTester:
             headers = {"Authorization": f"Basic {auth_header}"}
             
             try:
-                flower_url = "https://manual-preview.preview.emergentagent.com:5555/api/workers"
+                flower_url = "https://survey-support-ai.preview.emergentagent.com:5555/api/workers"
                 response = requests.get(flower_url, headers=headers, timeout=5)
                 
                 if response.status_code == 200:
