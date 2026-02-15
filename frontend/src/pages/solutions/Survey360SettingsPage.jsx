@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, Bell, Palette, Shield, Save, Moon, Sun, Monitor } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { User, Bell, Palette, Shield, Save, Moon, Sun, Monitor, BarChart3, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -11,6 +12,7 @@ import { useAuthStore, useUIStore } from '../../store';
 import { toast } from 'sonner';
 
 export function Survey360SettingsPage() {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { theme, setTheme } = useUIStore();
   const isDark = theme === 'dark';
@@ -23,11 +25,12 @@ export function Survey360SettingsPage() {
     <div className="space-y-6">
       <div><h1 className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Settings</h1><p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Manage your account and preferences</p></div>
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className={`grid w-full max-w-md grid-cols-4 ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
+        <TabsList className={`grid w-full max-w-lg grid-cols-5 ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
           <TabsTrigger value="profile" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><User className="w-4 h-4 mr-2" />Profile</TabsTrigger>
           <TabsTrigger value="appearance" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><Palette className="w-4 h-4 mr-2" />Theme</TabsTrigger>
           <TabsTrigger value="notifications" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><Bell className="w-4 h-4 mr-2" />Alerts</TabsTrigger>
           <TabsTrigger value="security" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><Shield className="w-4 h-4 mr-2" />Security</TabsTrigger>
+          <TabsTrigger value="admin" className="data-[state=active]:bg-teal-500/20 data-[state=active]:text-teal-400"><BarChart3 className="w-4 h-4 mr-2" />Admin</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
           <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
@@ -72,6 +75,37 @@ export function Survey360SettingsPage() {
               <div className="space-y-2"><Label className={isDark ? 'text-gray-300' : 'text-gray-700'}>New Password</Label><Input type="password" className={isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'} /></div>
               <div className="space-y-2"><Label className={isDark ? 'text-gray-300' : 'text-gray-700'}>Confirm Password</Label><Input type="password" className={isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'} /></div>
               <Button onClick={handleSave}>Update Password</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="admin">
+          <Card className={isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}>
+            <CardHeader>
+              <CardTitle className={isDark ? 'text-white' : 'text-gray-900'}>Admin Tools</CardTitle>
+              <CardDescription className={isDark ? 'text-gray-400' : 'text-gray-500'}>Administrative features and analytics</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className={`p-4 rounded-lg border ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                      <BarChart3 className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>Help Center Analytics</h3>
+                      <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>View AI Assistant usage, feedback, and insights</p>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={() => navigate('/solutions/survey360/app/help-analytics')} 
+                    className="bg-gradient-to-r from-teal-500 to-teal-600 text-white"
+                    data-testid="help-analytics-btn"
+                  >
+                    Open Dashboard
+                    <ExternalLink className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
