@@ -16,10 +16,17 @@ logger = logging.getLogger(__name__)
 # Try to import Celery, fallback to async processing
 try:
     from utils.celery_app import app as celery_app
+    # Check if Redis is actually available
+    import redis
+    redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    r = redis.from_url(redis_url, socket_connect_timeout=1)
+    r.ping()
     CELERY_AVAILABLE = True
-except ImportError:
+    logger.info("Celery with Redis backend available")
+except Exception as e:
     CELERY_AVAILABLE = False
-    logger.warning("Celery not available, using async fallback")
+    celery_app = None
+    logger.warning(f"Celery/Redis not available, using async fallback: {e}")
 
 
 # ============================================
