@@ -1,0 +1,104 @@
+# Infrastructure Validation Workflow
+# Validates Kubernetes manifests and Terraform
+
+name: Infrastructure Validation
+
+on:
+  push:
+    paths:
+      - 'k8s/**'
+      - 'terraform/**'
+  pull_request:
+    paths:
+      - 'k8s/**'
+      - 'terraform/**'
+
+jobs:
+  # ============================================
+  # KUBERNETES MANIFEST VALIDATION
+  # ============================================
+  validate-k8s:
+    name: Validate Kubernetes Manifests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install kubeval
+        run: |
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz
+          sudo mv kubeval /usr/local/bin/
+
+      - name: Validate manifests
+        run: |
+          find k8s -name '*.yaml' -type f | xargs kubeval --strict --ignore-missing-schemas
+
+      - name: Install kube-score
+        run: |
+          wget https://github.com/zegl/kube-score/releases/download/v1.18.0/kube-score_1.18.0_linux_amd64.tar.gz
+          tar xf kube-score_1.18.0_linux_amd64.tar.gz
+          sudo mv kube-score /usr/local/bin/
+
+      - name: Score manifests
+        run: |
+          find k8s -name '*.yaml' -type f | xargs kube-score score --output-format ci || true
+
+      - name: Install Pluto (deprecation check)
+        run: |
+          wget https://github.com/FairwindsOps/pluto/releases/download/v5.19.0/pluto_5.19.0_linux_amd64.tar.gz
+          tar xf pluto_5.19.0_linux_amd64.tar.gz
+          sudo mv pluto /usr/local/bin/
+
+      - name: Check for deprecated APIs
+        run: |
+          pluto detect-files -d k8s/
+
+  # ============================================
+  # SECURITY POLICY VALIDATION
+  # ============================================
+  validate-security:
+    name: Validate Security Policies
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Conftest
+        run: |
+          wget https://github.com/open-policy-agent/conftest/releases/download/v0.48.0/conftest_0.48.0_Linux_x86_64.tar.gz
+          tar xzf conftest_0.48.0_Linux_x86_64.tar.gz
+          sudo mv conftest /usr/local/bin/
+
+      - name: Create security policy
+        run: |
+          mkdir -p policy
+          cat > policy/security.rego << 'EOF'
+          package main
+
+          deny[msg] {
+            input.kind == "Deployment"
+            not input.spec.template.spec.securityContext.runAsNonRoot
+            msg = sprintf("Deployment %s should set runAsNonRoot", [input.metadata.name])
+          }
+
+          deny[msg] {
+            input.kind == "Deployment"
+            container := input.spec.template.spec.containers[_]
+            not container.resources.limits
+            msg = sprintf("Container %s in Deployment %s should have resource limits", [container.name, input.metadata.name])
+          }
+
+          warn[msg] {
+            input.kind == "Deployment"
+            container := input.spec.template.spec.containers[_]
+            container.securityContext.privileged
+            msg = sprintf("Container %s in Deployment %s should not be privileged", [container.name, input.metadata.name])
+          }
+          EOF
+
+      - name: Run policy checks
+        run: |
+          find k8s -name '*.yaml' -type f | xargs conftest test --policy policy/ || true
