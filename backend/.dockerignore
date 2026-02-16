@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environments
+venv/
+env/
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+tests/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+docker/
+
+# Logs
+*.log
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Local config
+config/kubernetes/
+
+# Documentation
+docs/
+*.md
