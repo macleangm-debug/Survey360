@@ -216,7 +216,7 @@ class TestSurvey360Dashboard:
         response = requests.post(
             f"{BASE_URL}/api/survey360/auth/login",
             json={
-                "email": "demo@datapulse.io",
+                "email": "demo@survey360.io",
                 "password": "Test123!"
             },
             timeout=10
@@ -281,7 +281,7 @@ class TestSurvey360Surveys:
         response = requests.post(
             f"{BASE_URL}/api/survey360/auth/login",
             json={
-                "email": "demo@datapulse.io",
+                "email": "demo@survey360.io",
                 "password": "Test123!"
             },
             timeout=10
@@ -390,7 +390,7 @@ class TestHelpAssistant:
         response = requests.post(
             f"{BASE_URL}/api/survey360/auth/login",
             json={
-                "email": "demo@datapulse.io",
+                "email": "demo@survey360.io",
                 "password": "Test123!"
             },
             timeout=10
