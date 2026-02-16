@@ -1,0 +1,154 @@
+# Cloudflare CDN Configuration Guide for Survey360
+# This file contains configuration templates and instructions
+
+# ============================================
+# CLOUDFLARE SETTINGS (Configure in Dashboard)
+# ============================================
+#
+# 1. DNS SETTINGS
+#    - Add A record: survey360.yourdomain.com → Load Balancer IP
+#    - Add CNAME: api.survey360.yourdomain.com → survey360.yourdomain.com
+#    - Enable Orange Cloud (Proxied) for CDN benefits
+#
+# 2. SSL/TLS SETTINGS
+#    - Mode: Full (Strict) - End-to-end encryption
+#    - Always Use HTTPS: ON
+#    - Minimum TLS Version: 1.2
+#    - Opportunistic Encryption: ON
+#    - TLS 1.3: ON
+#
+# 3. CACHING SETTINGS
+#    - Caching Level: Standard
+#    - Browser Cache TTL: 4 hours (for static assets)
+#    - Always Online: ON
+#
+# 4. PAGE RULES (Priority Order)
+#
+#    Rule 1: API No Cache
+#    URL: *survey360.yourdomain.com/api/*
+#    Settings:
+#      - Cache Level: Bypass
+#      - Disable Apps: ON
+#      - Disable Performance: ON
+#
+#    Rule 2: Static Assets Cache
+#    URL: *survey360.yourdomain.com/static/*
+#    Settings:
+#      - Cache Level: Cache Everything
+#      - Edge Cache TTL: 1 month
+#      - Browser Cache TTL: 1 week
+#
+#    Rule 3: Frontend Cache
+#    URL: *survey360.yourdomain.com/*
+#    Settings:
+#      - Cache Level: Standard
+#      - Edge Cache TTL: 2 hours
+#
+# 5. FIREWALL RULES
+#
+#    Rule: Rate Limit API
+#    Expression: (http.request.uri.path contains "/api/")
+#    Action: Rate Limit
+#    Requests: 1000 per minute
+#
+#    Rule: Block Bad Bots
+#    Expression: (cf.client.bot) and not (cf.client.bot_management.verified_bot)
+#    Action: Challenge
+#
+# 6. SPEED OPTIMIZATIONS
+#    - Auto Minify: JS, CSS, HTML
+#    - Brotli: ON
+#    - Early Hints: ON
+#    - Rocket Loader: OFF (can break React apps)
+#    - HTTP/2: ON
+#    - HTTP/3 (QUIC): ON
+
+---
+# ============================================
+# KUBERNETES CONFIGMAP FOR CLOUDFLARE SETTINGS
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflare-config
+  namespace: survey360
+data:
+  # Cloudflare IP ranges for trusted proxies
+  # Update periodically from https://www.cloudflare.com/ips/
+  CLOUDFLARE_IPS: |
+    173.245.48.0/20
+    103.21.244.0/22
+    103.22.200.0/22
+    103.31.4.0/22
+    141.101.64.0/18
+    108.162.192.0/18
+    190.93.240.0/20
+    188.114.96.0/20
+    197.234.240.0/22
+    198.41.128.0/17
+    162.158.0.0/15
+    104.16.0.0/13
+    104.24.0.0/14
+    172.64.0.0/13
+    131.0.72.0/22
+
+---
+# ============================================
+# NGINX INGRESS CONFIGMAP FOR CLOUDFLARE
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+data:
+  # Trust Cloudflare proxy headers
+  use-forwarded-headers: "true"
+  compute-full-forwarded-for: "true"
+  use-proxy-protocol: "false"
+  
+  # Real IP from Cloudflare
+  proxy-real-ip-cidr: "173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22"
+  
+  # Compression (Cloudflare handles this, but backup)
+  use-gzip: "true"
+  gzip-level: "5"
+  gzip-types: "application/javascript application/json application/xml text/css text/javascript text/plain text/xml"
+  
+  # Security headers
+  hide-headers: "X-Powered-By,Server"
+  
+  # Connection settings
+  keep-alive: "75"
+  keep-alive-requests: "1000"
+  upstream-keepalive-connections: "100"
+
+---
+# ============================================
+# BACKEND CACHE HEADERS CONFIGURATION
+# ============================================
+# Add these headers in your FastAPI application:
+#
+# from fastapi import Response
+# from fastapi.middleware.cors import CORSMiddleware
+#
+# @app.middleware("http")
+# async def add_cache_headers(request, call_next):
+#     response = await call_next(request)
+#     
+#     # Static assets - long cache
+#     if request.url.path.startswith("/static"):
+#         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+#         response.headers["CDN-Cache-Control"] = "max-age=31536000"
+#     
+#     # API responses - no cache
+#     elif request.url.path.startswith("/api"):
+#         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+#         response.headers["CDN-Cache-Control"] = "no-store"
+#     
+#     # HTML pages - short cache
+#     else:
+#         response.headers["Cache-Control"] = "public, max-age=300"
+#         response.headers["CDN-Cache-Control"] = "max-age=3600"
+#     
+#     return response

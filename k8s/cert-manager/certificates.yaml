@@ -1,0 +1,118 @@
+# Cert-Manager Installation and Let's Encrypt Configuration
+# Provides automatic SSL/TLS certificate provisioning
+
+---
+# ============================================
+# CERT-MANAGER NAMESPACE
+# ============================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+  labels:
+    app: cert-manager
+
+---
+# ============================================
+# LET'S ENCRYPT CLUSTER ISSUER - STAGING
+# Use for testing to avoid rate limits
+# ============================================
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # Staging server for testing
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: admin@survey360.yourdomain.com  # Change to your email
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+    # HTTP-01 challenge solver using ingress
+    - http01:
+        ingress:
+          class: nginx
+          serviceType: ClusterIP
+
+---
+# ============================================
+# LET'S ENCRYPT CLUSTER ISSUER - PRODUCTION
+# Use for production certificates
+# ============================================
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    # Production server
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@survey360.yourdomain.com  # Change to your email
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+    # HTTP-01 challenge solver
+    - http01:
+        ingress:
+          class: nginx
+          serviceType: ClusterIP
+    # DNS-01 challenge solver for Cloudflare (optional, for wildcard certs)
+    # - dns01:
+    #     cloudflare:
+    #       email: your-cloudflare-email@example.com
+    #       apiTokenSecretRef:
+    #         name: cloudflare-api-token
+    #         key: api-token
+
+---
+# ============================================
+# CLOUDFLARE API TOKEN SECRET (for DNS-01)
+# Uncomment and configure if using DNS-01 challenge
+# ============================================
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: cloudflare-api-token
+#   namespace: cert-manager
+# type: Opaque
+# stringData:
+#   api-token: "your-cloudflare-api-token-here"
+
+---
+# ============================================
+# CERTIFICATE RESOURCES
+# ============================================
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: survey360-tls
+  namespace: survey360
+spec:
+  secretName: survey360-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - survey360.yourdomain.com
+  - api.survey360.yourdomain.com
+  - submissions.survey360.yourdomain.com
+  - flower.survey360.yourdomain.com
+
+---
+# ============================================
+# WILDCARD CERTIFICATE (requires DNS-01)
+# ============================================
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: survey360-wildcard-tls
+#   namespace: survey360
+# spec:
+#   secretName: survey360-wildcard-tls
+#   issuerRef:
+#     name: letsencrypt-prod
+#     kind: ClusterIssuer
+#   dnsNames:
+#   - "*.survey360.yourdomain.com"
+#   - survey360.yourdomain.com
