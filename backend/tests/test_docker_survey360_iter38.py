@@ -118,7 +118,7 @@ class TestHighThroughputSubmissions:
         response = requests.post(
             f"{BASE_URL}/api/survey360/auth/login",
             json={
-                "email": "demo@datapulse.io",
+                "email": "demo@survey360.io",
                 "password": "Test123!"
             },
             timeout=10
