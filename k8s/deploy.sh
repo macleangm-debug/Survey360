@@ -6,16 +6,19 @@
 #   - kubectl configured with cluster access
 #   - Docker images built and pushed to registry
 #   - Storage class 'standard' available (or modify manifests)
+#   - cert-manager installed for TLS
 #
 # Usage:
 #   ./deploy.sh [command]
 #
 # Commands:
-#   deploy    - Deploy entire stack
-#   destroy   - Remove all resources
-#   status    - Show deployment status
-#   logs      - Show recent logs
-#   init-db   - Initialize MongoDB sharding
+#   deploy      - Deploy entire stack
+#   destroy     - Remove all resources
+#   status      - Show deployment status
+#   logs        - Show recent logs
+#   init-db     - Initialize MongoDB sharding
+#   monitoring  - Deploy Prometheus + Grafana
+#   tls         - Configure Let's Encrypt certificates
 
 set -e
 
