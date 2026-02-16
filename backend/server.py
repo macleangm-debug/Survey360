@@ -98,6 +98,7 @@ from routes.audit_routes import router as audit_router
 from routes.job_routes import router as job_router
 from routes.survey360_routes import router as survey360_router
 from routes.help_assistant_routes import router as help_assistant_router
+from routes.pricing_routes import router as pricing_router
 
 # Include all route modules
 api_router.include_router(auth_router)
