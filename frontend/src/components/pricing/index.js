@@ -44,6 +44,3 @@ export {
   PricingComparisonOnly,
   CustomStyledPricing,
 } from './PricingExamples';
-
-// Default export
-export { default as PricingSection } from './PricingComponents';
