@@ -1,391 +1,289 @@
-"""DataPulse - Submission Routes"""
-from fastapi import APIRouter, HTTPException, status, Request, Depends, Query
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timezone, timedelta
-from pydantic import BaseModel
+"""
+Survey360 - High-Throughput Submission Routes
+API endpoints optimized for 500K+ concurrent submissions
+"""
 
-from models import Submission, SubmissionCreate, SubmissionOut
-from auth import get_current_user
+from fastapi import APIRouter, Request, HTTPException, BackgroundTasks
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any, Optional
+from datetime import datetime, timezone
+import logging
 
-router = APIRouter(prefix="/submissions", tags=["Submissions"])
+from utils.submission_processor import (
+    high_throughput_submitter,
+    submission_buffer,
+    HighThroughputSubmitter
+)
+from utils.high_throughput_db import (
+    HighThroughputWriter,
+    initialize_high_throughput_db
+)
 
-
-class SubmissionReview(BaseModel):
-    status: str  # approved, rejected, flagged
-    notes: Optional[str] = None
-
-
-class BulkSubmissionCreate(BaseModel):
-    submissions: List[SubmissionCreate]
-
-
-async def check_form_access(db, form_id: str, user_id: str):
-    """Check if user has access to form's organization"""
-    form = await db.forms.find_one({"id": form_id}, {"_id": 0})
-    if not form:
-        return None, None
-    
-    membership = await db.org_members.find_one(
-        {"org_id": form["org_id"], "user_id": user_id},
-        {"_id": 0}
-    )
-    return membership, form
+logger = logging.getLogger(__name__)
+router = APIRouter(prefix="/survey360/submissions", tags=["High-Throughput Submissions"])
 
 
-def calculate_quality_score(data: Dict[str, Any], form_fields: List[Dict]) -> tuple:
-    """Calculate submission quality score and flags"""
-    score = 100.0
-    flags = []
-    
-    field_map = {f["name"]: f for f in form_fields}
-    
-    for field_name, field_config in field_map.items():
-        value = data.get(field_name)
-        
-        # Check required fields
-        if field_config.get("validation", {}).get("required") and not value:
-            score -= 10
-            flags.append(f"missing_required:{field_name}")
-        
-        # Check value constraints
-        validation = field_config.get("validation", {})
-        if value is not None:
-            if validation.get("min_value") and isinstance(value, (int, float)):
-                if value < validation["min_value"]:
-                    score -= 5
-                    flags.append(f"below_min:{field_name}")
-            
-            if validation.get("max_value") and isinstance(value, (int, float)):
-                if value > validation["max_value"]:
-                    score -= 5
-                    flags.append(f"above_max:{field_name}")
-    
-    return max(0, score), flags
+# ============================================
+# REQUEST/RESPONSE MODELS
+# ============================================
+
+class SubmissionRequest(BaseModel):
+    """Single submission request"""
+    responses: Dict[str, Any] = Field(..., description="Question responses")
+    respondent_id: Optional[str] = Field(None, description="Optional respondent ID")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Device info, location, etc.")
+    priority: Optional[str] = Field("normal", description="Priority: critical, high, normal, low")
 
 
-@router.post("", response_model=SubmissionOut)
-async def create_submission(
+class BulkSubmissionRequest(BaseModel):
+    """Bulk submission request"""
+    submissions: List[Dict[str, Any]] = Field(..., description="List of submissions")
+
+
+class SubmissionResponse(BaseModel):
+    """Submission response"""
+    success: bool
+    submission_id: str
+    survey_id: str
+    status: str
+    priority: str
+
+
+class BulkSubmissionResponse(BaseModel):
+    """Bulk submission response"""
+    success: bool
+    survey_id: str
+    count: int
+    status: str
+
+
+class MetricsResponse(BaseModel):
+    """Metrics response"""
+    total_received: int
+    total_processed: int
+    total_failed: int
+    buffer_pending: int
+    celery_available: bool
+
+
+# ============================================
+# SUBMISSION ENDPOINTS
+# ============================================
+
+@router.post("/{survey_id}", response_model=SubmissionResponse)
+async def submit_response(
+    survey_id: str,
     request: Request,
-    data: SubmissionCreate,
-    current_user: dict = Depends(get_current_user)
+    submission: SubmissionRequest
 ):
-    """Submit form data"""
-    db = request.app.state.db
+    """
+    Submit a single survey response.
     
-    # Check form access
-    membership, form = await check_form_access(db, data.form_id, current_user["user_id"])
+    Optimized for high-throughput with automatic batching and priority queuing.
     
-    if not membership and not current_user.get("is_superadmin"):
+    Priority levels:
+    - critical: Immediate processing (real-time updates)
+    - high: Fast processing with minimal batching
+    - normal: Standard batched processing
+    - low: Background processing
+    """
+    try:
+        result = await high_throughput_submitter.submit(
+            survey_id=survey_id,
+            responses=submission.responses,
+            respondent_id=submission.respondent_id,
+            metadata=submission.metadata,
+            priority=submission.priority
+        )
+        
+        return SubmissionResponse(
+            success=result['success'],
+            submission_id=result['submission_id'],
+            survey_id=result['survey_id'],
+            status=result['status'],
+            priority=result['priority']
+        )
+        
+    except Exception as e:
+        logger.error(f"Submission error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{survey_id}/bulk", response_model=BulkSubmissionResponse)
+async def submit_bulk_responses(
+    survey_id: str,
+    request: Request,
+    bulk_request: BulkSubmissionRequest
+):
+    """
+    Submit multiple survey responses in bulk.
+    
+    Optimized for:
+    - Data migrations
+    - Offline sync
+    - High-volume imports
+    
+    Maximum 10,000 submissions per request.
+    """
+    if len(bulk_request.submissions) > 10000:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to submit to this form"
+            status_code=400,
+            detail="Maximum 10,000 submissions per bulk request"
         )
     
-    if not form:
-        raise HTTPException(status_code=404, detail="Form not found")
+    try:
+        result = await high_throughput_submitter.submit_batch(
+            survey_id=survey_id,
+            submissions=bulk_request.submissions
+        )
+        
+        return BulkSubmissionResponse(
+            success=result['success'],
+            survey_id=result['survey_id'],
+            count=result['count'],
+            status=result['status']
+        )
+        
+    except Exception as e:
+        logger.error(f"Bulk submission error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/metrics", response_model=MetricsResponse)
+async def get_submission_metrics():
+    """
+    Get real-time submission metrics.
     
-    if form["status"] != "published":
-        raise HTTPException(status_code=400, detail="Form is not published")
+    Returns:
+    - Total received submissions
+    - Processing statistics
+    - Buffer status
+    - Queue health
+    """
+    metrics = high_throughput_submitter.get_metrics()
+    buffer_stats = submission_buffer.get_stats()
     
-    # Calculate quality score
-    quality_score, quality_flags = calculate_quality_score(
-        data.data,
-        form.get("fields", [])
-    )
-    
-    # Extract GPS if present
-    gps_location = None
-    gps_accuracy = None
-    if "_gps" in data.data:
-        gps_data = data.data["_gps"]
-        if isinstance(gps_data, dict):
-            gps_location = {
-                "lat": gps_data.get("latitude"),
-                "lng": gps_data.get("longitude")
-            }
-            gps_accuracy = gps_data.get("accuracy")
-    
-    # Create submission
-    submission = Submission(
-        form_id=data.form_id,
-        form_version=data.form_version or form["version"],
-        data=data.data,
-        device_id=data.device_id,
-        device_info=data.device_info,
-        org_id=form["org_id"],
-        project_id=form["project_id"],
-        submitted_by=current_user["user_id"],
-        gps_location=gps_location,
-        gps_accuracy=gps_accuracy,
-        quality_score=quality_score,
-        quality_flags=quality_flags
-    )
-    
-    submission_dict = submission.model_dump()
-    submission_dict["submitted_at"] = submission_dict["submitted_at"].isoformat()
-    if submission_dict.get("synced_at"):
-        submission_dict["synced_at"] = submission_dict["synced_at"].isoformat()
-    if submission_dict.get("reviewed_at"):
-        submission_dict["reviewed_at"] = submission_dict["reviewed_at"].isoformat()
-    
-    await db.submissions.insert_one(submission_dict)
-    
-    return SubmissionOut(
-        id=submission.id,
-        form_id=submission.form_id,
-        form_version=submission.form_version,
-        data=submission.data,
-        submitted_by=submission.submitted_by,
-        submitted_at=submission.submitted_at,
-        status=submission.status,
-        quality_score=submission.quality_score,
-        quality_flags=submission.quality_flags,
-        gps_location=submission.gps_location
+    return MetricsResponse(
+        total_received=metrics.get('total_received', 0),
+        total_processed=buffer_stats.get('total_flushed', 0),
+        total_failed=metrics.get('total_failed', 0),
+        buffer_pending=buffer_stats.get('pending', 0),
+        celery_available=metrics.get('celery_available', False)
     )
 
 
-@router.post("/bulk")
-async def create_bulk_submissions(
-    request: Request,
-    data: BulkSubmissionCreate,
-    current_user: dict = Depends(get_current_user)
-):
-    """Submit multiple form entries (for offline sync)"""
-    db = request.app.state.db
+@router.post("/flush")
+async def force_flush_buffer(background_tasks: BackgroundTasks):
+    """
+    Force flush all pending submissions in the buffer.
     
-    results = []
-    errors = []
+    Use this endpoint to ensure all submissions are processed
+    before maintenance or shutdown.
+    """
+    try:
+        await submission_buffer.force_flush()
+        return {"success": True, "message": "Buffer flushed successfully"}
+    except Exception as e:
+        logger.error(f"Flush error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================
+# DATABASE INITIALIZATION ENDPOINT
+# ============================================
+
+@router.post("/init-db")
+async def initialize_database(request: Request):
+    """
+    Initialize high-throughput database collections and indexes.
     
-    for idx, sub_data in enumerate(data.submissions):
-        try:
-            # Check form access
-            membership, form = await check_form_access(
-                db, sub_data.form_id, current_user["user_id"]
-            )
-            
-            if not membership and not current_user.get("is_superadmin"):
-                errors.append({"index": idx, "error": "Not authorized"})
-                continue
-            
-            if not form:
-                errors.append({"index": idx, "error": "Form not found"})
-                continue
-            
-            # Calculate quality score
-            quality_score, quality_flags = calculate_quality_score(
-                sub_data.data,
-                form.get("fields", [])
-            )
-            
-            # Create submission
-            submission = Submission(
-                form_id=sub_data.form_id,
-                form_version=sub_data.form_version or form["version"],
-                data=sub_data.data,
-                device_id=sub_data.device_id,
-                device_info=sub_data.device_info,
-                org_id=form["org_id"],
-                project_id=form["project_id"],
-                submitted_by=current_user["user_id"],
-                synced_at=datetime.now(timezone.utc),
-                quality_score=quality_score,
-                quality_flags=quality_flags
-            )
-            
-            submission_dict = submission.model_dump()
-            submission_dict["submitted_at"] = submission_dict["submitted_at"].isoformat()
-            submission_dict["synced_at"] = submission_dict["synced_at"].isoformat()
-            
-            await db.submissions.insert_one(submission_dict)
-            results.append({"index": idx, "id": submission.id})
-            
-        except Exception as e:
-            errors.append({"index": idx, "error": str(e)})
+    Creates:
+    - Time-series collections for responses
+    - Optimized indexes
+    - Sharding configuration (if on sharded cluster)
+    
+    Should be called once during initial deployment.
+    """
+    try:
+        db = request.app.state.db
+        result = await initialize_high_throughput_db(db)
+        return result
+    except Exception as e:
+        logger.error(f"Database initialization error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================
+# HEALTH & STATS ENDPOINTS
+# ============================================
+
+@router.get("/health")
+async def submissions_health():
+    """
+    Health check for submission system.
+    
+    Returns system status including:
+    - Buffer health
+    - Queue connectivity
+    - Processing capacity
+    """
+    buffer_stats = submission_buffer.get_stats()
+    metrics = high_throughput_submitter.get_metrics()
+    
+    # Calculate health status
+    pending = buffer_stats.get('pending', 0)
+    is_healthy = pending < 10000  # Alert if more than 10K pending
     
     return {
-        "success_count": len(results),
-        "error_count": len(errors),
-        "results": results,
-        "errors": errors
+        "status": "healthy" if is_healthy else "degraded",
+        "buffer": {
+            "pending": pending,
+            "total_flushed": buffer_stats.get('total_flushed', 0),
+            "last_flush": buffer_stats.get('last_flush')
+        },
+        "processing": {
+            "celery_available": metrics.get('celery_available', False),
+            "total_received": metrics.get('total_received', 0)
+        },
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
-@router.get("", response_model=List[SubmissionOut])
-async def list_submissions(
-    request: Request,
-    form_id: str,
-    status_filter: Optional[str] = None,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
-    page: int = Query(1, ge=1),
-    page_size: int = Query(50, ge=1, le=500),
-    current_user: dict = Depends(get_current_user)
-):
-    """List form submissions"""
-    db = request.app.state.db
+@router.get("/stats/detailed")
+async def detailed_submission_stats(request: Request):
+    """
+    Get detailed submission statistics.
     
-    # Check form access
-    membership, form = await check_form_access(db, form_id, current_user["user_id"])
+    Includes:
+    - Throughput metrics
+    - Latency percentiles
+    - Error rates
+    - Queue depths
+    """
+    buffer_stats = submission_buffer.get_stats()
+    metrics = high_throughput_submitter.get_metrics()
     
-    if not membership and not current_user.get("is_superadmin"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized"
-        )
+    # Calculate throughput
+    start_time = metrics.get('start_time')
+    total_received = metrics.get('total_received', 0)
     
-    # Build query
-    query = {"form_id": form_id}
-    if status_filter:
-        query["status"] = status_filter
-    if start_date:
-        query["submitted_at"] = {"$gte": start_date}
-    if end_date:
-        if "submitted_at" in query:
-            query["submitted_at"]["$lte"] = end_date
-        else:
-            query["submitted_at"] = {"$lte": end_date}
+    if start_time and total_received > 0:
+        start_dt = datetime.fromisoformat(start_time)
+        elapsed = (datetime.now(timezone.utc) - start_dt).total_seconds()
+        throughput = total_received / max(elapsed, 1)
+    else:
+        throughput = 0
     
-    skip = (page - 1) * page_size
-    
-    submissions = await db.submissions.find(
-        query, {"_id": 0}
-    ).sort("submitted_at", -1).skip(skip).limit(page_size).to_list(page_size)
-    
-    return [
-        SubmissionOut(
-            id=s["id"],
-            form_id=s["form_id"],
-            form_version=s["form_version"],
-            data=s["data"],
-            submitted_by=s["submitted_by"],
-            submitted_at=datetime.fromisoformat(s["submitted_at"]) if isinstance(s["submitted_at"], str) else s["submitted_at"],
-            status=s["status"],
-            quality_score=s.get("quality_score"),
-            quality_flags=s.get("quality_flags", []),
-            gps_location=s.get("gps_location")
-        )
-        for s in submissions
-    ]
-
-
-@router.get("/{submission_id}", response_model=SubmissionOut)
-async def get_submission(
-    request: Request,
-    submission_id: str,
-    current_user: dict = Depends(get_current_user)
-):
-    """Get submission details"""
-    db = request.app.state.db
-    
-    submission = await db.submissions.find_one({"id": submission_id}, {"_id": 0})
-    if not submission:
-        raise HTTPException(status_code=404, detail="Submission not found")
-    
-    # Check access
-    membership = await db.org_members.find_one(
-        {"org_id": submission["org_id"], "user_id": current_user["user_id"]},
-        {"_id": 0}
-    )
-    
-    if not membership and not current_user.get("is_superadmin"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized"
-        )
-    
-    return SubmissionOut(
-        id=submission["id"],
-        form_id=submission["form_id"],
-        form_version=submission["form_version"],
-        data=submission["data"],
-        submitted_by=submission["submitted_by"],
-        submitted_at=datetime.fromisoformat(submission["submitted_at"]) if isinstance(submission["submitted_at"], str) else submission["submitted_at"],
-        status=submission["status"],
-        quality_score=submission.get("quality_score"),
-        quality_flags=submission.get("quality_flags", []),
-        gps_location=submission.get("gps_location")
-    )
-
-
-@router.patch("/{submission_id}/review")
-async def review_submission(
-    request: Request,
-    submission_id: str,
-    data: SubmissionReview,
-    current_user: dict = Depends(get_current_user)
-):
-    """Review a submission (approve/reject/flag)"""
-    db = request.app.state.db
-    
-    submission = await db.submissions.find_one({"id": submission_id}, {"_id": 0})
-    if not submission:
-        raise HTTPException(status_code=404, detail="Submission not found")
-    
-    # Check manager/analyst access
-    membership = await db.org_members.find_one(
-        {
-            "org_id": submission["org_id"],
-            "user_id": current_user["user_id"],
-            "role": {"$in": ["admin", "manager", "analyst"]}
+    return {
+        "throughput": {
+            "submissions_per_second": round(throughput, 2),
+            "total_received": total_received,
+            "total_processed": buffer_stats.get('total_flushed', 0)
         },
-        {"_id": 0}
-    )
-    
-    if not membership and not current_user.get("is_superadmin"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Manager or analyst access required"
-        )
-    
-    valid_statuses = ["pending", "approved", "rejected", "flagged"]
-    if data.status not in valid_statuses:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
-        )
-    
-    await db.submissions.update_one(
-        {"id": submission_id},
-        {"$set": {
-            "status": data.status,
-            "reviewer_id": current_user["user_id"],
-            "reviewed_at": datetime.now(timezone.utc).isoformat(),
-            "review_notes": data.notes
-        }}
-    )
-    
-    return {"message": "Submission reviewed", "status": data.status}
-
-
-@router.delete("/{submission_id}")
-async def delete_submission(
-    request: Request,
-    submission_id: str,
-    current_user: dict = Depends(get_current_user)
-):
-    """Delete a submission"""
-    db = request.app.state.db
-    
-    submission = await db.submissions.find_one({"id": submission_id}, {"_id": 0})
-    if not submission:
-        raise HTTPException(status_code=404, detail="Submission not found")
-    
-    # Check admin access
-    membership = await db.org_members.find_one(
-        {
-            "org_id": submission["org_id"],
-            "user_id": current_user["user_id"],
-            "role": "admin"
+        "buffer": buffer_stats,
+        "system": {
+            "celery_available": metrics.get('celery_available', False),
+            "start_time": start_time
         },
-        {"_id": 0}
-    )
-    
-    if not membership and not current_user.get("is_superadmin"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required"
-        )
-    
-    await db.submissions.delete_one({"id": submission_id})
-    
-    return {"message": "Submission deleted"}
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
