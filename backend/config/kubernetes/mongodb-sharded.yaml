@@ -1,0 +1,397 @@
+# Survey360 MongoDB Sharded Cluster Configuration
+# For handling millions of survey responses across shards
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-config
+data:
+  mongod.conf: |
+    storage:
+      dbPath: /data/db
+      journal:
+        enabled: true
+      wiredTiger:
+        engineConfig:
+          cacheSizeGB: 2
+          journalCompressor: snappy
+        collectionConfig:
+          blockCompressor: snappy
+    
+    systemLog:
+      destination: file
+      path: /var/log/mongodb/mongod.log
+      logAppend: true
+    
+    net:
+      port: 27017
+      bindIp: 0.0.0.0
+    
+    replication:
+      replSetName: rs0
+    
+    sharding:
+      clusterRole: shardsvr
+
+---
+# Config Server Replica Set (3 nodes)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-configsvr
+  labels:
+    app: survey360
+    component: mongodb-configsvr
+spec:
+  serviceName: mongodb-configsvr
+  replicas: 3
+  selector:
+    matchLabels:
+      app: survey360
+      component: mongodb-configsvr
+  template:
+    metadata:
+      labels:
+        app: survey360
+        component: mongodb-configsvr
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        command:
+        - mongod
+        - --configsvr
+        - --replSet
+        - configRS
+        - --bind_ip_all
+        - --port
+        - "27019"
+        ports:
+        - containerPort: 27019
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: config-data
+          mountPath: /data/configdb
+  volumeClaimTemplates:
+  - metadata:
+      name: config-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 10Gi
+
+---
+# Config Server Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-configsvr
+spec:
+  clusterIP: None
+  selector:
+    app: survey360
+    component: mongodb-configsvr
+  ports:
+  - port: 27019
+    targetPort: 27019
+
+---
+# Shard Replica Set 1 (3 nodes)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-shard1
+  labels:
+    app: survey360
+    component: mongodb-shard1
+spec:
+  serviceName: mongodb-shard1
+  replicas: 3
+  selector:
+    matchLabels:
+      app: survey360
+      component: mongodb-shard1
+  template:
+    metadata:
+      labels:
+        app: survey360
+        component: mongodb-shard1
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        command:
+        - mongod
+        - --shardsvr
+        - --replSet
+        - shard1RS
+        - --bind_ip_all
+        - --port
+        - "27018"
+        - --wiredTigerCacheSizeGB
+        - "2"
+        ports:
+        - containerPort: 27018
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "1000m"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+        volumeMounts:
+        - name: shard-data
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: shard-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 100Gi
+
+---
+# Shard 1 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-shard1
+spec:
+  clusterIP: None
+  selector:
+    app: survey360
+    component: mongodb-shard1
+  ports:
+  - port: 27018
+    targetPort: 27018
+
+---
+# Shard Replica Set 2 (3 nodes)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-shard2
+  labels:
+    app: survey360
+    component: mongodb-shard2
+spec:
+  serviceName: mongodb-shard2
+  replicas: 3
+  selector:
+    matchLabels:
+      app: survey360
+      component: mongodb-shard2
+  template:
+    metadata:
+      labels:
+        app: survey360
+        component: mongodb-shard2
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        command:
+        - mongod
+        - --shardsvr
+        - --replSet
+        - shard2RS
+        - --bind_ip_all
+        - --port
+        - "27018"
+        - --wiredTigerCacheSizeGB
+        - "2"
+        ports:
+        - containerPort: 27018
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "1000m"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+        volumeMounts:
+        - name: shard-data
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: shard-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 100Gi
+
+---
+# Shard 2 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-shard2
+spec:
+  clusterIP: None
+  selector:
+    app: survey360
+    component: mongodb-shard2
+  ports:
+  - port: 27018
+    targetPort: 27018
+
+---
+# Shard Replica Set 3 (3 nodes)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-shard3
+  labels:
+    app: survey360
+    component: mongodb-shard3
+spec:
+  serviceName: mongodb-shard3
+  replicas: 3
+  selector:
+    matchLabels:
+      app: survey360
+      component: mongodb-shard3
+  template:
+    metadata:
+      labels:
+        app: survey360
+        component: mongodb-shard3
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0
+        command:
+        - mongod
+        - --shardsvr
+        - --replSet
+        - shard3RS
+        - --bind_ip_all
+        - --port
+        - "27018"
+        - --wiredTigerCacheSizeGB
+        - "2"
+        ports:
+        - containerPort: 27018
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "1000m"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+        volumeMounts:
+        - name: shard-data
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: shard-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 100Gi
+
+---
+# Shard 3 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-shard3
+spec:
+  clusterIP: None
+  selector:
+    app: survey360
+    component: mongodb-shard3
+  ports:
+  - port: 27018
+    targetPort: 27018
+
+---
+# Mongos Router Deployment (Load Balanced)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-mongos
+  labels:
+    app: survey360
+    component: mongodb-mongos
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: survey360
+      component: mongodb-mongos
+  template:
+    metadata:
+      labels:
+        app: survey360
+        component: mongodb-mongos
+    spec:
+      containers:
+      - name: mongos
+        image: mongo:7.0
+        command:
+        - mongos
+        - --configdb
+        - configRS/mongodb-configsvr-0.mongodb-configsvr:27019,mongodb-configsvr-1.mongodb-configsvr:27019,mongodb-configsvr-2.mongodb-configsvr:27019
+        - --bind_ip_all
+        - --port
+        - "27017"
+        ports:
+        - containerPort: 27017
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+
+---
+# Mongos Service (Entry Point)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-mongos
+spec:
+  type: ClusterIP
+  selector:
+    app: survey360
+    component: mongodb-mongos
+  ports:
+  - port: 27017
+    targetPort: 27017
+
+---
+# MongoDB HPA for Mongos
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mongodb-mongos-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mongodb-mongos
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
