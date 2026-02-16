@@ -266,8 +266,17 @@ case "${1:-deploy}" in
     init-db)
         init_db
         ;;
+    monitoring)
+        monitoring
+        ;;
+    tls)
+        tls
+        ;;
+    cdn)
+        cdn_info
+        ;;
     *)
-        echo "Usage: $0 {deploy|destroy|status|logs|scale|init-db}"
+        echo "Usage: $0 {deploy|destroy|status|logs|scale|init-db|monitoring|tls|cdn}"
         exit 1
         ;;
 esac
