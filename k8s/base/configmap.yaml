@@ -1,0 +1,31 @@
+# Survey360 ConfigMap - Non-sensitive configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: survey360-config
+  namespace: survey360
+data:
+  # Application
+  APP_NAME: "Survey360"
+  APP_ENV: "production"
+  LOG_LEVEL: "INFO"
+  
+  # Database
+  DB_NAME: "survey360"
+  MONGO_MAX_POOL_SIZE: "200"
+  MONGO_MIN_POOL_SIZE: "50"
+  
+  # Redis
+  REDIS_DB: "0"
+  REDIS_MAX_CONNECTIONS: "100"
+  
+  # Celery
+  CELERY_CONCURRENCY: "4"
+  CELERY_PREFETCH_MULTIPLIER: "4"
+  
+  # CORS
+  CORS_ORIGINS: "*"
+  
+  # Feature flags
+  ENABLE_METRICS: "true"
+  ENABLE_TRACING: "true"

@@ -1,0 +1,39 @@
+# Survey360 Kubernetes Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: survey360
+  labels:
+    app: survey360
+    environment: production
+---
+# Resource Quotas for the namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: survey360-quota
+  namespace: survey360
+spec:
+  hard:
+    requests.cpu: "50"
+    requests.memory: 100Gi
+    limits.cpu: "100"
+    limits.memory: 200Gi
+    persistentvolumeclaims: "20"
+    pods: "200"
+---
+# Limit Range for default resource limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: survey360-limits
+  namespace: survey360
+spec:
+  limits:
+  - default:
+      cpu: "1"
+      memory: 1Gi
+    defaultRequest:
+      cpu: "100m"
+      memory: 256Mi
+    type: Container
