@@ -1,0 +1,346 @@
+# Survey360 Celery Workers Deployment
+# Multiple worker types for different queue priorities
+
+---
+# ============================================
+# CELERY WORKER - CRITICAL & SUBMISSIONS
+# High-priority workers for real-time submissions
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker-critical
+  namespace: survey360
+  labels:
+    app: celery-worker
+    queue: critical
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: celery-worker
+      queue: critical
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+        queue: critical
+    spec:
+      containers:
+      - name: celery-worker
+        image: survey360/backend:latest
+        imagePullPolicy: Always
+        command:
+        - celery
+        - -A
+        - utils.celery_app
+        - worker
+        - --loglevel=info
+        - --concurrency=4
+        - -Q
+        - critical,submissions
+        - -n
+        - critical-worker@%h
+        envFrom:
+        - configMapRef:
+            name: survey360-config
+        - secretRef:
+            name: survey360-secrets
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 2
+            memory: 2Gi
+        livenessProbe:
+          exec:
+            command:
+            - celery
+            - -A
+            - utils.celery_app
+            - inspect
+            - ping
+            - -d
+            - critical-worker@$HOSTNAME
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 30
+---
+# HPA for Critical Workers
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: celery-worker-critical-hpa
+  namespace: survey360
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: celery-worker-critical
+  minReplicas: 3
+  maxReplicas: 30
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
+
+---
+# ============================================
+# CELERY WORKER - DEFAULT
+# Standard priority workers
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker-default
+  namespace: survey360
+  labels:
+    app: celery-worker
+    queue: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: celery-worker
+      queue: default
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+        queue: default
+    spec:
+      containers:
+      - name: celery-worker
+        image: survey360/backend:latest
+        imagePullPolicy: Always
+        command:
+        - celery
+        - -A
+        - utils.celery_app
+        - worker
+        - --loglevel=info
+        - --concurrency=4
+        - -Q
+        - high_priority,default
+        - -n
+        - default-worker@%h
+        envFrom:
+        - configMapRef:
+            name: survey360-config
+        - secretRef:
+            name: survey360-secrets
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 2
+            memory: 2Gi
+---
+# HPA for Default Workers
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: celery-worker-default-hpa
+  namespace: survey360
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: celery-worker-default
+  minReplicas: 2
+  maxReplicas: 15
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+
+---
+# ============================================
+# CELERY WORKER - BULK
+# Low-priority workers for bulk operations
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker-bulk
+  namespace: survey360
+  labels:
+    app: celery-worker
+    queue: bulk
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: celery-worker
+      queue: bulk
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+        queue: bulk
+    spec:
+      containers:
+      - name: celery-worker
+        image: survey360/backend:latest
+        imagePullPolicy: Always
+        command:
+        - celery
+        - -A
+        - utils.celery_app
+        - worker
+        - --loglevel=info
+        - --concurrency=2
+        - -Q
+        - low_priority,bulk
+        - -n
+        - bulk-worker@%h
+        envFrom:
+        - configMapRef:
+            name: survey360-config
+        - secretRef:
+            name: survey360-secrets
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 2
+            memory: 4Gi
+---
+# HPA for Bulk Workers
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: celery-worker-bulk-hpa
+  namespace: survey360
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: celery-worker-bulk
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# ============================================
+# CELERY BEAT - Task Scheduler (Single Instance)
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-beat
+  namespace: survey360
+  labels:
+    app: celery-beat
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Only one beat scheduler should run
+  selector:
+    matchLabels:
+      app: celery-beat
+  template:
+    metadata:
+      labels:
+        app: celery-beat
+    spec:
+      containers:
+      - name: celery-beat
+        image: survey360/backend:latest
+        imagePullPolicy: Always
+        command:
+        - celery
+        - -A
+        - utils.celery_app
+        - beat
+        - --loglevel=info
+        envFrom:
+        - configMapRef:
+            name: survey360-config
+        - secretRef:
+            name: survey360-secrets
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+
+---
+# ============================================
+# FLOWER - Celery Monitoring Dashboard
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: flower
+  namespace: survey360
+  labels:
+    app: flower
+spec:
+  type: ClusterIP
+  selector:
+    app: flower
+  ports:
+  - port: 5555
+    targetPort: 5555
+    name: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flower
+  namespace: survey360
+  labels:
+    app: flower
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flower
+  template:
+    metadata:
+      labels:
+        app: flower
+    spec:
+      containers:
+      - name: flower
+        image: survey360/backend:latest
+        imagePullPolicy: Always
+        command:
+        - celery
+        - -A
+        - utils.celery_app
+        - flower
+        - --port=5555
+        - --basic_auth=admin:survey360flower
+        ports:
+        - containerPort: 5555
+        envFrom:
+        - configMapRef:
+            name: survey360-config
+        - secretRef:
+            name: survey360-secrets
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
