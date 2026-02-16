@@ -150,6 +150,7 @@ api_router.include_router(audit_router)
 api_router.include_router(rbac_router)
 api_router.include_router(survey360_router)  # Survey360 product routes
 api_router.include_router(help_assistant_router)  # Help Center AI Assistant
+api_router.include_router(pricing_router)  # Survey360 pricing and subscriptions
 
 
 # Health check endpoint
