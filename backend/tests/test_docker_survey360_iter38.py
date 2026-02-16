@@ -47,11 +47,11 @@ class TestSurvey360Auth:
     """Test Survey360 authentication endpoints"""
     
     def test_login_with_demo_credentials(self):
-        """Test login with demo@datapulse.io / Test123!"""
+        """Test login with demo@survey360.io / Test123!"""
         response = requests.post(
             f"{BASE_URL}/api/survey360/auth/login",
             json={
-                "email": "demo@datapulse.io",
+                "email": "demo@survey360.io",
                 "password": "Test123!"
             },
             timeout=10
@@ -62,8 +62,8 @@ class TestSurvey360Auth:
         data = response.json()
         assert "access_token" in data, "Response should contain access_token"
         assert "user" in data, "Response should contain user"
-        assert data["user"]["email"] == "demo@datapulse.io"
-        print(f"Login successful for demo@datapulse.io")
+        assert data["user"]["email"] == "demo@survey360.io"
+        print(f"Login successful for demo@survey360.io")
         return data["access_token"]
     
     def test_login_with_invalid_credentials(self):
@@ -86,7 +86,7 @@ class TestSurvey360Auth:
         login_response = requests.post(
             f"{BASE_URL}/api/survey360/auth/login",
             json={
-                "email": "demo@datapulse.io",
+                "email": "demo@survey360.io",
                 "password": "Test123!"
             },
             timeout=10
@@ -105,7 +105,7 @@ class TestSurvey360Auth:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         data = response.json()
         assert "email" in data
-        assert data["email"] == "demo@datapulse.io"
+        assert data["email"] == "demo@survey360.io"
         print(f"Got current user: {data['email']}")
 
 
