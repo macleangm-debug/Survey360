@@ -1,0 +1,264 @@
+# Survey360 Kubernetes Deployment with Auto-Scaling
+# For high-traffic scenarios with 500K+ concurrent submissions
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: survey360-api
+  labels:
+    app: survey360
+    component: api
+spec:
+  replicas: 3  # Start with 3 replicas, HPA will scale
+  selector:
+    matchLabels:
+      app: survey360
+      component: api
+  template:
+    metadata:
+      labels:
+        app: survey360
+        component: api
+    spec:
+      containers:
+      - name: survey360-api
+        image: survey360/api:latest
+        ports:
+        - containerPort: 8001
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        env:
+        - name: MONGO_URL
+          valueFrom:
+            secretKeyRef:
+              name: survey360-secrets
+              key: mongo-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: survey360-secrets
+              key: redis-url
+        - name: CELERY_BROKER_URL
+          valueFrom:
+            secretKeyRef:
+              name: survey360-secrets
+              key: celery-broker-url
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - survey360
+              topologyKey: kubernetes.io/hostname
+
+---
+# Horizontal Pod Autoscaler for API
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: survey360-api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: survey360-api
+  minReplicas: 3
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "1000"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 10
+        periodSeconds: 15
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+
+---
+# API Service with Load Balancing
+apiVersion: v1
+kind: Service
+metadata:
+  name: survey360-api-service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  type: LoadBalancer
+  selector:
+    app: survey360
+    component: api
+  ports:
+  - port: 80
+    targetPort: 8001
+    protocol: TCP
+  sessionAffinity: None
+
+---
+# Celery Worker Deployment with Auto-Scaling
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: survey360-celery-worker
+  labels:
+    app: survey360
+    component: celery-worker
+spec:
+  replicas: 5  # Start with 5, scale up to 50
+  selector:
+    matchLabels:
+      app: survey360
+      component: celery-worker
+  template:
+    metadata:
+      labels:
+        app: survey360
+        component: celery-worker
+    spec:
+      containers:
+      - name: celery-worker
+        image: survey360/api:latest
+        command: ["celery", "-A", "utils.celery_app", "worker", "--loglevel=info", "--concurrency=4"]
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "4000m"
+        env:
+        - name: MONGO_URL
+          valueFrom:
+            secretKeyRef:
+              name: survey360-secrets
+              key: mongo-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: survey360-secrets
+              key: redis-url
+        - name: CELERY_BROKER_URL
+          valueFrom:
+            secretKeyRef:
+              name: survey360-secrets
+              key: celery-broker-url
+
+---
+# Celery Worker HPA
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: survey360-celery-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: survey360-celery-worker
+  minReplicas: 5
+  maxReplicas: 50
+  metrics:
+  - type: External
+    external:
+      metric:
+        name: celery_queue_length
+      target:
+        type: AverageValue
+        averageValue: "100"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 15
+      policies:
+      - type: Pods
+        value: 10
+        periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300
+
+---
+# Celery Beat Scheduler (Single Instance)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: survey360-celery-beat
+  labels:
+    app: survey360
+    component: celery-beat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: survey360
+      component: celery-beat
+  template:
+    metadata:
+      labels:
+        app: survey360
+        component: celery-beat
+    spec:
+      containers:
+      - name: celery-beat
+        image: survey360/api:latest
+        command: ["celery", "-A", "utils.celery_app", "beat", "--loglevel=info"]
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+        - name: CELERY_BROKER_URL
+          valueFrom:
+            secretKeyRef:
+              name: survey360-secrets
+              key: celery-broker-url
