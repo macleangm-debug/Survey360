@@ -41,8 +41,15 @@ survey360Api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('survey360-auth');
-      window.location.href = '/solutions/survey360/login';
+      // Only redirect on 401 if it's not a public endpoint
+      // Don't redirect on public pages like pricing that may optionally fetch user data
+      const isPublicPage = window.location.pathname.includes('/pricing') || 
+                           window.location.pathname.includes('/demo') ||
+                           window.location.pathname.includes('/help');
+      if (!isPublicPage) {
+        localStorage.removeItem('survey360-auth');
+        window.location.href = '/solutions/survey360/login';
+      }
     }
     return Promise.reject(error);
   }
